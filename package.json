@@ -1,0 +1,16 @@
+{
+  "name": "jotanunes-frontend-82",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:external": "npm run dev --workspace=external",
+    "dev:internal": "npm run dev --workspace=internal",
+    "build:external": "npm run build --workspace=external",
+    "build:internal": "npm run build --workspace=internal",
+    "build": "npm run build --workspaces"
+  }
+}
