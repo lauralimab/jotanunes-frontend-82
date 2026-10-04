@@ -1,7 +1,21 @@
-import { useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import logoDefault from "@/imports/logo.png";
 import logoAlternate from "@/imports/logo-1.png";
-import { login } from "./services/authService";
+
+import {
+  getAuthenticatedUser,
+  login,
+  logout as logoutRequest,
+  refreshAuthSession,
+} from "./services/authService";
+
+import {
+  clearAuthSession,
+  getAuthSession,
+  saveAuthSession,
+} from "./services/authSession";
+
+import type { AuthToken } from "./types/auth";
 
 type Screen =
   | "login"
@@ -162,45 +176,49 @@ function PageWrapper({ children }: { children: React.ReactNode }) {
   return <div style={{ padding: 28, maxWidth: 1180 }}>{children}</div>;
 }
 
-function LoginScreen({ onLogin }: { onLogin: () => void }) {
+function LoginScreen({
+  onLogin,
+}: {
+  onLogin: (auth: AuthToken) => void;
+}) {
   const [forgot, setForgot] = useState(false);
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [loginError, setLoginError] = useState("");
-const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-async function handleLogin() {
-  setLoginError("");
+  async function handleLogin() {
+    setLoginError("");
 
-  if (!email.trim()) {
-    setLoginError("Informe o e-mail.");
-    return;
-  }
-
-  if (!pass.trim()) {
-    setLoginError("Informe a senha.");
-    return;
-  }
-
-  try {
-    setIsLoading(true);
-
-    await login({
-      email: email.trim(),
-      password: pass,
-    });
-
-    onLogin();
-  } catch (error) {
-    if (error instanceof Error) {
-      setLoginError(error.message);
-    } else {
-      setLoginError("Não foi possível realizar o login.");
+    if (!email.trim()) {
+      setLoginError("Informe o e-mail.");
+      return;
     }
-  } finally {
-    setIsLoading(false);
+
+    if (!pass.trim()) {
+      setLoginError("Informe a senha.");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+
+      const auth = await login({
+        email: email.trim(),
+        password: pass,
+      });
+
+      onLogin(auth);
+    } catch (error) {
+      if (error instanceof Error) {
+        setLoginError(error.message);
+      } else {
+        setLoginError("Não foi possível realizar o login.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   }
-}
 
   return (
     <div style={{ position: "fixed", inset: 0, width: "100%", background: "#f3f4f6", display: "flex", alignItems: "center", justifyContent: "center", overflowY: "auto" }}>
@@ -1074,32 +1092,198 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>("login");
   const [navOpen, setNavOpen] = useState(false);
 
-  const handleLogin = () => setScreen("supplier-dashboard");
-  const handleLogout = () => setScreen("login");
-  const handleNav = (s: Screen) => setScreen(s);
+  const [auth, setAuth] = useState<AuthToken | null>(null);
+  const [isCheckingSession, setIsCheckingSession] = useState(true);
 
-  if (screen === "login") return <LoginScreen onLogin={handleLogin} />;
+  useEffect(() => {
+    let cancelled = false;
+
+    async function restoreSession() {
+      const storedSession = getAuthSession();
+
+      if (!storedSession) {
+        if (!cancelled) {
+          setIsCheckingSession(false);
+        }
+
+        return;
+      }
+
+      try {
+        const user = await getAuthenticatedUser(
+          storedSession.accessToken,
+        );
+
+        if (cancelled) {
+          return;
+        }
+
+        const validatedSession: AuthToken = {
+          ...storedSession,
+          user,
+        };
+
+        saveAuthSession(validatedSession);
+        setAuth(validatedSession);
+        setScreen("supplier-dashboard");
+      } catch {
+        try {
+          const refreshedSession = await refreshAuthSession(
+            storedSession.refreshToken,
+          );
+
+          const user = await getAuthenticatedUser(
+            refreshedSession.accessToken,
+          );
+
+          if (cancelled) {
+            return;
+          }
+
+          const validatedSession: AuthToken = {
+            ...refreshedSession,
+            user,
+          };
+
+          saveAuthSession(validatedSession);
+          setAuth(validatedSession);
+          setScreen("supplier-dashboard");
+        } catch {
+          if (cancelled) {
+            return;
+          }
+
+          clearAuthSession();
+          setAuth(null);
+          setScreen("login");
+        }
+      } finally {
+        if (!cancelled) {
+          setIsCheckingSession(false);
+        }
+      }
+    }
+
+    void restoreSession();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  function handleLogin(authToken: AuthToken) {
+    saveAuthSession(authToken);
+    setAuth(authToken);
+    setScreen("supplier-dashboard");
+  }
+
+  async function handleLogout() {
+    const currentSession = auth;
+
+    clearAuthSession();
+    setAuth(null);
+    setScreen("login");
+
+    if (!currentSession) {
+      return;
+    }
+
+    try {
+      await logoutRequest(currentSession.accessToken);
+    } catch {
+      // A sessão local já foi encerrada.
+    }
+  }
+
+  const handleNav = (s: Screen) => {
+    setScreen(s);
+  };
+
+  if (isCheckingSession) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "#f3f4f6",
+          color: "#6b7280",
+          fontSize: 14,
+        }}
+      >
+        Verificando sessão...
+      </div>
+    );
+  }
+
+  if (!auth) {
+    return <LoginScreen onLogin={handleLogin} />;
+  }
 
   const renderScreen = () => {
     switch (screen) {
-      case "supplier-dashboard": return <SupplierDashboard onNav={handleNav} />;
-      case "company-data": return <CompanyData />;
-      case "employees": return <Employees onNav={handleNav} />;
-      case "documents": return <Documents onNav={handleNav} />;
-      case "send-document": return <SendDocument />;
-      case "pendencies": return <Pendencies onNav={handleNav} />;
-      case "supplier-profile": return <SupplierProfile />;
-      default: return null;
+      case "supplier-dashboard":
+        return <SupplierDashboard onNav={handleNav} />;
+
+      case "company-data":
+        return <CompanyData />;
+
+      case "employees":
+        return <Employees onNav={handleNav} />;
+
+      case "documents":
+        return <Documents onNav={handleNav} />;
+
+      case "send-document":
+        return <SendDocument />;
+
+      case "pendencies":
+        return <Pendencies onNav={handleNav} />;
+
+      case "supplier-profile":
+        return <SupplierProfile />;
+
+      default:
+        return <SupplierDashboard onNav={handleNav} />;
     }
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
-      <Sidebar screen={screen} onNav={handleNav} onLogout={handleLogout} open={navOpen} onClose={() => setNavOpen(false)} />
-      <div className="app-content" style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+    <div
+      style={{
+        display: "flex",
+        minHeight: "100vh",
+        background: "#f8fafc",
+      }}
+    >
+      <Sidebar
+        screen={screen}
+        onNav={handleNav}
+        onLogout={() => void handleLogout()}
+        open={navOpen}
+        onClose={() => setNavOpen(false)}
+      />
+
+      <div
+        className="app-content"
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          minHeight: "100vh",
+        }}
+      >
         <div className="mobile-topbar">
-          <button className="mobile-menu-btn" onClick={() => setNavOpen(true)}><Icon name="list" size={18} />Menu</button>
+          <button
+            className="mobile-menu-btn"
+            onClick={() => setNavOpen(true)}
+          >
+            <Icon name="list" size={18} />
+            Menu
+          </button>
         </div>
+
         {renderScreen()}
       </div>
     </div>
