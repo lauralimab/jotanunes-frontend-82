@@ -40,18 +40,55 @@ const MOCK_DOCUMENTS = [
   { id: 9, name: "Certidão Negativa Municipal", person: "Vigilância Suprema Eireli", type: "company", status: "pending" as DocStatus, validity: "20/10/2026", uploadedAt: "08/09/2026" },
 ];
 
-const MOCK_EMPLOYEES = [
-  { id: 1, name: "Carlos Souza", cpf: "123.456.789-00", role: "Auxiliar de Limpeza", status: "pending" as SupplierStatus, pendingDocs: 2 },
-  { id: 2, name: "Ana Lima", cpf: "987.654.321-00", role: "Supervisora", status: "apt" as SupplierStatus, pendingDocs: 0 },
-  { id: 3, name: "João Ferreira", cpf: "456.789.123-00", role: "Eletricista", status: "pending" as SupplierStatus, pendingDocs: 1 },
-  { id: 4, name: "Marcia Ramos", cpf: "321.654.987-00", role: "Pintura", status: "apt" as SupplierStatus, pendingDocs: 0 },
+type Employee = {
+  id: number;
+  name: string;
+  cpf: string;
+  role: string;
+  status: SupplierStatus;
+  pendingDocs: number;
+};
+
+const MOCK_EMPLOYEES: Employee[] = [
+  {
+    id: 1,
+    name: "Carlos Souza",
+    cpf: "123.456.789-00",
+    role: "Auxiliar de Limpeza",
+    status: "pending",
+    pendingDocs: 2,
+  },
+  {
+    id: 2,
+    name: "Ana Lima",
+    cpf: "987.654.321-00",
+    role: "Supervisora",
+    status: "apt",
+    pendingDocs: 0,
+  },
+  {
+    id: 3,
+    name: "João Ferreira",
+    cpf: "456.789.123-00",
+    role: "Eletricista",
+    status: "pending",
+    pendingDocs: 1,
+  },
+  {
+    id: 4,
+    name: "Marcia Ramos",
+    cpf: "321.654.987-00",
+    role: "Pintura",
+    status: "apt",
+    pendingDocs: 0,
+  },
 ];
 
 function StatusBadge({ status }: { status: DocStatus | SupplierStatus | string }) {
   const map: Record<string, { cls: string; label: string; dot?: string }> = {
     approved: { cls: "badge badge-success", label: "Aprovado", dot: "#16a34a" },
     apt: { cls: "badge badge-success", label: "Apto", dot: "#16a34a" },
-    pending: { cls: "badge badge-warning", label: "Aguardando Análise", dot: "#ca8a04" },
+    pending: { cls: "badge badge-warning", label: "Pendente", dot: "#ca8a04" },
     waiting: { cls: "badge badge-gray", label: "Aguardando Envio", dot: "#6b7280" },
     expired: { cls: "badge badge-danger", label: "Vencido", dot: "#dc2626" },
     rejected: { cls: "badge badge-danger", label: "Reprovado", dot: "#dc2626" },
@@ -125,36 +162,36 @@ function Sidebar({ screen, onNav, onLogout, open, onClose }: { screen: Screen; o
     <>
       {open && <div className="sidebar-backdrop" onClick={onClose} />}
       <aside className={`app-sidebar${open ? " open" : ""}`} style={{ width: 232, minHeight: "100vh", background: "#1a0a0c", display: "flex", flexDirection: "column", position: "fixed", left: 0, top: 0, bottom: 0, zIndex: 100, overflowY: "auto" }}>
-      <div style={{ padding: "18px 16px 16px", borderBottom: "1px solid #2d1216", flexShrink: 0 }}>
-        <BrandLogo alternate compact white />
-      </div>
-      <div style={{ padding: "10px 18px 6px", flexShrink: 0 }}>
-        <div style={{ fontSize: 10, color: "#6b3a42", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
-          Portal Fornecedor
+        <div style={{ padding: "18px 16px 16px", borderBottom: "1px solid #2d1216", flexShrink: 0 }}>
+          <BrandLogo alternate compact white />
         </div>
-      </div>
-      <nav style={{ flex: 1, padding: "0 10px", display: "flex", flexDirection: "column", gap: 2 }}>
-        {links.map((l) => (
-          <div key={l.id} className={`sidebar-link${screen === l.id ? " active" : ""}`} onClick={() => { onNav(l.id); onClose(); }}>
-            <span className="icon"><Icon name={l.icon} size={17} /></span>
-            {l.label}
-          </div>
-        ))}
-      </nav>
-      <div style={{ padding: "14px 14px 18px", borderTop: "1px solid #2d1216", flexShrink: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-          <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#c01a2b", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#fff", flexShrink: 0 }}>
-            FL
-          </div>
-          <div>
-            <div style={{ fontSize: 12.5, fontWeight: 600, color: "#e2e8f0" }}>Felipe Lima</div>
-            <div style={{ fontSize: 11, color: "#7a3a42" }}>Fornecedor</div>
+        <div style={{ padding: "10px 18px 6px", flexShrink: 0 }}>
+          <div style={{ fontSize: 10, color: "#6b3a42", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+            Portal Fornecedor
           </div>
         </div>
-        <button className="btn btn-ghost btn-sm" style={{ width: "100%", justifyContent: "center", color: "#7a3a42", borderColor: "#2d1216" }} onClick={onLogout}>
-          <Icon name="logout" size={14} />Sair
-        </button>
-      </div>
+        <nav style={{ flex: 1, padding: "0 10px", display: "flex", flexDirection: "column", gap: 2 }}>
+          {links.map((l) => (
+            <div key={l.id} className={`sidebar-link${screen === l.id ? " active" : ""}`} onClick={() => { onNav(l.id); onClose(); }}>
+              <span className="icon"><Icon name={l.icon} size={17} /></span>
+              {l.label}
+            </div>
+          ))}
+        </nav>
+        <div style={{ padding: "14px 14px 18px", borderTop: "1px solid #2d1216", flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+            <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#c01a2b", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#fff", flexShrink: 0 }}>
+              FL
+            </div>
+            <div>
+              <div style={{ fontSize: 12.5, fontWeight: 600, color: "#e2e8f0" }}>Felipe Lima</div>
+              <div style={{ fontSize: 11, color: "#7a3a42" }}>Fornecedor</div>
+            </div>
+          </div>
+          <button className="btn btn-ghost btn-sm" style={{ width: "100%", justifyContent: "center", color: "#7a3a42", borderColor: "#2d1216" }} onClick={onLogout}>
+            <Icon name="logout" size={14} />Sair
+          </button>
+        </div>
       </aside>
     </>
   );
@@ -250,21 +287,21 @@ function LoginScreen({
               <button className="btn btn-primary btn-lg" style={{ width: "100%", justifyContent: "center" }}>Enviar instruções</button>
             </>
           ) : (
-              <>
-                {loginError && (
-                  <div
-                    style={{
-                      padding: "10px 12px",
-                      borderRadius: 8,
-                      background: "#fef2f2",
-                      border: "1px solid #fecaca",
-                      color: "#b91c1c",
-                      fontSize: 12.5,
-                    }}
-                  >
-                    {loginError}
-                  </div>
-                )}
+            <>
+              {loginError && (
+                <div
+                  style={{
+                    padding: "10px 12px",
+                    borderRadius: 8,
+                    background: "#fef2f2",
+                    border: "1px solid #fecaca",
+                    color: "#b91c1c",
+                    fontSize: 12.5,
+                  }}
+                >
+                  {loginError}
+                </div>
+              )}
               <h2 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 24, fontWeight: 700, margin: "0 0 6px" }}>Entrar no sistema</h2>
               <p style={{ color: "#6b7280", fontSize: 13.5, margin: "0 0 28px" }}>Acesse com suas credenciais de fornecedor</p>
               <div style={{ display: "flex", flexDirection: "column", gap: 16, marginBottom: 8 }}>
@@ -279,27 +316,27 @@ function LoginScreen({
                 <div style={{ display: "flex", justifyContent: "flex-end" }}>
                   <button style={{ background: "none", border: "none", color: "#c01a2b", fontSize: 12.5, cursor: "pointer", fontWeight: 500 }} onClick={() => setForgot(true)}>Esqueci minha senha</button>
                 </div>
-                </div>
-                <div
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 10,
+                  marginTop: 16,
+                }}
+              >
+                <button
+                  className="btn btn-primary btn-lg"
                   style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 10,
-                    marginTop: 16,
+                    width: "100%",
+                    justifyContent: "center",
                   }}
+                  onClick={() => void handleLogin()}
+                  disabled={isLoading}
                 >
-                  <button
-                    className="btn btn-primary btn-lg"
-                    style={{
-                      width: "100%",
-                      justifyContent: "center",
-                    }}
-                    onClick={() => void handleLogin()}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Entrando..." : "Entrar como Fornecedor"}
-                  </button>
-                </div>
+                  {isLoading ? "Entrando..." : "Entrar como Fornecedor"}
+                </button>
+              </div>
               <p style={{ textAlign: "center", color: "#9ca3af", fontSize: 11, marginTop: 16 }}></p>
             </>
           )}
@@ -454,6 +491,25 @@ function CompanyData() {
 
 function Employees({ onNav }: { onNav: (s: Screen) => void }) {
   const [showModal, setShowModal] = useState(false);
+  const [employees] = useState<Employee[]>(MOCK_EMPLOYEES);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  const filteredEmployees = employees.filter((employee) => {
+    const searchTerm = search.trim().toLowerCase();
+
+    const matchesSearch =
+      !searchTerm ||
+      employee.name.toLowerCase().includes(searchTerm) ||
+      employee.cpf.toLowerCase().includes(searchTerm) ||
+      employee.role.toLowerCase().includes(searchTerm);
+
+    const matchesStatus =
+      statusFilter === "all" ||
+      employee.status === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
   return (
     <>
       <Header title="Funcionários" subtitle="RF03 — Cadastro de funcionários vinculados ao fornecedor"
@@ -463,10 +519,22 @@ function Employees({ onNav }: { onNav: (s: Screen) => void }) {
           <div style={{ padding: "16px 20px", borderBottom: "1px solid #f3f4f6", display: "flex", gap: 10 }}>
             <div style={{ position: "relative", flex: 1, maxWidth: 320 }}>
               <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "#9ca3af" }}><Icon name="search" size={15} /></span>
-              <input className="input-base" placeholder="Buscar funcionário..." style={{ paddingLeft: 32 }} />
+              <input
+                className="input-base"
+                placeholder="Buscar funcionário..."
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                style={{ paddingLeft: 32 }}
+              />
             </div>
-            <select className="select-base">
-              <option>Todos os status</option><option>Apto</option><option>Pendente</option>
+            <select
+              className="select-base"
+              value={statusFilter}
+              onChange={(event) => setStatusFilter(event.target.value)}
+            >
+              <option value="all">Todos os status</option>
+              <option value="apt">Apto</option>
+              <option value="pending">Pendente</option>
             </select>
           </div>
           <table className="table-base">
@@ -474,7 +542,7 @@ function Employees({ onNav }: { onNav: (s: Screen) => void }) {
               <tr><th>Funcionário</th><th>CPF</th><th>Função</th><th>Status</th><th>Docs Pendentes</th><th>Ações</th></tr>
             </thead>
             <tbody>
-              {MOCK_EMPLOYEES.map(e => (
+              {filteredEmployees.map(e => (
                 <tr key={e.id}>
                   <td>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
