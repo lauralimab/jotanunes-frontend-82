@@ -6,6 +6,7 @@ import Icon from "./shared/components/Icon";
 import StatusBadge from "./shared/components/StatusBadge";
 import Header from "./shared/components/Header";
 import PageWrapper from "./shared/components/PageWrapper";
+import InicioPage from "./pages/inicio/Inicio";
 
 import {
   getAuthenticatedUser,
@@ -70,134 +71,37 @@ function Sidebar({ screen, onNav, onLogout, open, onClose }: { screen: Screen; o
     <>
       {open && <div className="sidebar-backdrop" onClick={onClose} />}
       <aside className={`app-sidebar${open ? " open" : ""}`} style={{ width: 232, minHeight: "100vh", background: "#1a0a0c", display: "flex", flexDirection: "column", position: "fixed", left: 0, top: 0, bottom: 0, zIndex: 100, overflowY: "auto" }}>
-      <div style={{ padding: "18px 16px 16px", borderBottom: "1px solid #2d1216", flexShrink: 0 }}>
-        <BrandLogo alternate compact white />
-      </div>
-      <div style={{ padding: "10px 18px 6px", flexShrink: 0 }}>
-        <div style={{ fontSize: 10, color: "#6b3a42", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
-          Portal Fornecedor
+        <div style={{ padding: "18px 16px 16px", borderBottom: "1px solid #2d1216", flexShrink: 0 }}>
+          <BrandLogo alternate compact white />
         </div>
-      </div>
-      <nav style={{ flex: 1, padding: "0 10px", display: "flex", flexDirection: "column", gap: 2 }}>
-        {links.map((l) => (
-          <div key={l.id} className={`sidebar-link${screen === l.id ? " active" : ""}`} onClick={() => { onNav(l.id); onClose(); }}>
-            <span className="icon"><Icon name={l.icon} size={17} /></span>
-            {l.label}
-          </div>
-        ))}
-      </nav>
-      <div style={{ padding: "14px 14px 18px", borderTop: "1px solid #2d1216", flexShrink: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-          <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#c01a2b", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#fff", flexShrink: 0 }}>
-            FL
-          </div>
-          <div>
-            <div style={{ fontSize: 12.5, fontWeight: 600, color: "#e2e8f0" }}>Felipe Lima</div>
-            <div style={{ fontSize: 11, color: "#7a3a42" }}>Fornecedor</div>
+        <div style={{ padding: "10px 18px 6px", flexShrink: 0 }}>
+          <div style={{ fontSize: 10, color: "#6b3a42", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+            Portal Fornecedor
           </div>
         </div>
-        <button className="btn btn-ghost btn-sm" style={{ width: "100%", justifyContent: "center", color: "#7a3a42", borderColor: "#2d1216" }} onClick={onLogout}>
-          <Icon name="logout" size={14} />Sair
-        </button>
-      </div>
-      </aside>
-    </>
-  );
-}
-
-function SupplierDashboard({ onNav }: { onNav: (s: Screen) => void }) {
-  const stats = [
-    { label: "Aprovados", value: 8, color: "#16a34a", bg: "#dcfce7", icon: "check" },
-    { label: "Aguardando Análise", value: 3, color: "#ca8a04", bg: "#fef9c3", icon: "clock" },
-    { label: "Correção Solicitada", value: 1, color: "#d97706", bg: "#fff7ed", icon: "edit" },
-    { label: "Vencidos", value: 1, color: "#dc2626", bg: "#fee2e2", icon: "alert" },
-  ];
-
-  return (
-    <>
-      <Header title="Dashboard" subtitle="Visão geral da sua documentação — Serviços e Logística SA" />
-      <PageWrapper>
-        <div style={{ background: "#fff", border: "2px solid #fbbf24", borderRadius: 12, padding: "18px 24px", marginBottom: 24, display: "flex", alignItems: "center", gap: 16 }}>
-          <div style={{ width: 48, height: 48, borderRadius: "50%", background: "#fef9c3", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-            <Icon name="alert" size={24} color="#ca8a04" />
-          </div>
-          <div style={{ flex: 1 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-              <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, fontWeight: 700, color: "#0f172a" }}>Status Geral</span>
-              <StatusBadge status="pending" />
-            </div>
-            <p style={{ margin: 0, fontSize: 13, color: "#6b7280" }}>Documentos pendentes precisam ser regularizados. O status <strong>APTO</strong> exige 100% dos documentos obrigatórios aprovados (RF01 / Regra de Negócio).</p>
-          </div>
-          <div style={{ display: "flex", gap: 10 }}>
-            <button className="btn btn-primary" onClick={() => onNav("send-document")}><Icon name="upload" size={15} />Enviar Documento</button>
-            <button className="btn btn-secondary" onClick={() => onNav("pendencies")}><Icon name="alert" size={15} />Ver Pendências</button>
-          </div>
-        </div>
-
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16, marginBottom: 24 }}>
-          {stats.map(s => (
-            <div key={s.label} className="stat-card">
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                <div>
-                  <div className="label">{s.label}</div>
-                  <div className="value" style={{ color: s.color, marginTop: 8 }}>{s.value}</div>
-                </div>
-                <div style={{ width: 40, height: 40, borderRadius: 10, background: s.bg, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <Icon name={s.icon} size={20} color={s.color} />
-                </div>
-              </div>
+        <nav style={{ flex: 1, padding: "0 10px", display: "flex", flexDirection: "column", gap: 2 }}>
+          {links.map((l) => (
+            <div key={l.id} className={`sidebar-link${screen === l.id ? " active" : ""}`} onClick={() => { onNav(l.id); onClose(); }}>
+              <span className="icon"><Icon name={l.icon} size={17} /></span>
+              {l.label}
             </div>
           ))}
-        </div>
-
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 20 }}>
-          <div className="card">
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-              <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700 }}>Documentos Recentes</h3>
-              <button className="btn btn-ghost btn-sm" onClick={() => onNav("documents")}>Ver todos</button>
+        </nav>
+        <div style={{ padding: "14px 14px 18px", borderTop: "1px solid #2d1216", flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+            <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#c01a2b", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#fff", flexShrink: 0 }}>
+              FL
             </div>
-            {MOCK_DOCUMENTS.slice(0, 6).map(d => (
-              <div key={d.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #f3f4f6" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <div style={{ width: 32, height: 32, borderRadius: 8, background: "#f8fafc", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <Icon name="doc" size={16} color="#6b7280" />
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: "#0f172a" }}>{d.name}</div>
-                    <div style={{ fontSize: 11.5, color: "#9ca3af" }}>{d.person}</div>
-                  </div>
-                </div>
-                <StatusBadge status={d.status} />
-              </div>
-            ))}
-          </div>
-
-          <div className="card">
-            <h3 style={{ margin: "0 0 16px", fontSize: 14, fontWeight: 700 }}>Progresso Documental</h3>
-            {[{ label: "Documentos da Empresa", done: 6, total: 8, color: "#16a34a" }, { label: "Documentos dos Funcionários", done: 5, total: 8, color: "#d97706" }].map(p => (
-              <div key={p.label} style={{ marginBottom: 20 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                  <span style={{ fontSize: 13, color: "#374151" }}>{p.label}</span>
-                  <span style={{ fontSize: 13, fontWeight: 600 }}>{p.done} / {p.total}</span>
-                </div>
-                <div className="progress-bar-track">
-                  <div className="progress-bar-fill" style={{ width: `${p.done / p.total * 100}%`, background: p.color }} />
-                </div>
-              </div>
-            ))}
-            <div style={{ background: "#fef9c3", borderRadius: 8, padding: 14, border: "1px solid #fde68a" }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: "#92400e", marginBottom: 8 }}>Correção Solicitada</div>
-              <div style={{ fontSize: 12.5, color: "#78350f" }}>
-                <strong>Insalubridade / Periculosidade</strong> — João Ferreira<br />
-                <span style={{ color: "#92400e" }}>Motivo: Assinatura do médico responsável ausente.</span>
-              </div>
-              <button className="btn btn-warning btn-sm" style={{ marginTop: 10 }} onClick={() => onNav("send-document")}>
-                <Icon name="upload" size={13} />Corrigir agora
-              </button>
+            <div>
+              <div style={{ fontSize: 12.5, fontWeight: 600, color: "#e2e8f0" }}>Felipe Lima</div>
+              <div style={{ fontSize: 11, color: "#7a3a42" }}>Fornecedor</div>
             </div>
           </div>
+          <button className="btn btn-ghost btn-sm" style={{ width: "100%", justifyContent: "center", color: "#7a3a42", borderColor: "#2d1216" }} onClick={onLogout}>
+            <Icon name="logout" size={14} />Sair
+          </button>
         </div>
-      </PageWrapper>
+      </aside>
     </>
   );
 }
@@ -1013,27 +917,32 @@ export default function App() {
     );
   }
 
-if (!auth) {
-  if (screen === "forgot-password") {
+  if (!auth) {
+    if (screen === "forgot-password") {
+      return (
+        <EsqueciSenhaPage
+          onBack={() => setScreen("login")}
+        />
+      );
+    }
+
     return (
-      <EsqueciSenhaPage
-        onBack={() => setScreen("login")}
+      <LoginPage
+        onLogin={handleLogin}
+        onForgotPassword={() => setScreen("forgot-password")}
       />
     );
   }
 
-  return (
-    <LoginPage
-      onLogin={handleLogin}
-      onForgotPassword={() => setScreen("forgot-password")}
-    />
-  );
-}
-
   const renderScreen = () => {
     switch (screen) {
       case "supplier-dashboard":
-        return <SupplierDashboard onNav={handleNav} />;
+        return (
+          <InicioPage
+            onNav={handleNav}
+            documents={MOCK_DOCUMENTS}
+          />
+        );
 
       case "company-data":
         return <CompanyData />;
@@ -1054,7 +963,12 @@ if (!auth) {
         return <SupplierProfile />;
 
       default:
-        return <SupplierDashboard onNav={handleNav} />;
+        return (
+          <InicioPage
+            onNav={handleNav}
+            documents={MOCK_DOCUMENTS}
+          />
+        );
     }
   };
 
