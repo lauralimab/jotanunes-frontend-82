@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import BrandLogo from "./shared/components/BrandLogo";
 import LoginPage from "./pages/auth/Login";
+import EsqueciSenhaPage from "./pages/auth/EsqueciSenha";
 
 import {
   getAuthenticatedUser,
@@ -18,6 +19,7 @@ import type { AuthToken } from "./shared/types/auth";
 
 type Screen =
   | "login"
+  | "forgot-password"
   | "supplier-dashboard" | "company-data" | "employees" | "documents"
   | "send-document" | "pendencies" | "supplier-profile";
 
@@ -1078,7 +1080,20 @@ export default function App() {
   }
 
 if (!auth) {
-  return <LoginPage onLogin={handleLogin} />;
+  if (screen === "forgot-password") {
+    return (
+      <EsqueciSenhaPage
+        onBack={() => setScreen("login")}
+      />
+    );
+  }
+
+  return (
+    <LoginPage
+      onLogin={handleLogin}
+      onForgotPassword={() => setScreen("forgot-password")}
+    />
+  );
 }
 
   const renderScreen = () => {

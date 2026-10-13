@@ -6,10 +6,12 @@ import type { AuthToken } from "../../../shared/types/auth";
 
 type LoginPageProps = {
   onLogin: (auth: AuthToken) => void;
+  onForgotPassword: () => void;
 };
 
 export default function LoginPage({
   onLogin,
+  onForgotPassword,
 }: LoginPageProps) {
   const [forgot, setForgot] = useState(false);
   const [email, setEmail] = useState("");
@@ -333,7 +335,7 @@ export default function LoginPage({
                       cursor: "pointer",
                       fontWeight: 500,
                     }}
-                    onClick={() => setForgot(true)}
+                    onClick={onForgotPassword}
                   >
                     Esqueci minha senha
                   </button>
