@@ -7,15 +7,15 @@ import {
   login,
   logout as logoutRequest,
   refreshAuthSession,
-} from "./services/authService";
+} from "./shared/api/auth";
 
 import {
   clearAuthSession,
   getAuthSession,
   saveAuthSession,
-} from "./services/authSession";
+} from "./shared/auth/session";
 
-import type { AuthToken } from "./types/auth";
+import type { AuthToken } from "./shared/types/auth";
 
 type Screen =
   | "login"
