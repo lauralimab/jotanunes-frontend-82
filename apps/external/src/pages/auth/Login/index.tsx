@@ -13,7 +13,6 @@ export default function LoginPage({
   onLogin,
   onForgotPassword,
 }: LoginPageProps) {
-  const [forgot, setForgot] = useState(false);
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [loginError, setLoginError] = useState("");
@@ -168,69 +167,6 @@ export default function LoginPage({
             justifyContent: "center",
           }}
         >
-          {forgot ? (
-            <>
-              <button
-                className="btn btn-ghost btn-sm"
-                style={{ alignSelf: "flex-start", marginBottom: 20 }}
-                onClick={() => setForgot(false)}
-              >
-                ← Voltar
-              </button>
-
-              <h2
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: 22,
-                  fontWeight: 700,
-                  margin: "0 0 6px",
-                }}
-              >
-                Recuperar senha
-              </h2>
-
-              <p
-                style={{
-                  color: "#6b7280",
-                  fontSize: 13.5,
-                  margin: "0 0 24px",
-                }}
-              >
-                Informe seu e-mail para receber as instruções.
-              </p>
-
-              <label
-                style={{
-                  fontSize: 12.5,
-                  fontWeight: 600,
-                  color: "#374151",
-                  display: "block",
-                  marginBottom: 6,
-                }}
-              >
-                E-mail
-              </label>
-
-              <input
-                className="input-base"
-                type="email"
-                placeholder="seu@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                style={{ marginBottom: 16 }}
-              />
-
-              <button
-                className="btn btn-primary btn-lg"
-                style={{
-                  width: "100%",
-                  justifyContent: "center",
-                }}
-              >
-                Enviar instruções
-              </button>
-            </>
-          ) : (
             <>
               {loginError && (
                 <div
@@ -363,7 +299,6 @@ export default function LoginPage({
                 </button>
               </div>
             </>
-          )}
         </div>
       </div>
     </div>
