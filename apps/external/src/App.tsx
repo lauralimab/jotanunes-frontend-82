@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import logoDefault from "@/imports/logo.png";
-import logoAlternate from "@/imports/logo-1.png";
+import BrandLogo from "./shared/components/BrandLogo";
 
 import {
   getAuthenticatedUser,
@@ -100,13 +99,6 @@ function Icon({ name, size = 18, color }: { name: string; size?: number; color?:
   return icons[name] ?? <svg viewBox="0 0 24 24" style={s}><circle cx="12" cy="12" r="10" /></svg>;
 }
 
-function BrandLogo({ alternate = false, compact = false, white = false }: { alternate?: boolean; compact?: boolean; white?: boolean }) {
-  return (
-    <div className={`brand-logo${compact ? " brand-logo-compact" : ""}${white ? " brand-logo-white" : ""}`}>
-      <img src={alternate ? logoAlternate : logoDefault} alt="Jotanunes Construtora" />
-    </div>
-  );
-}
 
 // ─── Layout ───────────────────────────────────────────────────────────────────
 
