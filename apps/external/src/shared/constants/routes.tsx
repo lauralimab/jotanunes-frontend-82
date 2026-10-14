@@ -6,8 +6,11 @@ export const ROUTES = {
 
   home: "/",
 
+  companyData: "/dados-empresa",
+
   documents: "/documentos",
   sendDocument: "/documentos/enviar",
+  pendencies: "/pendencias",
 
   workers: "/trabalhadores",
 
