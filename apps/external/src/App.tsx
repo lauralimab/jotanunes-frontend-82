@@ -8,6 +8,7 @@ import StatusBadge from "./shared/components/StatusBadge";
 import Header from "./shared/components/Header";
 import PageWrapper from "./shared/components/PageWrapper";
 import InicioPage from "./pages/inicio/Inicio";
+import DocumentosPage from "./pages/documentos/Documentos";
 
 
 import {
@@ -169,86 +170,13 @@ function Employees({ onNav }: { onNav: (s: Screen) => void }) {
   );
 }
 
-// ─── DOCUMENTS ────────────────────────────────────────────────────────────────
-
-function Documents({ onNav }: { onNav: (s: Screen) => void }) {
-  const [filter, setFilter] = useState("all");
-  const [type, setType] = useState("all");
-  const filtered = MOCK_DOCUMENTS.filter(d => {
-    if (filter !== "all" && d.status !== filter) return false;
-    if (type !== "all" && d.type !== type) return false;
-    return true;
-  });
-  return (
-    <>
-      <Header title="Documentos" subtitle="RF04/RF05/RF06 — Consulta de situação das documentações"
-        actions={<button className="btn btn-primary" onClick={() => onNav("send-document")}><Icon name="upload" size={15} />Enviar Documento</button>} />
-      <PageWrapper>
-        {/* Status flow legend */}
-        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 20, padding: "10px 16px", background: "#f8fafc", borderRadius: 8, border: "1px solid #e5e7eb", flexWrap: "wrap" }}>
-          <span style={{ fontSize: 11.5, color: "#6b7280", fontWeight: 600 }}>Fluxo de status (RF06):</span>
-          {[["Aguardando Envio", "#6b7280"], ["→", "#9ca3af"], ["Aguardando Análise", "#ca8a04"], ["→", "#9ca3af"], ["Aprovado", "#16a34a"], ["/", "#9ca3af"], ["Reprovado", "#dc2626"], ["/", "#9ca3af"], ["Correção Solicitada", "#d97706"], ["→", "#9ca3af"], ["Vencido", "#dc2626"]].map(([l, c], i) => (
-            <span key={i} style={{ fontSize: 11.5, color: c, fontWeight: l === "→" || l === "/" ? 400 : 600 }}>{l}</span>
-          ))}
-        </div>
-        <div className="card" style={{ padding: 0, overflow: "hidden" }}>
-          <div style={{ padding: "16px 20px", borderBottom: "1px solid #f3f4f6", display: "flex", gap: 10, flexWrap: "wrap" }}>
-            <div style={{ position: "relative", flex: 1, minWidth: 220 }}>
-              <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "#9ca3af" }}><Icon name="search" size={15} /></span>
-              <input className="input-base" placeholder="Buscar documento..." style={{ paddingLeft: 32 }} />
-            </div>
-            <select className="select-base" value={filter} onChange={e => setFilter(e.target.value)}>
-              <option value="all">Todos os status</option>
-              <option value="approved">Aprovado</option>
-              <option value="pending">Aguardando Análise</option>
-              <option value="waiting">Aguardando Envio</option>
-              <option value="correction">Correção Solicitada</option>
-              <option value="expired">Vencido</option>
-              <option value="rejected">Reprovado</option>
-            </select>
-            <select className="select-base" value={type} onChange={e => setType(e.target.value)}>
-              <option value="all">Todos os tipos</option>
-              <option value="company">Empresa</option>
-              <option value="employee">Funcionário</option>
-            </select>
-          </div>
-          <table className="table-base">
-            <thead>
-              <tr><th>Documento</th><th>Referente a</th><th>Tipo</th><th>Status</th><th>Validade</th><th>Enviado em</th><th>Ações</th></tr>
-            </thead>
-            <tbody>
-              {filtered.map(d => (
-                <tr key={d.id}>
-                  <td><div style={{ display: "flex", alignItems: "center", gap: 8 }}><Icon name="doc" size={16} color="#6b7280" /><span style={{ fontWeight: 600, color: "#0f172a" }}>{d.name}</span></div></td>
-                  <td style={{ color: "#374151" }}>{d.person}</td>
-                  <td><span className="badge badge-blue">{d.type === "company" ? "Empresa" : "Funcionário"}</span></td>
-                  <td><StatusBadge status={d.status} /></td>
-                  <td style={{ color: d.status === "expired" ? "#dc2626" : "#374151", fontWeight: d.status === "expired" ? 600 : 400 }}>{d.validity}</td>
-                  <td style={{ color: "#6b7280" }}>{d.uploadedAt}</td>
-                  <td>
-                    <div style={{ display: "flex", gap: 6 }}>
-                      <button className="btn btn-ghost btn-sm"><Icon name="eye" size={13} /></button>
-                      {(d.status === "rejected" || d.status === "expired" || d.status === "correction") && (
-                        <button className="btn btn-warning btn-sm" onClick={() => onNav("send-document")}>Corrigir</button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <div style={{ padding: "14px 20px", borderTop: "1px solid #f3f4f6" }}>
-            <span style={{ fontSize: 12.5, color: "#6b7280" }}>{filtered.length} documento(s) — RNF05: apenas PDF, JPG, PNG aceitos (máx. 10 MB)</span>
-          </div>
-        </div>
-      </PageWrapper>
-    </>
-  );
-}
-
 // ─── SEND DOCUMENT ────────────────────────────────────────────────────────────
 
-function SendDocument() {
+function SendDocument({
+  onNav,
+}: {
+  onNav: (screen: Screen) => void;
+}) {
   const [file, setFile] = useState<{ name: string; size: string } | null>(null);
   const [dragging, setDragging] = useState(false);
   const [sent, setSent] = useState(false);
@@ -334,7 +262,12 @@ function SendDocument() {
                 </div>
               )}
               <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20, gap: 10 }}>
-                <button className="btn btn-secondary">Cancelar</button>
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => onNav("documents")}
+                >
+                  Cancelar
+                </button>
                 <button className="btn btn-primary" onClick={() => file && setSent(true)} style={{ opacity: file ? 1 : 0.5 }}><Icon name="upload" size={15} />Enviar Documento</button>
               </div>
             </div>
@@ -894,10 +827,15 @@ export default function App() {
         return <Employees onNav={handleNav} />;
 
       case "documents":
-        return <Documents onNav={handleNav} />;
+        return (
+          <DocumentosPage
+            documents={MOCK_DOCUMENTS}
+            onNav={handleNav}
+          />
+        );
 
       case "send-document":
-        return <SendDocument />;
+        return <SendDocument onNav={handleNav} />;
 
       case "pendencies":
         return <Pendencies onNav={handleNav} />;
