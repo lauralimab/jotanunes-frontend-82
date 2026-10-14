@@ -3,8 +3,6 @@ import PortalLayout from "./app/layouts/PortalLayout";
 import type { Screen } from "./shared/types/navigation";
 import LoginPage from "./pages/auth/Login";
 import EsqueciSenhaPage from "./pages/auth/EsqueciSenha";
-import Icon from "./shared/components/Icon";
-import StatusBadge from "./shared/components/StatusBadge";
 import Header from "./shared/components/Header";
 import PageWrapper from "./shared/components/PageWrapper";
 import InicioPage from "./pages/inicio/Inicio";
@@ -12,6 +10,7 @@ import DocumentosPage from "./pages/documentos/Documentos";
 import EnviarDocumentoPage from "./pages/documentos/EnviarDocumento";
 import TrabalhadoresPage from "./pages/trabalhadores/Trabalhadores";
 import MinhaContaPage from "./pages/conta/MinhaConta";
+import PendenciasPage from "./pages/documentos/Pendencias";
 
 import {
   getAuthenticatedUser,
@@ -90,51 +89,6 @@ function CompanyData() {
             <button className="btn btn-secondary">Cancelar</button>
             <button className="btn btn-primary" onClick={() => setSaved(true)}>Salvar Alterações</button>
           </div>
-        </div>
-      </PageWrapper>
-    </>
-  );
-}
-
-// ─── PENDENCIES ───────────────────────────────────────────────────────────────
-
-function Pendencies({ onNav }: { onNav: (s: Screen) => void }) {
-  const items = MOCK_DOCUMENTS.filter(d => ["rejected", "expired", "correction"].includes(d.status));
-  const reasons: Record<number, string> = {
-    5: "ASO com data de emissão ilegível. Reenvie o documento original com boa resolução.",
-    7: "Certidão estadual com CNPJ divergente do cadastro.",
-    8: "Laudo de insalubridade com assinatura do médico responsável ausente.",
-  };
-  return (
-    <>
-      <Header title="Pendências" subtitle="RF06/RF09 — Documentos que necessitam de correção ou reenvio" />
-      <PageWrapper>
-        <div style={{ marginBottom: 16, padding: "12px 16px", background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 8, display: "flex", gap: 10, alignItems: "center" }}>
-          <Icon name="alert" size={18} color="#d97706" />
-          <span style={{ fontSize: 13, color: "#92400e" }}><strong>{items.length} documentos</strong> com pendência. O status <strong>APTO</strong> exige 100% aprovados (Regra de Negócio).</span>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {items.map(d => (
-            <div key={d.id} className="card" style={{ display: "flex", alignItems: "flex-start", gap: 16, borderLeft: `3px solid ${d.status === "correction" ? "#d97706" : "#dc2626"}` }}>
-              <div style={{ width: 40, height: 40, borderRadius: 10, background: d.status === "correction" ? "#fff7ed" : "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <Icon name="doc" size={20} color={d.status === "correction" ? "#d97706" : "#dc2626"} />
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-                  <span style={{ fontWeight: 700, fontSize: 14 }}>{d.name}</span>
-                  <StatusBadge status={d.status} />
-                </div>
-                <p style={{ margin: "0 0 4px", fontSize: 13, color: "#6b7280" }}>{d.person} • Validade: {d.validity}</p>
-                {reasons[d.id] && (
-                  <div style={{ background: d.status === "correction" ? "#fff7ed" : "#fef2f2", borderRadius: 6, padding: "8px 12px", marginTop: 8, border: `1px solid ${d.status === "correction" ? "#fed7aa" : "#fecaca"}` }}>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: d.status === "correction" ? "#92400e" : "#b91c1c" }}>Motivo da correção: </span>
-                    <span style={{ fontSize: 12, color: "#374151" }}>{reasons[d.id]}</span>
-                  </div>
-                )}
-              </div>
-              <button className="btn btn-primary btn-sm" onClick={() => onNav("send-document")}><Icon name="upload" size={13} />Corrigir Documento</button>
-            </div>
-          ))}
         </div>
       </PageWrapper>
     </>
@@ -324,7 +278,12 @@ export default function App() {
         );
 
       case "pendencies":
-        return <Pendencies onNav={handleNav} />;
+        return (
+          <PendenciasPage
+            documents={MOCK_DOCUMENTS}
+            onNav={handleNav}
+          />
+        );
 
       case "supplier-profile":
         return <MinhaContaPage />;
