@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import Sidebar from "./app/layouts/Sidebar";
+import PortalLayout from "./app/layouts/PortalLayout";
 import type { Screen } from "./shared/types/navigation";
 import LoginPage from "./pages/auth/Login";
 import EsqueciSenhaPage from "./pages/auth/EsqueciSenha";
@@ -916,42 +916,16 @@ export default function App() {
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        minHeight: "100vh",
-        background: "#f8fafc",
-      }}
+    <PortalLayout
+      screen={screen}
+      onNav={handleNav}
+      onLogout={() => void handleLogout()}
+      navOpen={navOpen}
+      onOpenNav={() => setNavOpen(true)}
+      onCloseNav={() => setNavOpen(false)}
     >
-      <Sidebar
-        screen={screen}
-        onNav={handleNav}
-        onLogout={() => void handleLogout()}
-        open={navOpen}
-        onClose={() => setNavOpen(false)}
-      />
-
-      <div
-        className="app-content"
-        style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          minHeight: "100vh",
-        }}
-      >
-        <div className="mobile-topbar">
-          <button
-            className="mobile-menu-btn"
-            onClick={() => setNavOpen(true)}
-          >
-            <Icon name="list" size={18} />
-            Menu
-          </button>
-        </div>
-
-        {renderScreen()}
-      </div>
-    </div>
+      {renderScreen()}
+    </PortalLayout>
   );
+
 }
