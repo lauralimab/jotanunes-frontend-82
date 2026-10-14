@@ -1,13 +1,10 @@
 import type { ReactNode } from "react";
 
 import Icon from "../../shared/components/Icon";
-import type { Screen } from "../../shared/types/navigation";
 
 import Sidebar from "./Sidebar";
 
 type PortalLayoutProps = {
-  screen: Screen;
-  onNav: (screen: Screen) => void;
   onLogout: () => void;
   navOpen: boolean;
   onOpenNav: () => void;
@@ -16,8 +13,6 @@ type PortalLayoutProps = {
 };
 
 export default function PortalLayout({
-  screen,
-  onNav,
   onLogout,
   navOpen,
   onOpenNav,
@@ -33,8 +28,6 @@ export default function PortalLayout({
       }}
     >
       <Sidebar
-        screen={screen}
-        onNav={onNav}
         onLogout={onLogout}
         open={navOpen}
         onClose={onCloseNav}

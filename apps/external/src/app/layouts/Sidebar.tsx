@@ -1,64 +1,68 @@
+import {
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+
 import BrandLogo from "../../shared/components/BrandLogo";
 import Icon from "../../shared/components/Icon";
-
-import type { Screen } from "../../shared/types/navigation";
+import { ROUTES } from "../../shared/constants/routes";
 
 type SidebarProps = {
-  screen: Screen;
-  onNav: (screen: Screen) => void;
   onLogout: () => void;
   open: boolean;
   onClose: () => void;
 };
 
 export default function Sidebar({
-  screen,
-  onNav,
   onLogout,
   open,
   onClose,
 }: SidebarProps) {
-  const links: {
-    id: Screen;
-    label: string;
-    icon: string;
-  }[] = [
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const links = [
     {
-      id: "supplier-dashboard",
+      path: ROUTES.home,
       label: "Dashboard",
       icon: "home",
     },
     {
-      id: "company-data",
+      path: ROUTES.companyData,
       label: "Dados da Empresa",
       icon: "building",
     },
     {
-      id: "employees",
+      path: ROUTES.workers,
       label: "Funcionários",
       icon: "users",
     },
     {
-      id: "documents",
+      path: ROUTES.documents,
       label: "Documentos",
       icon: "doc",
     },
     {
-      id: "send-document",
+      path: ROUTES.sendDocument,
       label: "Enviar Documento",
       icon: "upload",
     },
     {
-      id: "pendencies",
+      path: ROUTES.pendencies,
       label: "Pendências",
       icon: "alert",
     },
     {
-      id: "supplier-profile",
+      path: ROUTES.account,
       label: "Meu Perfil",
       icon: "shield",
     },
   ];
+
+  function handleNavigate(path: string) {
+    navigate(path);
+    onClose();
+  }
 
   return (
     <>
@@ -129,14 +133,15 @@ export default function Sidebar({
         >
           {links.map((link) => (
             <div
-              key={link.id}
+              key={link.path}
               className={`sidebar-link${
-                screen === link.id ? " active" : ""
+                location.pathname === link.path
+                  ? " active"
+                  : ""
               }`}
-              onClick={() => {
-                onNav(link.id);
-                onClose();
-              }}
+              onClick={() =>
+                handleNavigate(link.path)
+              }
             >
               <span className="icon">
                 <Icon

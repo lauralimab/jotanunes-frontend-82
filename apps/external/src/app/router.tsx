@@ -8,7 +8,6 @@ import {
   Outlet,
   Route,
   Routes,
-  useLocation,
   useNavigate,
 } from "react-router-dom";
 
@@ -33,7 +32,6 @@ import NaoEncontradoPage from "../pages/erros/NaoEncontrado";
 import { ROUTES } from "../shared/constants/routes";
 
 import type { AuthToken } from "../shared/types/auth";
-import type { Screen } from "../shared/types/navigation";
 
 type Documents =
   ComponentProps<typeof DocumentosPage>["documents"];
@@ -42,6 +40,15 @@ type Workers =
   ComponentProps<
     typeof TrabalhadoresPage
   >["trabalhadores"];
+
+const PAGE_ROUTES = {
+  documents: ROUTES.documents,
+  "send-document": ROUTES.sendDocument,
+  pendencies: ROUTES.pendencies,
+} as const;
+
+type PageDestination =
+  keyof typeof PAGE_ROUTES;
 
 type AppRouterProps = {
   auth: AuthToken | null;
@@ -57,72 +64,6 @@ type AppRouterProps = {
   workers: Workers;
 };
 
-const SCREEN_ROUTES: Partial<
-  Record<Screen, string>
-> = {
-  "supplier-dashboard": ROUTES.home,
-
-  "company-data": ROUTES.companyData,
-
-  employees: ROUTES.workers,
-
-  documents: ROUTES.documents,
-
-  "send-document":
-    ROUTES.sendDocument,
-
-  pendencies: ROUTES.pendencies,
-
-  "supplier-profile": ROUTES.account,
-
-  login: ROUTES.login,
-
-  "forgot-password":
-    ROUTES.forgotPassword,
-};
-
-function getScreenFromPath(
-  pathname: string,
-): Screen {
-  if (
-    pathname === ROUTES.sendDocument
-  ) {
-    return "send-document";
-  }
-
-  if (
-    pathname === ROUTES.documents
-  ) {
-    return "documents";
-  }
-
-  if (
-    pathname === ROUTES.workers
-  ) {
-    return "employees";
-  }
-
-  if (
-    pathname === ROUTES.companyData
-  ) {
-    return "company-data";
-  }
-
-  if (
-    pathname === ROUTES.pendencies
-  ) {
-    return "pendencies";
-  }
-
-  if (
-    pathname === ROUTES.account
-  ) {
-    return "supplier-profile";
-  }
-
-  return "supplier-dashboard";
-}
-
 type PortalRouteLayoutProps = {
   auth: AuthToken | null;
 
@@ -135,10 +76,6 @@ function PortalRouteLayout({
   auth,
   onLogout,
 }: PortalRouteLayoutProps) {
-  const navigate = useNavigate();
-
-  const location = useLocation();
-
   const [navOpen, setNavOpen] =
     useState(false);
 
@@ -151,27 +88,8 @@ function PortalRouteLayout({
     );
   }
 
-  const screen = getScreenFromPath(
-    location.pathname,
-  );
-
-  function handleNav(
-    targetScreen: Screen,
-  ) {
-    const route =
-      SCREEN_ROUTES[targetScreen];
-
-    if (!route) {
-      return;
-    }
-
-    navigate(route);
-  }
-
   return (
     <PortalLayout
-      screen={screen}
-      onNav={handleNav}
       onLogout={() =>
         void onLogout()
       }
@@ -197,21 +115,17 @@ export default function AppRouter({
 }: AppRouterProps) {
   const navigate = useNavigate();
 
-  function navigateByScreen(
-    screen: Screen,
+  function navigateByDestination(
+    destination: PageDestination,
   ) {
-    const route =
-      SCREEN_ROUTES[screen];
-
-    if (!route) {
-      return;
-    }
-
-    navigate(route);
+    navigate(
+      PAGE_ROUTES[destination],
+    );
   }
 
   return (
     <Routes>
+      {/* LOGIN */}
       <Route
         path={ROUTES.login}
         element={
@@ -233,6 +147,7 @@ export default function AppRouter({
         }
       />
 
+      {/* ESQUECI MINHA SENHA */}
       <Route
         path={ROUTES.forgotPassword}
         element={
@@ -251,6 +166,7 @@ export default function AppRouter({
         }
       />
 
+      {/* ÁREA AUTENTICADA */}
       <Route
         element={
           <PortalRouteLayout
@@ -259,16 +175,20 @@ export default function AppRouter({
           />
         }
       >
+        {/* DASHBOARD */}
         <Route
           path={ROUTES.home}
           element={
             <InicioPage
               documents={documents}
-              onNav={navigateByScreen}
+              onNav={
+                navigateByDestination
+              }
             />
           }
         />
 
+        {/* DADOS DA EMPRESA */}
         <Route
           path={ROUTES.companyData}
           element={
@@ -276,16 +196,20 @@ export default function AppRouter({
           }
         />
 
+        {/* DOCUMENTOS */}
         <Route
           path={ROUTES.documents}
           element={
             <DocumentosPage
               documents={documents}
-              onNav={navigateByScreen}
+              onNav={
+                navigateByDestination
+              }
             />
           }
         />
 
+        {/* ENVIAR DOCUMENTO */}
         <Route
           path={ROUTES.sendDocument}
           element={
@@ -299,28 +223,33 @@ export default function AppRouter({
           }
         />
 
+        {/* PENDÊNCIAS */}
         <Route
           path={ROUTES.pendencies}
           element={
             <PendenciasPage
               documents={documents}
-              onNav={navigateByScreen}
+              onNav={
+                navigateByDestination
+              }
             />
           }
         />
 
+        {/* TRABALHADORES */}
         <Route
           path={ROUTES.workers}
           element={
             <TrabalhadoresPage
               trabalhadores={workers}
               onNav={
-                navigateByScreen
+                navigateByDestination
               }
             />
           }
         />
 
+        {/* MINHA CONTA */}
         <Route
           path={ROUTES.account}
           element={
@@ -329,6 +258,7 @@ export default function AppRouter({
         />
       </Route>
 
+      {/* 404 */}
       <Route
         path="*"
         element={
