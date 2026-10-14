@@ -10,7 +10,7 @@ import PageWrapper from "./shared/components/PageWrapper";
 import InicioPage from "./pages/inicio/Inicio";
 import DocumentosPage from "./pages/documentos/Documentos";
 import EnviarDocumentoPage from "./pages/documentos/EnviarDocumento";
-
+import TrabalhadoresPage from "./pages/trabalhadores/Trabalhadores";
 
 import {
   getAuthenticatedUser,
@@ -91,82 +91,6 @@ function CompanyData() {
           </div>
         </div>
       </PageWrapper>
-    </>
-  );
-}
-
-// ─── EMPLOYEES ────────────────────────────────────────────────────────────────
-
-function Employees({ onNav }: { onNav: (s: Screen) => void }) {
-  const [showModal, setShowModal] = useState(false);
-  return (
-    <>
-      <Header title="Funcionários" subtitle="RF03 — Cadastro de funcionários vinculados ao fornecedor"
-        actions={<button className="btn btn-primary" onClick={() => setShowModal(true)}><Icon name="plus" size={15} />Adicionar Funcionário</button>} />
-      <PageWrapper>
-        <div className="card" style={{ padding: 0, overflow: "hidden" }}>
-          <div style={{ padding: "16px 20px", borderBottom: "1px solid #f3f4f6", display: "flex", gap: 10 }}>
-            <div style={{ position: "relative", flex: 1, maxWidth: 320 }}>
-              <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "#9ca3af" }}><Icon name="search" size={15} /></span>
-              <input className="input-base" placeholder="Buscar funcionário..." style={{ paddingLeft: 32 }} />
-            </div>
-            <select className="select-base">
-              <option>Todos os status</option><option>Apto</option><option>Pendente</option>
-            </select>
-          </div>
-          <table className="table-base">
-            <thead>
-              <tr><th>Funcionário</th><th>CPF</th><th>Função</th><th>Status</th><th>Docs Pendentes</th><th>Ações</th></tr>
-            </thead>
-            <tbody>
-              {MOCK_EMPLOYEES.map(e => (
-                <tr key={e.id}>
-                  <td>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#fde8ea", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#c01a2b" }}>
-                        {e.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
-                      </div>
-                      <span style={{ fontWeight: 600 }}>{e.name}</span>
-                    </div>
-                  </td>
-                  <td style={{ color: "#6b7280", fontFamily: "monospace", fontSize: 13 }}>{e.cpf}</td>
-                  <td>{e.role}</td>
-                  <td><StatusBadge status={e.status} /></td>
-                  <td>{e.pendingDocs > 0 ? <span style={{ fontWeight: 700, color: "#dc2626" }}>{e.pendingDocs}</span> : <span style={{ color: "#6b7280" }}>0</span>}</td>
-                  <td>
-                    <div style={{ display: "flex", gap: 6 }}>
-                      <button className="btn btn-ghost btn-sm" onClick={() => onNav("documents")}><Icon name="doc" size={13} />Docs</button>
-                      <button className="btn btn-ghost btn-sm"><Icon name="edit" size={13} /></button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </PageWrapper>
-      {showModal && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal-box" onClick={e => e.stopPropagation()}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-              <h3 style={{ margin: 0, fontFamily: "'DM Sans', sans-serif", fontSize: 18, fontWeight: 700 }}>Adicionar Funcionário</h3>
-              <button className="btn btn-ghost btn-sm" onClick={() => setShowModal(false)}><Icon name="x" size={16} /></button>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              {[["Nome Completo *", ""], ["CPF *", "000.000.000-00"], ["RG", ""], ["Data de Nascimento", "date"], ["Função / Cargo *", "Ex: Auxiliar de Limpeza"], ["E-mail", "joao@empresa.com"], ["Telefone", "(00) 00000-0000"]].map(([l, ph]) => (
-                <div key={l}>
-                  <label style={{ fontSize: 12.5, fontWeight: 600, color: "#374151", display: "block", marginBottom: 5 }}>{l}</label>
-                  <input className="input-base" placeholder={ph === "date" ? "" : ph} type={ph === "date" ? "date" : "text"} />
-                </div>
-              ))}
-            </div>
-            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 22 }}>
-              <button className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancelar</button>
-              <button className="btn btn-primary" onClick={() => setShowModal(false)}>Adicionar</button>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 }
@@ -717,7 +641,12 @@ export default function App() {
         return <CompanyData />;
 
       case "employees":
-        return <Employees onNav={handleNav} />;
+        return (
+          <TrabalhadoresPage
+            trabalhadores={MOCK_EMPLOYEES}
+            onNav={handleNav}
+          />
+        );
 
       case "documents":
         return (
@@ -728,11 +657,11 @@ export default function App() {
         );
 
       case "send-document":
-  return (
-    <EnviarDocumentoPage
-      onCancel={() => handleNav("documents")}
-    />
-  );
+        return (
+          <EnviarDocumentoPage
+            onCancel={() => handleNav("documents")}
+          />
+        );
 
       case "pendencies":
         return <Pendencies onNav={handleNav} />;
