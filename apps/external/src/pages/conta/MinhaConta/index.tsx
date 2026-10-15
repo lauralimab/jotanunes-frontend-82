@@ -16,6 +16,10 @@ import ProfileTabs, {
 
 import ChangePasswordModal from "./components/ChangePasswordModal";
 
+import DadosCadastraisTab, {
+  type AccountForm,
+} from "./components/DadosCadastraisTab";
+
 export default function MinhaContaPage() {
 
   const [editMode, setEditMode] = useState(false);
@@ -39,7 +43,7 @@ export default function MinhaContaPage() {
 
   const [saved, setSaved] = useState(false);
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<AccountForm>({
 
     razao: "Serviços e Logística SA",
 
@@ -106,21 +110,13 @@ export default function MinhaContaPage() {
   });
 
   function handleField(
-
-    field: keyof typeof form,
-
+    field: keyof AccountForm,
     value: string,
-
   ) {
-
     setForm((current) => ({
-
       ...current,
-
       [field]: value,
-
     }));
-
   }
 
   function handleSave() {
@@ -180,112 +176,6 @@ export default function MinhaContaPage() {
     },
 
   ];
-
-  const Field = ({
-
-    label,
-
-    field,
-
-    type = "text",
-
-  }: {
-
-    label: string;
-
-    field: keyof typeof form;
-
-    type?: string;
-
-  }) => (
-
-    <div>
-
-      <label
-
-        style={{
-
-          fontSize: 11.5,
-
-          fontWeight: 600,
-
-          color: "#6b7280",
-
-          display: "block",
-
-          marginBottom: 5,
-
-          textTransform: "uppercase",
-
-          letterSpacing: "0.05em",
-
-        }}
-
-      >
-
-        {label}
-
-      </label>
-
-      {editMode ? (
-
-        <input
-
-          className="input-base"
-
-          type={type}
-
-          value={form[field]}
-
-          onChange={(event) =>
-
-            handleField(
-
-              field,
-
-              event.target.value,
-
-            )
-
-          }
-
-          style={{
-
-            fontSize: 13.5,
-
-          }}
-
-        />
-
-      ) : (
-
-        <div
-
-          style={{
-
-            fontSize: 13.5,
-
-            color: "#0f172a",
-
-            padding: "8px 0",
-
-            borderBottom: "1px solid #f1f5f9",
-
-            fontWeight: 500,
-
-          }}
-
-        >
-
-          {form[field] || "—"}
-
-        </div>
-
-      )}
-
-    </div>
-
-  );
 
   return (
 
@@ -740,585 +630,11 @@ export default function MinhaContaPage() {
         />
 
         {activeTab === "dados" && (
-
-          <div
-
-            style={{
-
-              display: "flex",
-
-              flexDirection: "column",
-
-              gap: 16,
-
-            }}
-
-          >
-
-            <div className="card">
-
-              <h3
-
-                style={{
-
-                  margin: "0 0 18px",
-
-                  fontSize: 13.5,
-
-                  fontWeight: 700,
-
-                  color: "#0f172a",
-
-                  display: "flex",
-
-                  alignItems: "center",
-
-                  gap: 8,
-
-                }}
-
-              >
-
-                <span
-
-                  style={{
-
-                    width: 4,
-
-                    height: 16,
-
-                    background: "#c01a2b",
-
-                    borderRadius: 2,
-
-                    display: "inline-block",
-
-                  }}
-
-                />
-
-                Identificação da Empresa
-
-              </h3>
-
-              <div
-
-                style={{
-
-                  display: "grid",
-
-                  gridTemplateColumns:
-
-                    "repeat(auto-fit, minmax(220px, 1fr))",
-
-                  gap: "14px 20px",
-
-                }}
-
-              >
-
-                <div
-
-                  style={{
-
-                    gridColumn: "span 2",
-
-                  }}
-
-                >
-
-                  <Field
-
-                    label="Razão Social"
-
-                    field="razao"
-
-                  />
-
-                </div>
-
-                <Field
-
-                  label="Nome Fantasia"
-
-                  field="fantasia"
-
-                />
-
-                <Field
-
-                  label="CNPJ"
-
-                  field="cnpj"
-
-                />
-
-                <Field
-
-                  label="Inscrição Estadual"
-
-                  field="ie"
-
-                />
-
-                <Field
-
-                  label="Inscrição Municipal"
-
-                  field="im"
-
-                />
-
-                <div
-
-                  style={{
-
-                    gridColumn: "span 2",
-
-                  }}
-
-                >
-
-                  <Field
-
-                    label="CNAE Principal"
-
-                    field="cnaePrincipal"
-
-                  />
-
-                </div>
-
-                <Field
-
-                  label="Porte"
-
-                  field="porte"
-
-                />
-
-                <Field
-
-                  label="Data de Abertura"
-
-                  field="abertura"
-
-                />
-
-                <Field
-
-                  label="Unidade Jotanunes"
-
-                  field="unidade"
-
-                />
-
-                <Field
-
-                  label="Contrato"
-
-                  field="contrato"
-
-                />
-
-                <Field
-
-                  label="Início do Contrato"
-
-                  field="inicioContrato"
-
-                />
-
-                <Field
-
-                  label="Fim do Contrato"
-
-                  field="fimContrato"
-
-                />
-
-              </div>
-
-            </div>
-
-            <div className="card">
-
-              <h3
-
-                style={{
-
-                  margin: "0 0 18px",
-
-                  fontSize: 13.5,
-
-                  fontWeight: 700,
-
-                  color: "#0f172a",
-
-                  display: "flex",
-
-                  alignItems: "center",
-
-                  gap: 8,
-
-                }}
-
-              >
-
-                <span
-
-                  style={{
-
-                    width: 4,
-
-                    height: 16,
-
-                    background: "#c01a2b",
-
-                    borderRadius: 2,
-
-                    display: "inline-block",
-
-                  }}
-
-                />
-
-                Contato
-
-              </h3>
-
-              <div
-
-                style={{
-
-                  display: "grid",
-
-                  gridTemplateColumns:
-
-                    "repeat(auto-fit, minmax(220px, 1fr))",
-
-                  gap: "14px 20px",
-
-                }}
-
-              >
-
-                <div
-
-                  style={{
-
-                    gridColumn: "span 2",
-
-                  }}
-
-                >
-
-                  <Field
-
-                    label="E-mail Principal"
-
-                    field="email"
-
-                    type="email"
-
-                  />
-
-                </div>
-
-                <Field
-
-                  label="E-mail NF-e"
-
-                  field="emailSecundario"
-
-                  type="email"
-
-                />
-
-                <Field
-
-                  label="Telefone"
-
-                  field="telefone"
-
-                />
-
-                <Field
-
-                  label="Celular / WhatsApp"
-
-                  field="celular"
-
-                />
-
-                <Field
-
-                  label="Site"
-
-                  field="site"
-
-                />
-
-              </div>
-
-            </div>
-
-            <div className="card">
-
-              <h3
-
-                style={{
-
-                  margin: "0 0 18px",
-
-                  fontSize: 13.5,
-
-                  fontWeight: 700,
-
-                  color: "#0f172a",
-
-                  display: "flex",
-
-                  alignItems: "center",
-
-                  gap: 8,
-
-                }}
-
-              >
-
-                <span
-
-                  style={{
-
-                    width: 4,
-
-                    height: 16,
-
-                    background: "#c01a2b",
-
-                    borderRadius: 2,
-
-                    display: "inline-block",
-
-                  }}
-
-                />
-
-                Endereço
-
-              </h3>
-
-              <div
-
-                style={{
-
-                  display: "grid",
-
-                  gridTemplateColumns:
-
-                    "repeat(auto-fit, minmax(160px, 1fr))",
-
-                  gap: "14px 20px",
-
-                }}
-
-              >
-
-                <Field
-
-                  label="CEP"
-
-                  field="cep"
-
-                />
-
-                <div
-
-                  style={{
-
-                    gridColumn: "span 2",
-
-                  }}
-
-                >
-
-                  <Field
-
-                    label="Logradouro"
-
-                    field="logradouro"
-
-                  />
-
-                </div>
-
-                <Field
-
-                  label="Número"
-
-                  field="numero"
-
-                />
-
-                <Field
-
-                  label="Complemento"
-
-                  field="complemento"
-
-                />
-
-                <Field
-
-                  label="Bairro"
-
-                  field="bairro"
-
-                />
-
-                <Field
-
-                  label="Cidade"
-
-                  field="cidade"
-
-                />
-
-                <Field
-
-                  label="UF"
-
-                  field="uf"
-
-                />
-
-              </div>
-
-            </div>
-
-            <div className="card">
-
-              <h3
-
-                style={{
-
-                  margin: "0 0 18px",
-
-                  fontSize: 13.5,
-
-                  fontWeight: 700,
-
-                  color: "#0f172a",
-
-                  display: "flex",
-
-                  alignItems: "center",
-
-                  gap: 8,
-
-                }}
-
-              >
-
-                <span
-
-                  style={{
-
-                    width: 4,
-
-                    height: 16,
-
-                    background: "#c01a2b",
-
-                    borderRadius: 2,
-
-                    display: "inline-block",
-
-                  }}
-
-                />
-
-                Responsável Legal
-
-              </h3>
-
-              <div
-
-                style={{
-
-                  display: "grid",
-
-                  gridTemplateColumns:
-
-                    "repeat(auto-fit, minmax(220px, 1fr))",
-
-                  gap: "14px 20px",
-
-                }}
-
-              >
-
-                <div
-
-                  style={{
-
-                    gridColumn: "span 2",
-
-                  }}
-
-                >
-
-                  <Field
-
-                    label="Nome Completo"
-
-                    field="responsavel"
-
-                  />
-
-                </div>
-
-                <Field
-
-                  label="CPF"
-
-                  field="cpfResponsavel"
-
-                />
-
-                <Field
-
-                  label="Cargo"
-
-                  field="cargoResponsavel"
-
-                />
-
-                <Field
-
-                  label="E-mail"
-
-                  field="emailResponsavel"
-
-                  type="email"
-
-                />
-
-                <Field
-
-                  label="Telefone"
-
-                  field="telefoneResponsavel"
-
-                />
-
-              </div>
-
-            </div>
-
-          </div>
-
+          <DadosCadastraisTab
+            form={form}
+            editMode={editMode}
+            onFieldChange={handleField}
+          />
         )}
 
         {activeTab === "acesso" && (
@@ -2231,7 +1547,7 @@ export default function MinhaContaPage() {
 
                                 record.user ===
 
-                                "Sistema"
+                                  "Sistema"
 
                                   ? "#f1f5f9"
 
@@ -2255,7 +1571,7 @@ export default function MinhaContaPage() {
 
                                 record.user ===
 
-                                "Sistema"
+                                  "Sistema"
 
                                   ? "#6b7280"
 
@@ -2267,25 +1583,25 @@ export default function MinhaContaPage() {
 
                             {record.user ===
 
-                            "Sistema"
+                              "Sistema"
 
                               ? "S"
 
                               : record.user
 
-                                  .split(" ")
+                                .split(" ")
 
-                                  .map(
+                                .map(
 
-                                    (word) =>
+                                  (word) =>
 
-                                      word[0],
+                                    word[0],
 
-                                  )
+                                )
 
-                                  .slice(0, 2)
+                                .slice(0, 2)
 
-                                  .join("")}
+                                .join("")}
 
                           </div>
 
@@ -2327,45 +1643,45 @@ export default function MinhaContaPage() {
 
       {showPassModal && (
 
-  <ChangePasswordModal
+        <ChangePasswordModal
 
           values={passForm}
 
           onChange={(field, value) =>
 
-      setPassForm((current) => ({
+            setPassForm((current) => ({
 
-        ...current,
+              ...current,
 
-        [field]: value,
+              [field]: value,
 
-      }))
+            }))
 
-    }
+          }
 
           onClose={() =>
 
-      setShowPassModal(false)
+            setShowPassModal(false)
 
-    }
+          }
 
           onSave={() => {
 
-      setShowPassModal(false);
+            setShowPassModal(false);
 
-      setSaved(true);
+            setSaved(true);
 
-      setTimeout(() => {
+            setTimeout(() => {
 
-        setSaved(false);
+              setSaved(false);
 
-      }, 3000);
+            }, 3000);
 
-    }}
+          }}
 
-  />
+        />
 
-)}
+      )}
     </>
   );
 }
