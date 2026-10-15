@@ -1,21 +1,5 @@
-import { useEffect, useState } from "react";
-
+import { useAuth } from "./app/providers";
 import AppRouter from "./app/router";
-
-import {
-  getAuthenticatedUser,
-  logout as logoutRequest,
-  refreshAuthSession,
-} from "./shared/api/auth";
-
-import {
-  clearAuthSession,
-  getAuthSession,
-  saveAuthSession,
-} from "./shared/auth/session";
-
-import type { AuthToken } from "./shared/types/auth";
-
 // ─── Mock Data ────────────────────────────────────────────────────────────────
 // Temporário até a integração das páginas com os endpoints reais.
 
@@ -139,108 +123,12 @@ const MOCK_EMPLOYEES = [
 ];
 
 export default function App() {
-  const [auth, setAuth] = useState<AuthToken | null>(null);
-
-  const [isCheckingSession, setIsCheckingSession] =
-    useState(true);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function restoreSession() {
-      const storedSession = getAuthSession();
-
-      if (!storedSession) {
-        if (!cancelled) {
-          setIsCheckingSession(false);
-        }
-
-        return;
-      }
-
-      try {
-        const user = await getAuthenticatedUser(
-          storedSession.accessToken,
-        );
-
-        if (cancelled) {
-          return;
-        }
-
-        const validatedSession: AuthToken = {
-          ...storedSession,
-          user,
-        };
-
-        saveAuthSession(validatedSession);
-        setAuth(validatedSession);
-      } catch {
-        try {
-          const refreshedSession =
-            await refreshAuthSession(
-              storedSession.refreshToken,
-            );
-
-          const user = await getAuthenticatedUser(
-            refreshedSession.accessToken,
-          );
-
-          if (cancelled) {
-            return;
-          }
-
-          const validatedSession: AuthToken = {
-            ...refreshedSession,
-            user,
-          };
-
-          saveAuthSession(validatedSession);
-          setAuth(validatedSession);
-        } catch {
-          if (cancelled) {
-            return;
-          }
-
-          clearAuthSession();
-          setAuth(null);
-        }
-      } finally {
-        if (!cancelled) {
-          setIsCheckingSession(false);
-        }
-      }
-    }
-
-    void restoreSession();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  function handleLogin(authToken: AuthToken) {
-    saveAuthSession(authToken);
-    setAuth(authToken);
-  }
-
-  async function handleLogout() {
-    const currentSession = auth;
-
-    clearAuthSession();
-    setAuth(null);
-
-    if (!currentSession) {
-      return;
-    }
-
-    try {
-      await logoutRequest(
-        currentSession.accessToken,
-      );
-    } catch {
-      // A sessão local já foi encerrada.
-    }
-  }
+  const {
+    auth,
+    isCheckingSession,
+    handleLogin,
+    handleLogout,
+  } = useAuth();
 
   if (isCheckingSession) {
     return (
