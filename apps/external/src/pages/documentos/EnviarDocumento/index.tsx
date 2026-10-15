@@ -1,12 +1,12 @@
-import {
-  useRef,
-  useState,
-  type DragEvent,
-} from "react";
+import { useState } from "react";
 
 import Header from "../../../shared/components/Header";
 import Icon from "../../../shared/components/Icon";
 import PageWrapper from "../../../shared/components/PageWrapper";
+
+import DocumentoUploadArea, {
+  type SelectedFile,
+} from "./components/DocumentoUploadArea";
 
 type EnviarDocumentoPageProps = {
   onCancel: () => void;
@@ -15,41 +15,13 @@ type EnviarDocumentoPageProps = {
 export default function EnviarDocumentoPage({
   onCancel,
 }: EnviarDocumentoPageProps) {
-  const [file, setFile] = useState<{
-    name: string;
-    size: string;
-  } | null>(null);
+  const [file, setFile] =
+    useState<SelectedFile | null>(
+      null,
+    );
 
-  const [dragging, setDragging] = useState(false);
-  const [sent, setSent] = useState(false);
-
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  function handleDrop(
-    event: DragEvent<HTMLDivElement>,
-  ) {
-    event.preventDefault();
-    setDragging(false);
-
-    const selectedFile =
-      event.dataTransfer.files[0];
-
-    if (!selectedFile) {
-      return;
-    }
-
-    const kb = selectedFile.size / 1024;
-
-    if (kb > 10240) {
-      alert("Arquivo excede 10 MB (RNF05)");
-      return;
-    }
-
-    setFile({
-      name: selectedFile.name,
-      size: `${kb.toFixed(0)} KB`,
-    });
-  }
+  const [sent, setSent] =
+    useState(false);
 
   return (
     <>
@@ -96,7 +68,8 @@ export default function EnviarDocumentoPage({
                   marginBottom: 8,
                 }}
               >
-                Documento enviado com sucesso!
+                Documento enviado com
+                sucesso!
               </h3>
 
               <p
@@ -164,37 +137,50 @@ export default function EnviarDocumentoPage({
 
                   <select
                     className="select-base"
-                    style={{ width: "100%" }}
+                    style={{
+                      width: "100%",
+                    }}
                   >
                     <option>
                       Selecionar tipo...
                     </option>
+
                     <option>
-                      Certidão Negativa Federal
+                      Certidão Negativa
+                      Federal
                     </option>
+
                     <option>
-                      CNDT — Certidão de Débitos
-                      Trabalhistas
+                      CNDT — Certidão de
+                      Débitos Trabalhistas
                     </option>
+
                     <option>
                       Certidão Negativa FGTS
                     </option>
+
                     <option>
                       Certidão Estadual
                     </option>
+
                     <option>
                       Certidão Municipal
                     </option>
+
                     <option>
                       Contrato Social
                     </option>
+
                     <option>
-                      ASO — Atestado de Saúde
-                      Ocupacional
+                      ASO — Atestado de
+                      Saúde Ocupacional
                     </option>
+
                     <option>
-                      NR-35 — Trabalho em Altura
+                      NR-35 — Trabalho em
+                      Altura
                     </option>
+
                     <option>
                       Insalubridade /
                       Periculosidade
@@ -217,18 +203,26 @@ export default function EnviarDocumentoPage({
 
                   <select
                     className="select-base"
-                    style={{ width: "100%" }}
+                    style={{
+                      width: "100%",
+                    }}
                   >
-                    <option>Empresa</option>
+                    <option>
+                      Empresa
+                    </option>
+
                     <option>
                       Carlos Souza
                     </option>
+
                     <option>
                       Ana Lima
                     </option>
+
                     <option>
                       João Ferreira
                     </option>
+
                     <option>
                       Marcia Ramos
                     </option>
@@ -265,7 +259,8 @@ export default function EnviarDocumentoPage({
                       marginBottom: 6,
                     }}
                   >
-                    Data de Validade (RF11)
+                    Data de Validade
+                    (RF11)
                   </label>
 
                   <input
@@ -277,7 +272,8 @@ export default function EnviarDocumentoPage({
 
                 <div
                   style={{
-                    gridColumn: "span 2",
+                    gridColumn:
+                      "span 2",
                   }}
                 >
                   <label
@@ -303,169 +299,18 @@ export default function EnviarDocumentoPage({
                 </div>
               </div>
 
-              <div
-                className={`drag-zone${
-                  dragging ? " active" : ""
-                }`}
-                onDragOver={(event) => {
-                  event.preventDefault();
-                  setDragging(true);
-                }}
-                onDragLeave={() =>
-                  setDragging(false)
+              <DocumentoUploadArea
+                file={file}
+                onFileChange={
+                  setFile
                 }
-                onDrop={handleDrop}
-                onClick={() =>
-                  inputRef.current?.click()
-                }
-              >
-                <input
-                  ref={inputRef}
-                  type="file"
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  style={{
-                    display: "none",
-                  }}
-                  onChange={(event) => {
-                    const selectedFile =
-                      event.target.files?.[0];
-
-                    if (!selectedFile) {
-                      return;
-                    }
-
-                    if (
-                      selectedFile.size >
-                      10485760
-                    ) {
-                      alert(
-                        "Arquivo excede 10 MB (RNF05)",
-                      );
-
-                      return;
-                    }
-
-                    setFile({
-                      name: selectedFile.name,
-                      size: `${(
-                        selectedFile.size /
-                        1024
-                      ).toFixed(0)} KB`,
-                    });
-                  }}
-                />
-
-                <div
-                  style={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: "50%",
-                    background: "#fde8ea",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    margin: "0 auto 12px",
-                  }}
-                >
-                  <Icon
-                    name="upload"
-                    size={24}
-                    color="#c01a2b"
-                  />
-                </div>
-
-                <p
-                  style={{
-                    margin: "0 0 4px",
-                    fontSize: 14,
-                    fontWeight: 600,
-                    color: "#0f172a",
-                  }}
-                >
-                  Arraste o arquivo aqui ou clique
-                  para selecionar
-                </p>
-
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: 12,
-                    color: "#6b7280",
-                  }}
-                >
-                  RNF05 — Formatos aceitos: PDF,
-                  JPG, PNG — máximo 10 MB por
-                  arquivo
-                </p>
-              </div>
-
-              {file && (
-                <div
-                  style={{
-                    marginTop: 14,
-                    padding: "12px 16px",
-                    background: "#fef2f2",
-                    border:
-                      "1px solid #fecaca",
-                    borderRadius: 8,
-                    display: "flex",
-                    justifyContent:
-                      "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 10,
-                    }}
-                  >
-                    <Icon
-                      name="doc"
-                      size={18}
-                      color="#c01a2b"
-                    />
-
-                    <div>
-                      <div
-                        style={{
-                          fontSize: 13.5,
-                          fontWeight: 600,
-                        }}
-                      >
-                        {file.name}
-                      </div>
-
-                      <div
-                        style={{
-                          fontSize: 11.5,
-                          color: "#6b7280",
-                        }}
-                      >
-                        {file.size}
-                      </div>
-                    </div>
-                  </div>
-
-                  <button
-                    className="btn btn-ghost btn-sm"
-                    onClick={() =>
-                      setFile(null)
-                    }
-                  >
-                    <Icon
-                      name="x"
-                      size={14}
-                    />
-                  </button>
-                </div>
-              )}
+              />
 
               <div
                 style={{
                   display: "flex",
-                  justifyContent: "flex-end",
+                  justifyContent:
+                    "flex-end",
                   marginTop: 20,
                   gap: 10,
                 }}
@@ -480,10 +325,13 @@ export default function EnviarDocumentoPage({
                 <button
                   className="btn btn-primary"
                   onClick={() =>
-                    file && setSent(true)
+                    file &&
+                    setSent(true)
                   }
                   style={{
-                    opacity: file ? 1 : 0.5,
+                    opacity: file
+                      ? 1
+                      : 0.5,
                   }}
                 >
                   <Icon
