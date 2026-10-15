@@ -4,6 +4,8 @@ import Header from "../../../shared/components/Header";
 import Icon from "../../../shared/components/Icon";
 import PageWrapper from "../../../shared/components/PageWrapper";
 
+import DocumentoEnviadoSucesso from "./components/DocumentoEnviadoSucesso";
+
 import DocumentoUploadArea, {
   type SelectedFile,
 } from "./components/DocumentoUploadArea";
@@ -23,6 +25,11 @@ export default function EnviarDocumentoPage({
   const [sent, setSent] =
     useState(false);
 
+  function handleSendAnother() {
+    setSent(false);
+    setFile(null);
+  }
+
   return (
     <>
       <Header
@@ -33,73 +40,11 @@ export default function EnviarDocumentoPage({
       <PageWrapper>
         <div style={{ maxWidth: 700 }}>
           {sent ? (
-            <div
-              className="card"
-              style={{
-                textAlign: "center",
-                padding: 48,
-              }}
-            >
-              <div
-                style={{
-                  width: 64,
-                  height: 64,
-                  borderRadius: "50%",
-                  background: "#dcfce7",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  margin: "0 auto 20px",
-                }}
-              >
-                <Icon
-                  name="check"
-                  size={32}
-                  color="#16a34a"
-                />
-              </div>
-
-              <h3
-                style={{
-                  fontFamily:
-                    "'DM Sans', sans-serif",
-                  fontSize: 20,
-                  fontWeight: 700,
-                  marginBottom: 8,
-                }}
-              >
-                Documento enviado com sucesso!
-              </h3>
-
-              <p
-                style={{
-                  color: "#6b7280",
-                  marginBottom: 8,
-                }}
-              >
-                Status:{" "}
-                <strong>
-                  Aguardando Análise
-                </strong>{" "}
-                — a equipe Jotanunes será notificada
-                (RF15).
-              </p>
-
-              <button
-                className="btn btn-primary"
-                onClick={() => {
-                  setSent(false);
-                  setFile(null);
-                }}
-              >
-                <Icon
-                  name="plus"
-                  size={15}
-                />
-
-                Enviar outro
-              </button>
-            </div>
+            <DocumentoEnviadoSucesso
+              onSendAnother={
+                handleSendAnother
+              }
+            />
           ) : (
             <div className="card">
               <InformacoesDocumentoForm />
@@ -112,7 +57,8 @@ export default function EnviarDocumentoPage({
               <div
                 style={{
                   display: "flex",
-                  justifyContent: "flex-end",
+                  justifyContent:
+                    "flex-end",
                   marginTop: 20,
                   gap: 10,
                 }}
@@ -127,10 +73,13 @@ export default function EnviarDocumentoPage({
                 <button
                   className="btn btn-primary"
                   onClick={() =>
-                    file && setSent(true)
+                    file &&
+                    setSent(true)
                   }
                   style={{
-                    opacity: file ? 1 : 0.5,
+                    opacity: file
+                      ? 1
+                      : 0.5,
                   }}
                 >
                   <Icon
