@@ -12,5 +12,8 @@
     "build:external": "npm run build --workspace=external",
     "build:internal": "npm run build --workspace=internal",
     "build": "npm run build --workspaces"
+  },
+  "dependencies": {
+    "react-router-dom": "^7.18.4"
   }
 }

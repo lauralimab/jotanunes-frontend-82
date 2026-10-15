@@ -486,4 +486,31 @@ html, body {
     background: rgba(0,0,0,0.45);
     z-index: 90;
   }
+
+}
+
+.document-viewer {
+  width: 100%;
+}
+
+.document-viewer:fullscreen {
+  width: 100vw !important;
+  height: 100vh !important;
+  min-height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: #252525 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  overflow: hidden !important;
+}
+
+.document-viewer:fullscreen .document-viewer-iframe {
+  width: 100% !important;
+  height: 100vh !important;
+  min-height: 100vh !important;
+  flex: 1 1 auto !important;
+  border: none !important;
 }
