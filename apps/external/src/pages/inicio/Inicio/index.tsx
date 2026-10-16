@@ -3,6 +3,7 @@ import Icon from "../../../shared/components/Icon";
 import PageWrapper from "../../../shared/components/PageWrapper";
 import StatusBadge from "../../../shared/components/StatusBadge";
 
+import EstatisticasCards from "./components/EstatisticasCards";
 import StatusGeralCard from "./components/StatusGeralCard";
 
 type InicioNavigation =
@@ -26,37 +27,6 @@ export default function InicioPage({
   onNav,
   documents,
 }: InicioPageProps) {
-  const stats = [
-    {
-      label: "Aprovados",
-      value: 8,
-      color: "#16a34a",
-      bg: "#dcfce7",
-      icon: "check",
-    },
-    {
-      label: "Aguardando Análise",
-      value: 3,
-      color: "#ca8a04",
-      bg: "#fef9c3",
-      icon: "clock",
-    },
-    {
-      label: "Correção Solicitada",
-      value: 1,
-      color: "#d97706",
-      bg: "#fff7ed",
-      icon: "edit",
-    },
-    {
-      label: "Vencidos",
-      value: 1,
-      color: "#dc2626",
-      bg: "#fee2e2",
-      icon: "alert",
-    },
-  ];
-
   const progressItems = [
     {
       label: "Documentos da Empresa",
@@ -89,65 +59,7 @@ export default function InicioPage({
           }
         />
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns:
-              "repeat(auto-fit, minmax(200px, 1fr))",
-            gap: 16,
-            marginBottom: 24,
-          }}
-        >
-          {stats.map((stat) => (
-            <div
-              key={stat.label}
-              className="stat-card"
-            >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent:
-                    "space-between",
-                  alignItems: "flex-start",
-                }}
-              >
-                <div>
-                  <div className="label">
-                    {stat.label}
-                  </div>
-
-                  <div
-                    className="value"
-                    style={{
-                      color: stat.color,
-                      marginTop: 8,
-                    }}
-                  >
-                    {stat.value}
-                  </div>
-                </div>
-
-                <div
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 10,
-                    background: stat.bg,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Icon
-                    name={stat.icon}
-                    size={20}
-                    color={stat.color}
-                  />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <EstatisticasCards />
 
         <div
           style={{
@@ -161,8 +73,7 @@ export default function InicioPage({
             <div
               style={{
                 display: "flex",
-                justifyContent:
-                  "space-between",
+                justifyContent: "space-between",
                 alignItems: "center",
                 marginBottom: 16,
               }}
@@ -217,8 +128,7 @@ export default function InicioPage({
                         background: "#f8fafc",
                         display: "flex",
                         alignItems: "center",
-                        justifyContent:
-                          "center",
+                        justifyContent: "center",
                       }}
                     >
                       <Icon
