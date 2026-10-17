@@ -42,57 +42,83 @@ export default function ProfileTabs({
         display: "flex",
         gap: 4,
         marginBottom: 20,
-        background: "#f1f5f9",
-        borderRadius: 10,
+
+        background:
+          "rgba(226, 232, 240, 0.72)",
+
+        border:
+          "1px solid rgba(148, 163, 184, 0.16)",
+
+        borderRadius: 11,
         padding: 4,
+
         width: "fit-content",
+
+        backdropFilter: "blur(10px)",
+        WebkitBackdropFilter: "blur(10px)",
       }}
     >
-      {tabs.map((tab) => (
-        <button
-          key={tab.id}
-          onClick={() => onChange(tab.id)}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 7,
-            padding: "8px 18px",
-            background:
-              activeTab === tab.id
-                ? "#fff"
+      {tabs.map((tab) => {
+        const isActive =
+          activeTab === tab.id;
+
+        return (
+          <button
+            key={tab.id}
+            onClick={() =>
+              onChange(tab.id)
+            }
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 7,
+
+              padding: "8px 18px",
+
+              background: isActive
+                ? "rgba(255, 255, 255, 0.94)"
                 : "transparent",
-            border: "none",
-            borderRadius: 8,
-            cursor: "pointer",
-            fontSize: 13,
-            fontWeight:
-              activeTab === tab.id
+
+              border: "none",
+              borderRadius: 8,
+
+              cursor: "pointer",
+
+              fontFamily:
+                "'Inter', sans-serif",
+
+              fontSize: 13,
+
+              fontWeight: isActive
                 ? 700
                 : 500,
-            color:
-              activeTab === tab.id
-                ? "#c01a2b"
-                : "#6b7280",
-            boxShadow:
-              activeTab === tab.id
-                ? "0 1px 4px rgba(0,0,0,0.08)"
-                : "none",
-            transition: "all 0.15s",
-          }}
-        >
-          <Icon
-            name={tab.icon}
-            size={15}
-            color={
-              activeTab === tab.id
-                ? "#c01a2b"
-                : "#9ca3af"
-            }
-          />
 
-          {tab.label}
-        </button>
-      ))}
+              color: isActive
+                ? "#b51224"
+                : "#374151",
+
+              boxShadow: isActive
+                ? "0 2px 6px rgba(15, 23, 42, 0.08)"
+                : "none",
+
+              transition:
+                "background-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease",
+            }}
+          >
+            <Icon
+              name={tab.icon}
+              size={15}
+              color={
+                isActive
+                  ? "#b51224"
+                  : "#64748b"
+              }
+            />
+
+            {tab.label}
+          </button>
+        );
+      })}
     </div>
   );
 }

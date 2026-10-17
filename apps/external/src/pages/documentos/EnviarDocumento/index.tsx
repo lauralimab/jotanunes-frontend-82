@@ -38,7 +38,13 @@ export default function EnviarDocumentoPage({
       />
 
       <PageWrapper>
-        <div style={{ maxWidth: 700 }}>
+        <div
+          style={{
+            width: "100%",
+            maxWidth: 700,
+            margin: "0 auto",
+          }}
+        >
           {sent ? (
             <DocumentoEnviadoSucesso
               onSendAnother={
