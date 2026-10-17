@@ -1,52 +1,184 @@
-import { useState } from "react";
+import {
+  useMemo,
+  useState,
+} from "react";
 
 import Icon from "../../../../shared/components/Icon";
 import StatusBadge from "../../../../shared/components/StatusBadge";
 
-export type Documento = {
-  id: number;
-  name: string;
-  person: string;
-  type: string;
-  status: string;
-  validity: string;
-  uploadedAt: string;
-};
+import type {
+  Document as SupplierDocument,
+  DocumentStatus,
+} from "../../../../shared/types/documents";
 
 type DocumentosTableProps = {
-  documents: Documento[];
-  onCorrect: () => void;
+  documents:
+    SupplierDocument[];
+
+  totalCount: number;
 };
+
+type StatusFilter =
+  | "all"
+  | "1"
+  | "2"
+  | "3";
+
+type TypeFilter =
+  | "all"
+  | "company"
+  | "worker";
+
+function normalizeText(
+  value: string,
+) {
+  return value
+    .normalize("NFD")
+    .replace(
+      /[\u0300-\u036f]/g,
+      "",
+    )
+    .toLowerCase()
+    .trim();
+}
+
+function getStatusKey(
+  status: DocumentStatus,
+) {
+  if (status === 1) {
+    return "pending";
+  }
+
+  if (status === 2) {
+    return "approved";
+  }
+
+  return "rejected";
+}
+
+function formatDate(
+  value: string | null,
+) {
+  if (!value) {
+    return "—";
+  }
+
+  const dateOnly =
+    value.slice(0, 10);
+
+  const parts =
+    dateOnly.split("-");
+
+  if (parts.length !== 3) {
+    return value;
+  }
+
+  const [
+    year,
+    month,
+    day,
+  ] = parts;
+
+  return `${day}/${month}/${year}`;
+}
 
 export default function DocumentosTable({
   documents,
-  onCorrect,
+  totalCount,
 }: DocumentosTableProps) {
-  const [filter, setFilter] =
-    useState("all");
+  const [
+    search,
+    setSearch,
+  ] = useState("");
 
-  const [type, setType] =
-    useState("all");
+  const [
+    statusFilter,
+    setStatusFilter,
+  ] =
+    useState<StatusFilter>(
+      "all",
+    );
 
-  const filtered = documents.filter(
-    (document) => {
-      if (
-        filter !== "all" &&
-        document.status !== filter
-      ) {
-        return false;
-      }
+  const [
+    typeFilter,
+    setTypeFilter,
+  ] =
+    useState<TypeFilter>(
+      "all",
+    );
 
-      if (
-        type !== "all" &&
-        document.type !== type
-      ) {
-        return false;
-      }
+  const filtered =
+    useMemo(() => {
+      const normalizedSearch =
+        normalizeText(search);
 
-      return true;
-    },
-  );
+      return documents.filter(
+        (document) => {
+          const matchesSearch =
+            normalizedSearch === "" ||
+            normalizeText(
+              document.documentTypeName,
+            ).includes(
+              normalizedSearch,
+            ) ||
+            normalizeText(
+              document.originalFileName,
+            ).includes(
+              normalizedSearch,
+            ) ||
+            normalizeText(
+              document.workerName ??
+                "",
+            ).includes(
+              normalizedSearch,
+            ) ||
+            normalizeText(
+              document.companyCorporateName,
+            ).includes(
+              normalizedSearch,
+            ) ||
+            normalizeText(
+              document.workSiteName ??
+                "",
+            ).includes(
+              normalizedSearch,
+            );
+
+          const matchesStatus =
+            statusFilter ===
+              "all" ||
+            document.status ===
+              Number(
+                statusFilter,
+              );
+
+          const isWorkerDocument =
+            document.workerId !==
+            null;
+
+          const matchesType =
+            typeFilter ===
+              "all" ||
+            (typeFilter ===
+              "worker" &&
+              isWorkerDocument) ||
+            (typeFilter ===
+              "company" &&
+              !isWorkerDocument);
+
+          return (
+            matchesSearch &&
+            matchesStatus &&
+            matchesType
+          );
+        },
+      );
+    }, [
+      documents,
+      search,
+      statusFilter,
+      typeFilter,
+    ]);
 
   return (
     <div
@@ -58,9 +190,10 @@ export default function DocumentosTable({
     >
       <div
         style={{
-          padding: "16px 20px",
+          padding:
+            "16px 20px",
           borderBottom:
-            "1px solid #f3f4f6",
+            "1px solid rgba(15,23,42,0.06)",
           display: "flex",
           gap: 10,
           flexWrap: "wrap",
@@ -68,19 +201,25 @@ export default function DocumentosTable({
       >
         <div
           style={{
-            position: "relative",
+            position:
+              "relative",
             flex: 1,
             minWidth: 220,
+            maxWidth: 340,
           }}
         >
           <span
             style={{
-              position: "absolute",
+              position:
+                "absolute",
               left: 10,
               top: "50%",
               transform:
                 "translateY(-50%)",
-              color: "#9ca3af",
+              color:
+                "#64748b",
+              pointerEvents:
+                "none",
             }}
           >
             <Icon
@@ -92,6 +231,12 @@ export default function DocumentosTable({
           <input
             className="input-base"
             placeholder="Buscar documento..."
+            value={search}
+            onChange={(event) =>
+              setSearch(
+                event.target.value,
+              )
+            }
             style={{
               paddingLeft: 32,
             }}
@@ -100,10 +245,11 @@ export default function DocumentosTable({
 
         <select
           className="select-base"
-          value={filter}
+          value={statusFilter}
           onChange={(event) =>
-            setFilter(
-              event.target.value,
+            setStatusFilter(
+              event.target
+                .value as StatusFilter,
             )
           }
         >
@@ -111,37 +257,26 @@ export default function DocumentosTable({
             Todos os status
           </option>
 
-          <option value="approved">
-            Aprovado
-          </option>
-
-          <option value="pending">
+          <option value="1">
             Aguardando Análise
           </option>
 
-          <option value="waiting">
-            Aguardando Envio
+          <option value="2">
+            Aprovado
           </option>
 
-          <option value="correction">
-            Correção Solicitada
-          </option>
-
-          <option value="expired">
-            Vencido
-          </option>
-
-          <option value="rejected">
+          <option value="3">
             Reprovado
           </option>
         </select>
 
         <select
           className="select-base"
-          value={type}
+          value={typeFilter}
           onChange={(event) =>
-            setType(
-              event.target.value,
+            setTypeFilter(
+              event.target
+                .value as TypeFilter,
             )
           }
         >
@@ -153,7 +288,7 @@ export default function DocumentosTable({
             Empresa
           </option>
 
-          <option value="employee">
+          <option value="worker">
             Funcionário
           </option>
         </select>
@@ -162,151 +297,188 @@ export default function DocumentosTable({
       <table className="table-base">
         <thead>
           <tr>
-            <th>Documento</th>
-            <th>Referente a</th>
-            <th>Tipo</th>
-            <th>Status</th>
-            <th>Validade</th>
-            <th>Enviado em</th>
-            <th>Ações</th>
+            <th>
+              Documento
+            </th>
+
+            <th>
+              Referente a
+            </th>
+
+            <th>
+              Tipo
+            </th>
+
+            <th>
+              Status
+            </th>
+
+            <th>
+              Validade
+            </th>
+
+            <th>
+              Enviado em
+            </th>
           </tr>
         </thead>
 
         <tbody>
-          {filtered.map(
-            (document) => (
-              <tr key={document.id}>
-                <td>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems:
-                        "center",
-                      gap: 8,
-                    }}
-                  >
-                    <Icon
-                      name="doc"
-                      size={16}
-                      color="#6b7280"
-                    />
-
-                    <span
+          {filtered.length >
+          0 ? (
+            filtered.map(
+              (document) => (
+                <tr
+                  key={
+                    document.id
+                  }
+                >
+                  <td>
+                    <div
                       style={{
-                        fontWeight: 600,
-                        color: "#0f172a",
+                        display:
+                          "flex",
+                        alignItems:
+                          "center",
+                        gap: 8,
                       }}
                     >
-                      {document.name}
-                    </span>
-                  </div>
-                </td>
+                      <Icon
+                        name="doc"
+                        size={16}
+                        color="#6b7280"
+                      />
 
-                <td
-                  style={{
-                    color: "#374151",
-                  }}
-                >
-                  {document.person}
-                </td>
+                      <div>
+                        <div
+                          style={{
+                            fontWeight:
+                              600,
+                            color:
+                              "#0f172a",
+                          }}
+                        >
+                          {
+                            document.documentTypeName
+                          }
+                        </div>
 
-                <td>
-                  <span className="badge badge-blue">
-                    {document.type ===
-                    "company"
-                      ? "Empresa"
-                      : "Funcionário"}
-                  </span>
-                </td>
+                        <div
+                          style={{
+                            marginTop:
+                              2,
+                            color:
+                              "#94a3b8",
+                            fontSize:
+                              11.5,
+                          }}
+                        >
+                          {
+                            document.originalFileName
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  </td>
 
-                <td>
-                  <StatusBadge
-                    status={
-                      document.status
-                    }
-                  />
-                </td>
-
-                <td
-                  style={{
-                    color:
-                      document.status ===
-                      "expired"
-                        ? "#dc2626"
-                        : "#374151",
-
-                    fontWeight:
-                      document.status ===
-                      "expired"
-                        ? 600
-                        : 400,
-                  }}
-                >
-                  {document.validity}
-                </td>
-
-                <td
-                  style={{
-                    color: "#6b7280",
-                  }}
-                >
-                  {document.uploadedAt}
-                </td>
-
-                <td>
-                  <div
+                  <td
                     style={{
-                      display: "flex",
-                      gap: 6,
+                      color:
+                        "#374151",
                     }}
                   >
-                    <button className="btn btn-ghost btn-sm">
-                      <Icon
-                        name="eye"
-                        size={13}
-                      />
-                    </button>
+                    {document.workerName ??
+                      document.companyCorporateName}
+                  </td>
 
-                    {(document.status ===
-                      "rejected" ||
-                      document.status ===
-                        "expired" ||
-                      document.status ===
-                        "correction") && (
-                      <button
-                        className="btn btn-warning btn-sm"
-                        onClick={
-                          onCorrect
-                        }
-                      >
-                        Corrigir
-                      </button>
+                  <td>
+                    <span className="badge badge-blue">
+                      {document.workerId !==
+                      null
+                        ? "Funcionário"
+                        : "Empresa"}
+                    </span>
+                  </td>
+
+                  <td>
+                    <StatusBadge
+                      status={getStatusKey(
+                        document.status,
+                      )}
+                    />
+                  </td>
+
+                  <td
+                    style={{
+                      color:
+                        "#374151",
+                    }}
+                  >
+                    {formatDate(
+                      document.expirationDate,
                     )}
-                  </div>
-                </td>
-              </tr>
-            ),
+                  </td>
+
+                  <td
+                    style={{
+                      color:
+                        "#6b7280",
+                    }}
+                  >
+                    {formatDate(
+                      document.createdAt,
+                    )}
+                  </td>
+                </tr>
+              ),
+            )
+          ) : (
+            <tr>
+              <td
+                colSpan={6}
+                style={{
+                  padding:
+                    "36px 20px",
+                  textAlign:
+                    "center",
+                  color:
+                    "#64748b",
+                }}
+              >
+                Nenhum documento
+                encontrado.
+              </td>
+            </tr>
           )}
         </tbody>
       </table>
 
       <div
         style={{
-          padding: "14px 20px",
+          padding:
+            "14px 20px",
           borderTop:
-            "1px solid #f3f4f6",
+            "1px solid rgba(15,23,42,0.06)",
         }}
       >
         <span
           style={{
             fontSize: 12.5,
-            color: "#6b7280",
+            color:
+              "#6b7280",
           }}
         >
-          {filtered.length} documento(s)
-          {" — "}
-          RNF05: apenas PDF, JPG, PNG
-          aceitos (máx. 10 MB)
+          {filtered.length}
+          {" documento(s) exibido(s)"}
+
+          {totalCount >
+            documents.length && (
+            <>
+              {" de "}
+              {totalCount}
+              {" no total"}
+            </>
+          )}
         </span>
       </div>
     </div>

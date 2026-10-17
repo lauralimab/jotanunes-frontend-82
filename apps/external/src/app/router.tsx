@@ -36,7 +36,7 @@ import type { AuthToken } from "../shared/types/auth";
 
 type Documents =
   ComponentProps<
-    typeof DocumentosPage
+    typeof PendenciasPage
   >["documents"];
 
 const PAGE_ROUTES = {
@@ -139,7 +139,7 @@ export default function AppRouter({
   ) {
     navigate(
       PAGE_ROUTES[
-        destination
+      destination
       ],
     );
   }
@@ -189,7 +189,7 @@ export default function AppRouter({
               replace
             />
           ) : auth.user
-              .mustChangePassword ? (
+            .mustChangePassword ? (
             <TrocarSenhaPage />
           ) : (
             <Navigate
@@ -273,9 +273,6 @@ export default function AppRouter({
           }
           element={
             <DocumentosPage
-              documents={
-                documents
-              }
               onNav={
                 navigateByDestination
               }

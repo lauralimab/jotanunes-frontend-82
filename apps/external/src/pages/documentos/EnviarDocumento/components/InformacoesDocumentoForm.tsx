@@ -1,4 +1,68 @@
-export default function InformacoesDocumentoForm() {
+import type {
+  SupplierDocumentType,
+} from "../../../../shared/types/documentsTypes";
+
+import {
+  DOCUMENT_SUBJECT,
+} from "../../../../shared/types/documentsTypes";
+
+import type {
+  Worker,
+} from "../../../../shared/types/workers";
+
+type InformacoesDocumentoFormProps = {
+  documentTypes:
+    SupplierDocumentType[];
+
+  workers: Worker[];
+
+  documentTypeId: string;
+
+  workerId: string;
+
+  expirationDate: string;
+
+  isLoading: boolean;
+
+  onDocumentTypeChange: (
+    value: string,
+  ) => void;
+
+  onWorkerChange: (
+    value: string,
+  ) => void;
+
+  onExpirationDateChange: (
+    value: string,
+  ) => void;
+};
+
+export default function InformacoesDocumentoForm({
+  documentTypes,
+  workers,
+  documentTypeId,
+  workerId,
+  expirationDate,
+  isLoading,
+  onDocumentTypeChange,
+  onWorkerChange,
+  onExpirationDateChange,
+}: InformacoesDocumentoFormProps) {
+  const selectedDocumentType =
+    documentTypes.find(
+      (documentType) =>
+        documentType.id ===
+        Number(documentTypeId),
+    );
+
+  const isWorkerDocument =
+    selectedDocumentType?.subject ===
+    DOCUMENT_SUBJECT.worker;
+
+  const isCompanyDocument =
+    selectedDocumentType?.subject ===
+    DOCUMENT_SUBJECT.company;
+
   return (
     <>
       <h3
@@ -35,49 +99,39 @@ export default function InformacoesDocumentoForm() {
 
           <select
             className="select-base"
+            value={documentTypeId}
+            disabled={isLoading}
+            onChange={(event) =>
+              onDocumentTypeChange(
+                event.target.value,
+              )
+            }
             style={{
               width: "100%",
             }}
           >
-            <option>
-              Selecionar tipo...
+            <option value="">
+              {isLoading
+                ? "Carregando tipos..."
+                : "Selecionar tipo..."}
             </option>
 
-            <option>
-              Certidão Negativa Federal
-            </option>
-
-            <option>
-              CNDT — Certidão de Débitos Trabalhistas
-            </option>
-
-            <option>
-              Certidão Negativa FGTS
-            </option>
-
-            <option>
-              Certidão Estadual
-            </option>
-
-            <option>
-              Certidão Municipal
-            </option>
-
-            <option>
-              Contrato Social
-            </option>
-
-            <option>
-              ASO — Atestado de Saúde Ocupacional
-            </option>
-
-            <option>
-              NR-35 — Trabalho em Altura
-            </option>
-
-            <option>
-              Insalubridade / Periculosidade
-            </option>
+            {documentTypes.map(
+              (documentType) => (
+                <option
+                  key={
+                    documentType.id
+                  }
+                  value={
+                    documentType.id
+                  }
+                >
+                  {
+                    documentType.name
+                  }
+                </option>
+              ),
+            )}
           </select>
         </div>
 
@@ -94,18 +148,82 @@ export default function InformacoesDocumentoForm() {
             Referente a *
           </label>
 
-          <select
-            className="select-base"
-            style={{
-              width: "100%",
-            }}
-          >
-            <option>Empresa</option>
-            <option>Carlos Souza</option>
-            <option>Ana Lima</option>
-            <option>João Ferreira</option>
-            <option>Marcia Ramos</option>
-          </select>
+          {!selectedDocumentType ? (
+            <select
+              className="select-base"
+              disabled
+              style={{
+                width: "100%",
+              }}
+            >
+              <option>
+                Selecione o tipo primeiro
+              </option>
+            </select>
+          ) : isCompanyDocument ? (
+            <select
+              className="select-base"
+              disabled
+              value="company"
+              style={{
+                width: "100%",
+              }}
+            >
+              <option value="company">
+                Empresa
+              </option>
+            </select>
+          ) : isWorkerDocument ? (
+            <select
+              className="select-base"
+              value={workerId}
+              onChange={(event) =>
+                onWorkerChange(
+                  event.target.value,
+                )
+              }
+              style={{
+                width: "100%",
+              }}
+            >
+              <option value="">
+                Selecionar funcionário...
+              </option>
+
+              {workers.map(
+                (worker) => (
+                  <option
+                    key={
+                      worker.id
+                    }
+                    value={
+                      worker.id
+                    }
+                  >
+                    {
+                      worker.name
+                    }
+                    {" — "}
+                    {
+                      worker.formattedCpf
+                    }
+                  </option>
+                ),
+              )}
+            </select>
+          ) : (
+            <select
+              className="select-base"
+              disabled
+              style={{
+                width: "100%",
+              }}
+            >
+              <option>
+                Tipo não identificado
+              </option>
+            </select>
+          )}
         </div>
 
         <div>
@@ -118,62 +236,73 @@ export default function InformacoesDocumentoForm() {
               marginBottom: 6,
             }}
           >
-            Data de Emissão
+            Data de Validade
+            {selectedDocumentType
+              ?.requiresExpirationDate
+              ? " *"
+              : ""}
           </label>
 
           <input
             className="input-base"
             type="date"
-            defaultValue="2026-09-01"
+            value={expirationDate}
+            onChange={(event) =>
+              onExpirationDateChange(
+                event.target.value,
+              )
+            }
           />
+
+          {selectedDocumentType
+            ?.requiresExpirationDate && (
+            <div
+              style={{
+                marginTop: 5,
+                color: "#64748b",
+                fontSize: 11.5,
+              }}
+            >
+              Obrigatória para este
+              tipo de documento.
+            </div>
+          )}
         </div>
 
-        <div>
-          <label
-            style={{
-              fontSize: 12.5,
-              fontWeight: 600,
-              color: "#374151",
-              display: "block",
-              marginBottom: 6,
-            }}
-          >
-            Data de Validade (RF11)
-          </label>
+        {selectedDocumentType
+          ?.isConditional &&
+          selectedDocumentType
+            .conditionDescription && (
+            <div
+              style={{
+                gridColumn:
+                  "1 / -1",
 
-          <input
-            className="input-base"
-            type="date"
-            defaultValue="2026-12-31"
-          />
-        </div>
+                padding:
+                  "10px 12px",
 
-        <div
-          style={{
-            gridColumn: "span 2",
-          }}
-        >
-          <label
-            style={{
-              fontSize: 12.5,
-              fontWeight: 600,
-              color: "#374151",
-              display: "block",
-              marginBottom: 6,
-            }}
-          >
-            Observações
-          </label>
+                background:
+                  "#f8fafc",
 
-          <textarea
-            className="input-base"
-            rows={2}
-            placeholder="Informações adicionais..."
-            style={{
-              resize: "vertical",
-            }}
-          />
-        </div>
+                border:
+                  "1px solid #e2e8f0",
+
+                borderRadius: 8,
+
+                fontSize: 12.5,
+
+                color: "#475569",
+              }}
+            >
+              <strong>
+                Condição:
+              </strong>{" "}
+              {
+                selectedDocumentType
+                  .conditionDescription
+              }
+            </div>
+          )}
       </div>
     </>
   );
