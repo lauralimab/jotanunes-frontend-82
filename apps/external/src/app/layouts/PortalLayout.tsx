@@ -1,7 +1,9 @@
-import type { ReactNode } from "react";
+import {
+  useState,
+  type ReactNode,
+} from "react";
 
 import Icon from "../../shared/components/Icon";
-
 import Sidebar from "./Sidebar";
 
 type PortalLayoutProps = {
@@ -19,27 +21,43 @@ export default function PortalLayout({
   onCloseNav,
   children,
 }: PortalLayoutProps) {
+  const [
+    sidebarCollapsed,
+    setSidebarCollapsed,
+  ] = useState(false);
+
   return (
     <div
+      className="portal-background"
       style={{
         display: "flex",
         minHeight: "100vh",
-        background: "#f8fafc",
       }}
     >
       <Sidebar
         onLogout={onLogout}
         open={navOpen}
         onClose={onCloseNav}
+        collapsed={sidebarCollapsed}
+        onToggleCollapsed={() =>
+          setSidebarCollapsed(
+            (current) => !current,
+          )
+        }
       />
 
       <div
-        className="app-content"
+        className={`app-content${
+          sidebarCollapsed
+            ? " sidebar-collapsed"
+            : ""
+        }`}
         style={{
           flex: 1,
           display: "flex",
           flexDirection: "column",
           minHeight: "100vh",
+          background: "transparent",
         }}
       >
         <div className="mobile-topbar">

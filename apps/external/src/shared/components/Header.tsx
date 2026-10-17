@@ -12,18 +12,24 @@ export default function Header({
   actions,
 }: HeaderProps) {
   return (
-    <div
-      style={{
-        background: "#fff",
-        borderBottom: "1px solid #e5e7eb",
-        padding: "16px 28px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        minHeight: 64,
-        flexShrink: 0,
-      }}
-    >
+<div
+  style={{
+    background: "#fff",
+    borderBottom: "1px solid #e5e7eb",
+    padding: "16px 28px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    minHeight: 64,
+    flexShrink: 0,
+
+    boxShadow:
+      "0 3px 12px rgba(15, 23, 42, 0.06)",
+
+    position: "relative",
+    zIndex: 20,
+  }}
+>
       <div>
         <h1
           style={{

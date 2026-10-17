@@ -8,13 +8,10 @@ export default function PageWrapper({
   children,
 }: PageWrapperProps) {
   return (
-    <div
-      style={{
-        padding: 28,
-        maxWidth: 1180,
-      }}
-    >
-      {children}
-    </div>
+    <main className="page-wrapper">
+      <div className="page-wrapper-inner">
+        {children}
+      </div>
+    </main>
   );
 }

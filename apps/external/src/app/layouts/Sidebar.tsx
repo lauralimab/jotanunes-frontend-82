@@ -11,12 +11,16 @@ type SidebarProps = {
   onLogout: () => void;
   open: boolean;
   onClose: () => void;
+  collapsed: boolean;
+  onToggleCollapsed: () => void;
 };
 
 export default function Sidebar({
   onLogout,
   open,
   onClose,
+  collapsed,
+  onToggleCollapsed,
 }: SidebarProps) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -74,11 +78,12 @@ export default function Sidebar({
       )}
 
       <aside
-        className={`app-sidebar${open ? " open" : ""}`}
+        className={`app-sidebar${open ? " open" : ""}${
+          collapsed ? " collapsed" : ""
+        }`}
         style={{
-          width: 232,
           minHeight: "100vh",
-          background: "#1a0a0c",
+          background: "#8f1320",
           display: "flex",
           flexDirection: "column",
           position: "fixed",
@@ -86,24 +91,53 @@ export default function Sidebar({
           top: 0,
           bottom: 0,
           zIndex: 100,
-          overflowY: "auto",
+          overflow: "hidden",
+
+          boxShadow:
+  "4px 0 14px rgba(15, 23, 60, 0.10)",
         }}
       >
+        <button
+          type="button"
+          className="sidebar-collapse-btn"
+          onClick={onToggleCollapsed}
+          title={
+            collapsed
+              ? "Expandir menu"
+              : "Recolher menu"
+          }
+          aria-label={
+            collapsed
+              ? "Expandir menu"
+              : "Recolher menu"
+          }
+        >
+          <Icon
+            name="list"
+            size={20}
+          />
+        </button>
+
         <div
+          className="sidebar-brand"
           style={{
             padding: "18px 16px 16px",
-            borderBottom: "1px solid #2d1216",
+            borderBottom:
+              "1px solid rgba(255, 255, 255, 0.14)",
             flexShrink: 0,
           }}
         >
-          <BrandLogo
-            alternate
-            compact
-            white
-          />
+          <div className="sidebar-logo-full">
+            <BrandLogo
+              alternate
+              compact
+              white
+            />
+          </div>
         </div>
 
         <div
+          className="sidebar-hide-collapsed"
           style={{
             padding: "10px 18px 6px",
             flexShrink: 0,
@@ -112,7 +146,8 @@ export default function Sidebar({
           <div
             style={{
               fontSize: 10,
-              color: "#6b3a42",
+              color:
+                "rgba(255, 255, 255, 0.65)",
               fontWeight: 700,
               letterSpacing: "0.1em",
               textTransform: "uppercase",
@@ -122,78 +157,58 @@ export default function Sidebar({
           </div>
         </div>
 
-        <nav
-          style={{
-            flex: 1,
-            padding: "0 10px",
-            display: "flex",
-            flexDirection: "column",
-            gap: 2,
-          }}
-        >
-          {links.map((link) => (
-            <div
-              key={link.path}
-              className={`sidebar-link${
-                location.pathname === link.path
-                  ? " active"
-                  : ""
-              }`}
-              onClick={() =>
-                handleNavigate(link.path)
-              }
-            >
-              <span className="icon">
-                <Icon
-                  name={link.icon}
-                  size={17}
-                />
-              </span>
+        <nav className="sidebar-nav">
+          {links.map((link) => {
+            const active =
+              location.pathname === link.path;
 
-              {link.label}
-            </div>
-          ))}
+            return (
+              <div
+                key={link.path}
+                className={`sidebar-link${
+                  active ? " active" : ""
+                }`}
+                onClick={() =>
+                  handleNavigate(link.path)
+                }
+                title={
+                  collapsed
+                    ? link.label
+                    : undefined
+                }
+                aria-current={
+                  active
+                    ? "page"
+                    : undefined
+                }
+              >
+                <span className="icon">
+                  <Icon
+                    name={link.icon}
+                    size={18}
+                  />
+                </span>
+
+                <span className="sidebar-link-label">
+                  {link.label}
+                </span>
+              </div>
+            );
+          })}
         </nav>
 
-        <div
-          style={{
-            padding: "14px 14px 18px",
-            borderTop: "1px solid #2d1216",
-            flexShrink: 0,
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              marginBottom: 10,
-            }}
-          >
-            <div
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: "50%",
-                background: "#c01a2b",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 13,
-                fontWeight: 700,
-                color: "#fff",
-                flexShrink: 0,
-              }}
-            >
+        <div className="sidebar-footer">
+          <div className="sidebar-user">
+            <div className="sidebar-user-avatar">
               FL
             </div>
 
-            <div>
+            <div className="sidebar-user-info">
               <div
                 style={{
                   fontSize: 12.5,
                   fontWeight: 600,
-                  color: "#e2e8f0",
+                  color: "#ffffff",
                 }}
               >
                 Felipe Lima
@@ -202,7 +217,8 @@ export default function Sidebar({
               <div
                 style={{
                   fontSize: 11,
-                  color: "#7a3a42",
+                  color:
+                    "rgba(255, 255, 255, 0.62)",
                 }}
               >
                 Fornecedor
@@ -211,21 +227,22 @@ export default function Sidebar({
           </div>
 
           <button
-            className="btn btn-ghost btn-sm"
-            style={{
-              width: "100%",
-              justifyContent: "center",
-              color: "#7a3a42",
-              borderColor: "#2d1216",
-            }}
+            className="btn btn-sm sidebar-logout-btn"
             onClick={onLogout}
+            title={
+              collapsed
+                ? "Sair"
+                : undefined
+            }
           >
             <Icon
               name="logout"
-              size={14}
+              size={15}
             />
 
-            Sair
+            <span className="sidebar-logout-label">
+              Sair
+            </span>
           </button>
         </div>
       </aside>
