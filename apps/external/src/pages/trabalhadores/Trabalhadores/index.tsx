@@ -5,20 +5,25 @@ import {
 
 import { useAuth } from "../../../app/providers";
 
-import {
-  createWorker,
-  getWorkers,
-} from "../../../shared/api/workers";
-
 import Header from "../../../shared/components/Header";
 import Icon from "../../../shared/components/Icon";
 import PageWrapper from "../../../shared/components/PageWrapper";
+
+import {
+  activateWorker,
+  createWorker,
+  deactivateWorker,
+  getWorkers,
+  updateWorker,
+} from "../../../shared/api/workers";
 
 import type { Worker } from "../../../shared/types/workers";
 
 import AdicionarTrabalhadorModal, {
   type TrabalhadorForm,
 } from "./components/AdicionarTrabalhadorModal";
+
+import EditarTrabalhadorModal from "./components/EditarTrabalhadorModal";
 
 import TrabalhadoresTable from "./components/TrabalhadoresTable";
 
@@ -33,18 +38,22 @@ export default function TrabalhadoresPage({
 }: TrabalhadoresPageProps) {
   const { auth } = useAuth();
 
-  const accessToken =
-    auth?.accessToken;
-
   const [
     trabalhadores,
     setTrabalhadores,
   ] = useState<Worker[]>([]);
 
   const [
-    showModal,
-    setShowModal,
+    showAddModal,
+    setShowAddModal,
   ] = useState(false);
+
+  const [
+    trabalhadorEditando,
+    setTrabalhadorEditando,
+  ] = useState<Worker | null>(
+    null,
+  );
 
   const [
     isLoading,
@@ -57,33 +66,36 @@ export default function TrabalhadoresPage({
   ] = useState("");
 
   useEffect(() => {
+    const accessToken =
+      auth?.accessToken;
+
     if (!accessToken) {
       return;
     }
 
     let cancelled = false;
 
-    async function loadWorkers() {
+    async function loadWorkers(
+      token: string,
+    ) {
       try {
         setIsLoading(true);
         setError("");
 
-        const response =
+        const result =
           await getWorkers(
-            accessToken!,
+            token,
             {
               pageNumber: 1,
               pageSize: 50,
             },
           );
 
-        if (cancelled) {
-          return;
+        if (!cancelled) {
+          setTrabalhadores(
+            result.items,
+          );
         }
-
-        setTrabalhadores(
-          response.items,
-        );
       } catch (loadError) {
         if (cancelled) {
           return;
@@ -107,19 +119,86 @@ export default function TrabalhadoresPage({
       }
     }
 
-    void loadWorkers();
+    void loadWorkers(
+      accessToken,
+    );
 
     return () => {
       cancelled = true;
     };
-  }, [accessToken]);
+  }, [auth?.accessToken]);
 
   async function handleAddTrabalhador(
     form: TrabalhadorForm,
   ) {
-    if (!accessToken) {
+    if (!auth?.accessToken) {
+      throw new Error(
+        "Sessão inválida.",
+      );
+    }
+
+    const novoTrabalhador =
+      await createWorker(
+        auth.accessToken,
+        {
+          name: form.name,
+          cpf: form.cpf,
+        },
+      );
+
+    setTrabalhadores(
+      (current) => [
+        ...current,
+        novoTrabalhador,
+      ],
+    );
+
+    setShowAddModal(false);
+  }
+
+  async function handleEditTrabalhador(
+    name: string,
+  ) {
+    if (
+      !auth?.accessToken ||
+      !trabalhadorEditando
+    ) {
+      throw new Error(
+        "Não foi possível identificar o funcionário.",
+      );
+    }
+
+    const atualizado =
+      await updateWorker(
+        auth.accessToken,
+        trabalhadorEditando.id,
+        {
+          name,
+        },
+      );
+
+    setTrabalhadores(
+      (current) =>
+        current.map(
+          (trabalhador) =>
+            trabalhador.id ===
+            atualizado.id
+              ? atualizado
+              : trabalhador,
+        ),
+    );
+
+    setTrabalhadorEditando(
+      null,
+    );
+  }
+
+  async function handleToggleStatus(
+    trabalhador: Worker,
+  ) {
+    if (!auth?.accessToken) {
       setError(
-        "Sessão inválida. Faça login novamente.",
+        "Sessão inválida.",
       );
 
       return;
@@ -128,33 +207,37 @@ export default function TrabalhadoresPage({
     try {
       setError("");
 
-      const novoTrabalhador =
-        await createWorker(
-          accessToken,
-          {
-            name: form.name,
-            cpf: form.cpf,
-          },
-        );
+      const atualizado =
+        trabalhador.active
+          ? await deactivateWorker(
+              auth.accessToken,
+              trabalhador.id,
+            )
+          : await activateWorker(
+              auth.accessToken,
+              trabalhador.id,
+            );
 
       setTrabalhadores(
-        (current) => [
-          ...current,
-          novoTrabalhador,
-        ],
+        (current) =>
+          current.map(
+            (item) =>
+              item.id ===
+              atualizado.id
+                ? atualizado
+                : item,
+          ),
       );
-
-      setShowModal(false);
-    } catch (createError) {
+    } catch (statusError) {
       if (
-        createError instanceof Error
+        statusError instanceof Error
       ) {
         setError(
-          createError.message,
+          statusError.message,
         );
       } else {
         setError(
-          "Não foi possível cadastrar o funcionário.",
+          "Não foi possível alterar o status do funcionário.",
         );
       }
     }
@@ -164,12 +247,14 @@ export default function TrabalhadoresPage({
     <>
       <Header
         title="Funcionários"
-        subtitle="RF03 — Cadastro de funcionários vinculados ao fornecedor"
+        subtitle="Cadastro de funcionários vinculados ao fornecedor"
         actions={
           <button
             className="btn btn-primary"
             onClick={() =>
-              setShowModal(true)
+              setShowAddModal(
+                true,
+              )
             }
           >
             <Icon
@@ -187,22 +272,16 @@ export default function TrabalhadoresPage({
           <div
             style={{
               padding:
-                "12px 16px",
+                "12px 14px",
               marginBottom: 16,
-
+              borderRadius: 8,
+              background:
+                "#fef2f2",
               border:
                 "1px solid #fecaca",
-
-              borderRadius: 10,
-
-              background:
-                "rgba(254, 242, 242, 0.94)",
-
               color:
                 "#b91c1c",
-
               fontSize: 13,
-              fontWeight: 500,
             }}
           >
             {error}
@@ -213,7 +292,7 @@ export default function TrabalhadoresPage({
           <div
             className="card"
             style={{
-              padding: 40,
+              padding: 32,
               textAlign:
                 "center",
               color:
@@ -232,17 +311,41 @@ export default function TrabalhadoresPage({
                 "documents",
               )
             }
+            onEdit={
+              setTrabalhadorEditando
+            }
+            onToggleStatus={
+              handleToggleStatus
+            }
           />
         )}
       </PageWrapper>
 
-      {showModal && (
+      {showAddModal && (
         <AdicionarTrabalhadorModal
           onClose={() =>
-            setShowModal(false)
+            setShowAddModal(
+              false,
+            )
           }
           onAdd={
             handleAddTrabalhador
+          }
+        />
+      )}
+
+      {trabalhadorEditando && (
+        <EditarTrabalhadorModal
+          trabalhador={
+            trabalhadorEditando
+          }
+          onClose={() =>
+            setTrabalhadorEditando(
+              null,
+            )
+          }
+          onSave={
+            handleEditTrabalhador
           }
         />
       )}

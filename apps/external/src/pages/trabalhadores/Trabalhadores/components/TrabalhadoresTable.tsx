@@ -9,7 +9,16 @@ import type { Worker } from "../../../../shared/types/workers";
 
 type TrabalhadoresTableProps = {
   trabalhadores: Worker[];
+
   onDocuments: () => void;
+
+  onEdit: (
+    trabalhador: Worker,
+  ) => void;
+
+  onToggleStatus: (
+    trabalhador: Worker,
+  ) => Promise<void>;
 };
 
 type StatusFilter =
@@ -33,6 +42,8 @@ function normalizeText(
 export default function TrabalhadoresTable({
   trabalhadores,
   onDocuments,
+  onEdit,
+  onToggleStatus,
 }: TrabalhadoresTableProps) {
   const [
     search,
@@ -47,6 +58,13 @@ export default function TrabalhadoresTable({
       "todos",
     );
 
+  const [
+    changingStatusId,
+    setChangingStatusId,
+  ] = useState<number | null>(
+    null,
+  );
+
   const trabalhadoresFiltrados =
     useMemo(() => {
       const normalizedSearch =
@@ -60,10 +78,6 @@ export default function TrabalhadoresTable({
 
       return trabalhadores.filter(
         (trabalhador) => {
-          const cpf =
-            trabalhador.formattedCpf ||
-            trabalhador.cpf;
-
           const matchesSearch =
             normalizedSearch === "" ||
             normalizeText(
@@ -71,36 +85,24 @@ export default function TrabalhadoresTable({
             ).includes(
               normalizedSearch,
             ) ||
-            normalizeText(
-              cpf,
-            ).includes(
-              normalizedSearch,
-            ) ||
-            (
-              searchDigits !== "" &&
-              trabalhador.cpf
-                .replace(
-                  /\D/g,
-                  "",
-                )
-                .includes(
-                  searchDigits,
-                )
-            );
+            trabalhador.cpf
+              .replace(
+                /\D/g,
+                "",
+              )
+              .includes(
+                searchDigits,
+              );
 
           const matchesStatus =
             statusFilter ===
               "todos" ||
-            (
-              statusFilter ===
-                "ativos" &&
-              trabalhador.active
-            ) ||
-            (
-              statusFilter ===
-                "inativos" &&
-              !trabalhador.active
-            );
+            (statusFilter ===
+              "ativos" &&
+              trabalhador.active) ||
+            (statusFilter ===
+              "inativos" &&
+              !trabalhador.active);
 
           return (
             matchesSearch &&
@@ -114,6 +116,24 @@ export default function TrabalhadoresTable({
       statusFilter,
     ]);
 
+  async function handleToggleStatus(
+    trabalhador: Worker,
+  ) {
+    try {
+      setChangingStatusId(
+        trabalhador.id,
+      );
+
+      await onToggleStatus(
+        trabalhador,
+      );
+    } finally {
+      setChangingStatusId(
+        null,
+      );
+    }
+  }
+
   return (
     <div
       className="card"
@@ -126,10 +146,8 @@ export default function TrabalhadoresTable({
         style={{
           padding:
             "16px 20px",
-
           borderBottom:
-            "1px solid rgba(15, 23, 42, 0.06)",
-
+            "1px solid rgba(15,23,42,0.06)",
           display: "flex",
           gap: 10,
           flexWrap: "wrap",
@@ -139,9 +157,7 @@ export default function TrabalhadoresTable({
           style={{
             position:
               "relative",
-
             flex: 1,
-
             minWidth: 220,
             maxWidth: 320,
           }}
@@ -150,16 +166,12 @@ export default function TrabalhadoresTable({
             style={{
               position:
                 "absolute",
-
               left: 10,
               top: "50%",
-
               transform:
                 "translateY(-50%)",
-
               color:
                 "#64748b",
-
               pointerEvents:
                 "none",
             }}
@@ -172,14 +184,11 @@ export default function TrabalhadoresTable({
 
           <input
             className="input-base"
-            placeholder="Buscar funcionário..."
+            placeholder="Buscar por nome ou CPF..."
             value={search}
-            onChange={(
-              event,
-            ) =>
+            onChange={(event) =>
               setSearch(
-                event.target
-                  .value,
+                event.target.value,
               )
             }
             style={{
@@ -190,12 +199,8 @@ export default function TrabalhadoresTable({
 
         <select
           className="select-base"
-          value={
-            statusFilter
-          }
-          onChange={(
-            event,
-          ) =>
+          value={statusFilter}
+          onChange={(event) =>
             setStatusFilter(
               event.target
                 .value as StatusFilter,
@@ -203,7 +208,7 @@ export default function TrabalhadoresTable({
           }
         >
           <option value="todos">
-            Todos os status
+            Todos
           </option>
 
           <option value="ativos">
@@ -223,11 +228,17 @@ export default function TrabalhadoresTable({
               Funcionário
             </th>
 
-            <th>CPF</th>
+            <th>
+              CPF
+            </th>
 
-            <th>Status</th>
+            <th>
+              Status
+            </th>
 
-            <th>Ações</th>
+            <th>
+              Ações
+            </th>
           </tr>
         </thead>
 
@@ -235,175 +246,207 @@ export default function TrabalhadoresTable({
           {trabalhadoresFiltrados
             .length > 0 ? (
             trabalhadoresFiltrados.map(
-              (
-                trabalhador,
-              ) => (
-                <tr
-                  key={
-                    trabalhador.id
-                  }
-                >
-                  <td>
-                    <div
-                      style={{
-                        display:
-                          "flex",
+              (trabalhador) => {
+                const isChangingStatus =
+                  changingStatusId ===
+                  trabalhador.id;
 
-                        alignItems:
-                          "center",
-
-                        gap: 10,
-                      }}
-                    >
+                return (
+                  <tr
+                    key={
+                      trabalhador.id
+                    }
+                  >
+                    <td>
                       <div
                         style={{
-                          width: 32,
-                          height: 32,
-                          minWidth: 32,
-
-                          borderRadius:
-                            "50%",
-
-                          background:
-                            "#fde8ea",
-
                           display:
                             "flex",
-
                           alignItems:
                             "center",
+                          gap: 10,
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: 32,
+                            height: 32,
+                            minWidth: 32,
+                            borderRadius:
+                              "50%",
+                            background:
+                              "#fde8ea",
+                            display:
+                              "flex",
+                            alignItems:
+                              "center",
+                            justifyContent:
+                              "center",
+                            fontSize: 12,
+                            fontWeight: 700,
+                            color:
+                              "#c01a2b",
+                          }}
+                        >
+                          {trabalhador.name
+                            .split(" ")
+                            .filter(
+                              Boolean,
+                            )
+                            .map(
+                              (name) =>
+                                name[0],
+                            )
+                            .join("")
+                            .slice(0, 2)
+                            .toUpperCase()}
+                        </div>
 
-                          justifyContent:
+                        <span
+                          style={{
+                            fontWeight:
+                              600,
+                          }}
+                        >
+                          {
+                            trabalhador.name
+                          }
+                        </span>
+                      </div>
+                    </td>
+
+                    <td
+                      style={{
+                        color:
+                          "#6b7280",
+                        fontFamily:
+                          "monospace",
+                        fontSize: 13,
+                      }}
+                    >
+                      {trabalhador.formattedCpf ||
+                        trabalhador.cpf}
+                    </td>
+
+                    <td>
+                      <span
+                        style={{
+                          display:
+                            "inline-flex",
+                          alignItems:
                             "center",
-
+                          padding:
+                            "4px 9px",
+                          borderRadius:
+                            999,
                           fontSize:
-                            12,
-
+                            11.5,
                           fontWeight:
                             700,
 
-                          color:
-                            "#c01a2b",
-                        }}
-                      >
-                        {trabalhador.name
-                          .split(
-                            " ",
-                          )
-                          .filter(
-                            Boolean,
-                          )
-                          .map(
-                            (
-                              name,
-                            ) =>
-                              name[0],
-                          )
-                          .join("")
-                          .slice(
-                            0,
-                            2,
-                          )
-                          .toUpperCase()}
-                      </div>
-
-                      <span
-                        style={{
-                          fontWeight:
-                            600,
-                        }}
-                      >
-                        {
-                          trabalhador.name
-                        }
-                      </span>
-                    </div>
-                  </td>
-
-                  <td
-                    style={{
-                      color:
-                        "#6b7280",
-
-                      fontFamily:
-                        "monospace",
-
-                      fontSize: 13,
-                    }}
-                  >
-                    {trabalhador.formattedCpf ||
-                      trabalhador.cpf}
-                  </td>
-
-                  <td>
-                    <span
-                      className={`badge ${
-                        trabalhador.active
-                          ? "badge-success"
-                          : "badge-gray"
-                      }`}
-                    >
-                      <span
-                        style={{
-                          width: 6,
-                          height: 6,
-
-                          borderRadius:
-                            "50%",
-
-                          display:
-                            "inline-block",
-
                           background:
                             trabalhador.active
-                              ? "#16a34a"
+                              ? "#dcfce7"
+                              : "#f1f5f9",
+
+                          color:
+                            trabalhador.active
+                              ? "#15803d"
                               : "#64748b",
                         }}
-                      />
-
-                      {trabalhador.active
-                        ? "Ativo"
-                        : "Inativo"}
-                    </span>
-                  </td>
-
-                  <td>
-                    <div
-                      style={{
-                        display:
-                          "flex",
-
-                        gap: 6,
-                      }}
-                    >
-                      <button
-                        className="btn btn-ghost btn-sm"
-                        onClick={
-                          onDocuments
-                        }
                       >
-                        <Icon
-                          name="doc"
-                          size={13}
-                        />
+                        {trabalhador.active
+                          ? "Ativo"
+                          : "Inativo"}
+                      </span>
+                    </td>
 
-                        Docs
-                      </button>
-
-                      <button
-                        className="btn btn-ghost btn-sm"
-                        disabled
-                        title="Edição será integrada na próxima etapa"
+                    <td>
+                      <div
+                        style={{
+                          display:
+                            "flex",
+                          gap: 6,
+                          flexWrap:
+                            "wrap",
+                        }}
                       >
-                        <Icon
-                          name="edit"
-                          size={13}
-                        />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ),
+                        <button
+                          type="button"
+                          className="btn btn-ghost btn-sm"
+                          onClick={
+                            onDocuments
+                          }
+                        >
+                          <Icon
+                            name="doc"
+                            size={
+                              13
+                            }
+                          />
+
+                          Docs
+                        </button>
+
+                        <button
+                          type="button"
+                          className="btn btn-ghost btn-sm"
+                          title="Editar funcionário"
+                          onClick={() =>
+                            onEdit(
+                              trabalhador,
+                            )
+                          }
+                        >
+                          <Icon
+                            name="edit"
+                            size={
+                              13
+                            }
+                          />
+
+                          Editar
+                        </button>
+
+                        <button
+                          type="button"
+                          className="btn btn-ghost btn-sm"
+                          disabled={
+                            isChangingStatus
+                          }
+                          title={
+                            trabalhador.active
+                              ? "Desativar funcionário"
+                              : "Ativar funcionário"
+                          }
+                          onClick={() =>
+                            void handleToggleStatus(
+                              trabalhador,
+                            )
+                          }
+                        >
+                          <Icon
+                            name={
+                              trabalhador.active
+                                ? "x"
+                                : "check"
+                            }
+                            size={
+                              13
+                            }
+                          />
+
+                          {isChangingStatus
+                            ? "Alterando..."
+                            : trabalhador.active
+                              ? "Desativar"
+                              : "Ativar"}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              },
             )
           ) : (
             <tr>
@@ -412,10 +455,8 @@ export default function TrabalhadoresTable({
                 style={{
                   padding:
                     "36px 20px",
-
                   textAlign:
                     "center",
-
                   color:
                     "#64748b",
                 }}
