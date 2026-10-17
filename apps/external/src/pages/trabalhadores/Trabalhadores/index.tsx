@@ -1,66 +1,163 @@
-import { useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
+
+import { useAuth } from "../../../app/providers";
+
+import {
+  createWorker,
+  getWorkers,
+} from "../../../shared/api/workers";
 
 import Header from "../../../shared/components/Header";
 import Icon from "../../../shared/components/Icon";
 import PageWrapper from "../../../shared/components/PageWrapper";
 
+import type { Worker } from "../../../shared/types/workers";
+
 import AdicionarTrabalhadorModal, {
   type TrabalhadorForm,
 } from "./components/AdicionarTrabalhadorModal";
 
-import TrabalhadoresTable, {
-  type Trabalhador,
-} from "./components/TrabalhadoresTable";
+import TrabalhadoresTable from "./components/TrabalhadoresTable";
 
 type TrabalhadoresPageProps = {
-  trabalhadores: Trabalhador[];
-  onNav: (screen: "documents") => void;
+  onNav: (
+    screen: "documents",
+  ) => void;
 };
 
 export default function TrabalhadoresPage({
-  trabalhadores,
   onNav,
 }: TrabalhadoresPageProps) {
-  const [showModal, setShowModal] =
-    useState(false);
+  const { auth } = useAuth();
+
+  const accessToken =
+    auth?.accessToken;
 
   const [
-    listaTrabalhadores,
-    setListaTrabalhadores,
-  ] = useState<Trabalhador[]>(
     trabalhadores,
-  );
+    setTrabalhadores,
+  ] = useState<Worker[]>([]);
 
-  function handleAddTrabalhador(
+  const [
+    showModal,
+    setShowModal,
+  ] = useState(false);
+
+  const [
+    isLoading,
+    setIsLoading,
+  ] = useState(true);
+
+  const [
+    error,
+    setError,
+  ] = useState("");
+
+  useEffect(() => {
+    if (!accessToken) {
+      return;
+    }
+
+    let cancelled = false;
+
+    async function loadWorkers() {
+      try {
+        setIsLoading(true);
+        setError("");
+
+        const response =
+          await getWorkers(
+            accessToken!,
+            {
+              pageNumber: 1,
+              pageSize: 50,
+            },
+          );
+
+        if (cancelled) {
+          return;
+        }
+
+        setTrabalhadores(
+          response.items,
+        );
+      } catch (loadError) {
+        if (cancelled) {
+          return;
+        }
+
+        if (
+          loadError instanceof Error
+        ) {
+          setError(
+            loadError.message,
+          );
+        } else {
+          setError(
+            "Não foi possível carregar os funcionários.",
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    void loadWorkers();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [accessToken]);
+
+  async function handleAddTrabalhador(
     form: TrabalhadorForm,
   ) {
-    const nextId =
-      listaTrabalhadores.length > 0
-        ? Math.max(
-            ...listaTrabalhadores.map(
-              (trabalhador) =>
-                trabalhador.id,
-            ),
-          ) + 1
-        : 1;
+    if (!accessToken) {
+      setError(
+        "Sessão inválida. Faça login novamente.",
+      );
 
-    const novoTrabalhador: Trabalhador = {
-      id: nextId,
-      name: form.name,
-      cpf: form.cpf,
-      role: form.role,
-      status: "pending",
-      pendingDocs: 0,
-    };
+      return;
+    }
 
-    setListaTrabalhadores(
-      (current) => [
-        ...current,
-        novoTrabalhador,
-      ],
-    );
+    try {
+      setError("");
 
-    setShowModal(false);
+      const novoTrabalhador =
+        await createWorker(
+          accessToken,
+          {
+            name: form.name,
+            cpf: form.cpf,
+          },
+        );
+
+      setTrabalhadores(
+        (current) => [
+          ...current,
+          novoTrabalhador,
+        ],
+      );
+
+      setShowModal(false);
+    } catch (createError) {
+      if (
+        createError instanceof Error
+      ) {
+        setError(
+          createError.message,
+        );
+      } else {
+        setError(
+          "Não foi possível cadastrar o funcionário.",
+        );
+      }
+    }
   }
 
   return (
@@ -86,14 +183,57 @@ export default function TrabalhadoresPage({
       />
 
       <PageWrapper>
-        <TrabalhadoresTable
-          trabalhadores={
-            listaTrabalhadores
-          }
-          onDocuments={() =>
-            onNav("documents")
-          }
-        />
+        {error && (
+          <div
+            style={{
+              padding:
+                "12px 16px",
+              marginBottom: 16,
+
+              border:
+                "1px solid #fecaca",
+
+              borderRadius: 10,
+
+              background:
+                "rgba(254, 242, 242, 0.94)",
+
+              color:
+                "#b91c1c",
+
+              fontSize: 13,
+              fontWeight: 500,
+            }}
+          >
+            {error}
+          </div>
+        )}
+
+        {isLoading ? (
+          <div
+            className="card"
+            style={{
+              padding: 40,
+              textAlign:
+                "center",
+              color:
+                "#64748b",
+            }}
+          >
+            Carregando funcionários...
+          </div>
+        ) : (
+          <TrabalhadoresTable
+            trabalhadores={
+              trabalhadores
+            }
+            onDocuments={() =>
+              onNav(
+                "documents",
+              )
+            }
+          />
+        )}
       </PageWrapper>
 
       {showModal && (

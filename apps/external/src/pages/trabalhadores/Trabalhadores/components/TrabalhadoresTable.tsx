@@ -4,26 +4,18 @@ import {
 } from "react";
 
 import Icon from "../../../../shared/components/Icon";
-import StatusBadge from "../../../../shared/components/StatusBadge";
 
-export type Trabalhador = {
-  id: number;
-  name: string;
-  cpf: string;
-  role: string;
-  status: string;
-  pendingDocs: number;
-};
+import type { Worker } from "../../../../shared/types/workers";
 
 type TrabalhadoresTableProps = {
-  trabalhadores: Trabalhador[];
+  trabalhadores: Worker[];
   onDocuments: () => void;
 };
 
 type StatusFilter =
   | "todos"
-  | "apto"
-  | "pendente";
+  | "ativos"
+  | "inativos";
 
 function normalizeText(
   value: string,
@@ -36,31 +28,6 @@ function normalizeText(
     )
     .toLowerCase()
     .trim();
-}
-
-function getStatusGroup(
-  status: string,
-): "apto" | "pendente" | "outro" {
-  const normalized =
-    normalizeText(status);
-
-  if (
-    normalized === "apt" ||
-    normalized === "apto"
-  ) {
-    return "apto";
-  }
-
-  if (
-    normalized === "pending" ||
-    normalized === "pendente" ||
-    normalized ===
-      "aguardando analise"
-  ) {
-    return "pendente";
-  }
-
-  return "outro";
 }
 
 export default function TrabalhadoresTable({
@@ -93,6 +60,10 @@ export default function TrabalhadoresTable({
 
       return trabalhadores.filter(
         (trabalhador) => {
+          const cpf =
+            trabalhador.formattedCpf ||
+            trabalhador.cpf;
+
           const matchesSearch =
             normalizedSearch === "" ||
             normalizeText(
@@ -101,12 +72,7 @@ export default function TrabalhadoresTable({
               normalizedSearch,
             ) ||
             normalizeText(
-              trabalhador.role,
-            ).includes(
-              normalizedSearch,
-            ) ||
-            normalizeText(
-              trabalhador.cpf,
+              cpf,
             ).includes(
               normalizedSearch,
             ) ||
@@ -125,10 +91,16 @@ export default function TrabalhadoresTable({
           const matchesStatus =
             statusFilter ===
               "todos" ||
-            getStatusGroup(
-              trabalhador.status,
-            ) ===
-              statusFilter;
+            (
+              statusFilter ===
+                "ativos" &&
+              trabalhador.active
+            ) ||
+            (
+              statusFilter ===
+                "inativos" &&
+              !trabalhador.active
+            );
 
           return (
             matchesSearch &&
@@ -154,8 +126,10 @@ export default function TrabalhadoresTable({
         style={{
           padding:
             "16px 20px",
+
           borderBottom:
             "1px solid rgba(15, 23, 42, 0.06)",
+
           display: "flex",
           gap: 10,
           flexWrap: "wrap",
@@ -165,7 +139,9 @@ export default function TrabalhadoresTable({
           style={{
             position:
               "relative",
+
             flex: 1,
+
             minWidth: 220,
             maxWidth: 320,
           }}
@@ -174,12 +150,16 @@ export default function TrabalhadoresTable({
             style={{
               position:
                 "absolute",
+
               left: 10,
               top: "50%",
+
               transform:
                 "translateY(-50%)",
+
               color:
                 "#64748b",
+
               pointerEvents:
                 "none",
             }}
@@ -226,12 +206,12 @@ export default function TrabalhadoresTable({
             Todos os status
           </option>
 
-          <option value="apto">
-            Apto
+          <option value="ativos">
+            Ativos
           </option>
 
-          <option value="pendente">
-            Pendente
+          <option value="inativos">
+            Inativos
           </option>
         </select>
       </div>
@@ -242,12 +222,11 @@ export default function TrabalhadoresTable({
             <th>
               Funcionário
             </th>
+
             <th>CPF</th>
-            <th>Função</th>
+
             <th>Status</th>
-            <th>
-              Docs Pendentes
-            </th>
+
             <th>Ações</th>
           </tr>
         </thead>
@@ -269,8 +248,10 @@ export default function TrabalhadoresTable({
                       style={{
                         display:
                           "flex",
+
                         alignItems:
                           "center",
+
                         gap: 10,
                       }}
                     >
@@ -347,55 +328,43 @@ export default function TrabalhadoresTable({
                       fontFamily:
                         "monospace",
 
-                      fontSize:
-                        13,
+                      fontSize: 13,
                     }}
                   >
-                    {
-                      trabalhador.cpf
-                    }
+                    {trabalhador.formattedCpf ||
+                      trabalhador.cpf}
                   </td>
 
                   <td>
-                    {
-                      trabalhador.role
-                    }
-                  </td>
-
-                  <td>
-                    <StatusBadge
-                      status={
-                        trabalhador.status
-                      }
-                    />
-                  </td>
-
-                  <td>
-                    {trabalhador.pendingDocs >
-                    0 ? (
+                    <span
+                      className={`badge ${
+                        trabalhador.active
+                          ? "badge-success"
+                          : "badge-gray"
+                      }`}
+                    >
                       <span
                         style={{
-                          fontWeight:
-                            700,
+                          width: 6,
+                          height: 6,
 
-                          color:
-                            "#dc2626",
+                          borderRadius:
+                            "50%",
+
+                          display:
+                            "inline-block",
+
+                          background:
+                            trabalhador.active
+                              ? "#16a34a"
+                              : "#64748b",
                         }}
-                      >
-                        {
-                          trabalhador.pendingDocs
-                        }
-                      </span>
-                    ) : (
-                      <span
-                        style={{
-                          color:
-                            "#6b7280",
-                        }}
-                      >
-                        0
-                      </span>
-                    )}
+                      />
+
+                      {trabalhador.active
+                        ? "Ativo"
+                        : "Inativo"}
+                    </span>
                   </td>
 
                   <td>
@@ -403,6 +372,7 @@ export default function TrabalhadoresTable({
                       style={{
                         display:
                           "flex",
+
                         gap: 6,
                       }}
                     >
@@ -422,6 +392,8 @@ export default function TrabalhadoresTable({
 
                       <button
                         className="btn btn-ghost btn-sm"
+                        disabled
+                        title="Edição será integrada na próxima etapa"
                       >
                         <Icon
                           name="edit"
@@ -436,7 +408,7 @@ export default function TrabalhadoresTable({
           ) : (
             <tr>
               <td
-                colSpan={6}
+                colSpan={4}
                 style={{
                   padding:
                     "36px 20px",
@@ -448,11 +420,8 @@ export default function TrabalhadoresTable({
                     "#64748b",
                 }}
               >
-                Nenhum
-                funcionário
-                encontrado com
-                os filtros
-                selecionados.
+                Nenhum funcionário
+                encontrado.
               </td>
             </tr>
           )}

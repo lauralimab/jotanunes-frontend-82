@@ -1,6 +1,8 @@
 import { useState } from "react";
 
 import { login } from "../../../../shared/api/auth";
+import Icon from "../../../../shared/components/Icon";
+
 import type { AuthToken } from "../../../../shared/types/auth";
 
 type LoginFormProps = {
@@ -18,11 +20,20 @@ export default function LoginForm({
   const [pass, setPass] =
     useState("");
 
-  const [loginError, setLoginError] =
-    useState("");
+  const [
+    showPassword,
+    setShowPassword,
+  ] = useState(false);
 
-  const [isLoading, setIsLoading] =
-    useState(false);
+  const [
+    loginError,
+    setLoginError,
+  ] = useState("");
+
+  const [
+    isLoading,
+    setIsLoading,
+  ] = useState(false);
 
   async function handleLogin() {
     setLoginError("");
@@ -88,6 +99,7 @@ export default function LoginForm({
               "1px solid #fecaca",
             color: "#b91c1c",
             fontSize: 12.5,
+            marginBottom: 18,
           }}
         >
           {loginError}
@@ -164,17 +176,80 @@ export default function LoginForm({
             Senha
           </label>
 
-          <input
-            className="input-base"
-            type="password"
-            placeholder="••••••••"
-            value={pass}
-            onChange={(event) =>
-              setPass(
-                event.target.value,
-              )
-            }
-          />
+          <div
+            style={{
+              position: "relative",
+            }}
+          >
+            <input
+              className="input-base"
+              type={
+                showPassword
+                  ? "text"
+                  : "password"
+              }
+              placeholder="••••••••"
+              value={pass}
+              onChange={(event) =>
+                setPass(
+                  event.target.value,
+                )
+              }
+              style={{
+                paddingRight: 44,
+              }}
+            />
+
+            <button
+              type="button"
+              onClick={() =>
+                setShowPassword(
+                  (current) =>
+                    !current,
+                )
+              }
+              title={
+                showPassword
+                  ? "Ocultar senha"
+                  : "Mostrar senha"
+              }
+              aria-label={
+                showPassword
+                  ? "Ocultar senha"
+                  : "Mostrar senha"
+              }
+              style={{
+                position:
+                  "absolute",
+                right: 8,
+                top: "50%",
+                transform:
+                  "translateY(-50%)",
+                width: 34,
+                height: 34,
+                border: "none",
+                background:
+                  "transparent",
+                color: "#64748b",
+                cursor: "pointer",
+                display: "flex",
+                alignItems:
+                  "center",
+                justifyContent:
+                  "center",
+                borderRadius: 7,
+              }}
+            >
+              <Icon
+                name={
+                  showPassword
+                    ? "eyeOff"
+                    : "eye"
+                }
+                size={17}
+              />
+            </button>
+          </div>
         </div>
 
         <div
@@ -185,6 +260,7 @@ export default function LoginForm({
           }}
         >
           <button
+            type="button"
             style={{
               background: "none",
               border: "none",

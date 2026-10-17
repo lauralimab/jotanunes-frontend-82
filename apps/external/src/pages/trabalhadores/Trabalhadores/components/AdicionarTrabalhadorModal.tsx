@@ -1,67 +1,71 @@
-import { useState } from "react";
+import {
+  useState,
+} from "react";
 
 import Icon from "../../../../shared/components/Icon";
 
 export type TrabalhadorForm = {
   name: string;
   cpf: string;
-  rg: string;
-  birthDate: string;
-  role: string;
-  email: string;
-  phone: string;
 };
 
 type AdicionarTrabalhadorModalProps = {
   onClose: () => void;
-  onAdd: (form: TrabalhadorForm) => void;
+
+  onAdd: (
+    form: TrabalhadorForm,
+  ) => void | Promise<void>;
 };
 
 const initialForm: TrabalhadorForm = {
   name: "",
   cpf: "",
-  rg: "",
-  birthDate: "",
-  role: "",
-  email: "",
-  phone: "",
 };
 
 export default function AdicionarTrabalhadorModal({
   onClose,
   onAdd,
 }: AdicionarTrabalhadorModalProps) {
-  const [form, setForm] =
-    useState<TrabalhadorForm>(initialForm);
+  const [
+    form,
+    setForm,
+  ] =
+    useState<TrabalhadorForm>(
+      initialForm,
+    );
 
   function handleField(
-    field: keyof TrabalhadorForm,
+    field:
+      keyof TrabalhadorForm,
+
     value: string,
   ) {
-    setForm((current) => ({
-      ...current,
-      [field]: value,
-    }));
+    setForm(
+      (current) => ({
+        ...current,
+        [field]: value,
+      }),
+    );
   }
 
-  function handleAdd() {
+  async function handleAdd() {
     if (
       !form.name.trim() ||
-      !form.cpf.trim() ||
-      !form.role.trim()
+      !form.cpf.trim()
     ) {
       alert(
-        "Preencha Nome, CPF e Função / Cargo.",
+        "Preencha Nome e CPF.",
       );
 
       return;
     }
 
-    onAdd({
-      ...form,
-      name: form.name.trim(),
-      cpf: form.cpf.trim(),
-      role: form.role.trim(),
+    await onAdd({
+      name:
+        form.name.trim(),
+
+      cpf:
+        form.cpf.trim(),
     });
   }
 
@@ -79,16 +83,23 @@ export default function AdicionarTrabalhadorModal({
         <div
           style={{
             display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
+
+            justifyContent:
+              "space-between",
+
+            alignItems:
+              "center",
+
             marginBottom: 20,
           }}
         >
           <h3
             style={{
               margin: 0,
+
               fontFamily:
                 "'DM Sans', sans-serif",
+
               fontSize: 18,
               fontWeight: 700,
             }}
@@ -110,7 +121,8 @@ export default function AdicionarTrabalhadorModal({
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
+            flexDirection:
+              "column",
             gap: 14,
           }}
         >
@@ -119,8 +131,13 @@ export default function AdicionarTrabalhadorModal({
               style={{
                 fontSize: 12.5,
                 fontWeight: 600,
-                color: "#374151",
-                display: "block",
+
+                color:
+                  "#374151",
+
+                display:
+                  "block",
+
                 marginBottom: 5,
               }}
             >
@@ -129,11 +146,18 @@ export default function AdicionarTrabalhadorModal({
 
             <input
               className="input-base"
-              value={form.name}
-              onChange={(event) =>
+
+              value={
+                form.name
+              }
+
+              onChange={(
+                event,
+              ) =>
                 handleField(
                   "name",
-                  event.target.value,
+                  event.target
+                    .value,
                 )
               }
             />
@@ -144,8 +168,13 @@ export default function AdicionarTrabalhadorModal({
               style={{
                 fontSize: 12.5,
                 fontWeight: 600,
-                color: "#374151",
-                display: "block",
+
+                color:
+                  "#374151",
+
+                display:
+                  "block",
+
                 marginBottom: 5,
               }}
             >
@@ -154,142 +183,20 @@ export default function AdicionarTrabalhadorModal({
 
             <input
               className="input-base"
+
               placeholder="000.000.000-00"
-              value={form.cpf}
-              onChange={(event) =>
+
+              value={
+                form.cpf
+              }
+
+              onChange={(
+                event,
+              ) =>
                 handleField(
                   "cpf",
-                  event.target.value,
-                )
-              }
-            />
-          </div>
-
-          <div>
-            <label
-              style={{
-                fontSize: 12.5,
-                fontWeight: 600,
-                color: "#374151",
-                display: "block",
-                marginBottom: 5,
-              }}
-            >
-              RG
-            </label>
-
-            <input
-              className="input-base"
-              value={form.rg}
-              onChange={(event) =>
-                handleField(
-                  "rg",
-                  event.target.value,
-                )
-              }
-            />
-          </div>
-
-          <div>
-            <label
-              style={{
-                fontSize: 12.5,
-                fontWeight: 600,
-                color: "#374151",
-                display: "block",
-                marginBottom: 5,
-              }}
-            >
-              Data de Nascimento
-            </label>
-
-            <input
-              className="input-base"
-              type="date"
-              value={form.birthDate}
-              onChange={(event) =>
-                handleField(
-                  "birthDate",
-                  event.target.value,
-                )
-              }
-            />
-          </div>
-
-          <div>
-            <label
-              style={{
-                fontSize: 12.5,
-                fontWeight: 600,
-                color: "#374151",
-                display: "block",
-                marginBottom: 5,
-              }}
-            >
-              Função / Cargo *
-            </label>
-
-            <input
-              className="input-base"
-              placeholder="Ex: Auxiliar de Limpeza"
-              value={form.role}
-              onChange={(event) =>
-                handleField(
-                  "role",
-                  event.target.value,
-                )
-              }
-            />
-          </div>
-
-          <div>
-            <label
-              style={{
-                fontSize: 12.5,
-                fontWeight: 600,
-                color: "#374151",
-                display: "block",
-                marginBottom: 5,
-              }}
-            >
-              E-mail
-            </label>
-
-            <input
-              className="input-base"
-              type="email"
-              placeholder="joao@empresa.com"
-              value={form.email}
-              onChange={(event) =>
-                handleField(
-                  "email",
-                  event.target.value,
-                )
-              }
-            />
-          </div>
-
-          <div>
-            <label
-              style={{
-                fontSize: 12.5,
-                fontWeight: 600,
-                color: "#374151",
-                display: "block",
-                marginBottom: 5,
-              }}
-            >
-              Telefone
-            </label>
-
-            <input
-              className="input-base"
-              placeholder="(00) 00000-0000"
-              value={form.phone}
-              onChange={(event) =>
-                handleField(
-                  "phone",
-                  event.target.value,
+                  event.target
+                    .value,
                 )
               }
             />
@@ -299,8 +206,12 @@ export default function AdicionarTrabalhadorModal({
         <div
           style={{
             display: "flex",
+
             gap: 10,
-            justifyContent: "flex-end",
+
+            justifyContent:
+              "flex-end",
+
             marginTop: 22,
           }}
         >
@@ -313,7 +224,9 @@ export default function AdicionarTrabalhadorModal({
 
           <button
             className="btn btn-primary"
-            onClick={handleAdd}
+            onClick={() =>
+              void handleAdd()
+            }
           >
             Adicionar
           </button>

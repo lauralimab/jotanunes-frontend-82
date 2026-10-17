@@ -9,6 +9,7 @@ import {
 import { BrowserRouter } from "react-router-dom";
 
 import {
+  changePassword as changePasswordRequest,
   getAuthenticatedUser,
   logout as logoutRequest,
   refreshAuthSession,
@@ -20,13 +21,25 @@ import {
   saveAuthSession,
 } from "../shared/auth/session";
 
-import type { AuthToken } from "../shared/types/auth";
+import type {
+  AuthToken,
+  ChangePasswordRequest,
+} from "../shared/types/auth";
 
 type AuthContextValue = {
   auth: AuthToken | null;
+
   isCheckingSession: boolean;
-  handleLogin: (authToken: AuthToken) => void;
+
+  handleLogin: (
+    authToken: AuthToken,
+  ) => void;
+
   handleLogout: () => Promise<void>;
+
+  handleChangePassword: (
+    data: ChangePasswordRequest,
+  ) => Promise<void>;
 };
 
 type AuthProviderProps = {
@@ -38,13 +51,20 @@ type AppProvidersProps = {
 };
 
 const AuthContext =
-  createContext<AuthContextValue | null>(null);
+  createContext<AuthContextValue | null>(
+    null,
+  );
 
 function AuthProvider({
   children,
 }: AuthProviderProps) {
-  const [auth, setAuth] =
-    useState<AuthToken | null>(null);
+  const [
+    auth,
+    setAuth,
+  ] =
+    useState<AuthToken | null>(
+      null,
+    );
 
   const [
     isCheckingSession,
@@ -60,7 +80,9 @@ function AuthProvider({
 
       if (!storedSession) {
         if (!cancelled) {
-          setIsCheckingSession(false);
+          setIsCheckingSession(
+            false,
+          );
         }
 
         return;
@@ -76,10 +98,11 @@ function AuthProvider({
           return;
         }
 
-        const validatedSession: AuthToken = {
-          ...storedSession,
-          user,
-        };
+        const validatedSession: AuthToken =
+          {
+            ...storedSession,
+            user,
+          };
 
         saveAuthSession(
           validatedSession,
@@ -104,10 +127,11 @@ function AuthProvider({
             return;
           }
 
-          const validatedSession: AuthToken = {
-            ...refreshedSession,
-            user,
-          };
+          const validatedSession: AuthToken =
+            {
+              ...refreshedSession,
+              user,
+            };
 
           saveAuthSession(
             validatedSession,
@@ -122,11 +146,14 @@ function AuthProvider({
           }
 
           clearAuthSession();
+
           setAuth(null);
         }
       } finally {
         if (!cancelled) {
-          setIsCheckingSession(false);
+          setIsCheckingSession(
+            false,
+          );
         }
       }
     }
@@ -141,14 +168,45 @@ function AuthProvider({
   function handleLogin(
     authToken: AuthToken,
   ) {
-    saveAuthSession(authToken);
-    setAuth(authToken);
+    saveAuthSession(
+      authToken,
+    );
+
+    setAuth(
+      authToken,
+    );
+  }
+
+  async function handleChangePassword(
+    data: ChangePasswordRequest,
+  ) {
+    if (!auth) {
+      throw new Error(
+        "Sessão inválida. Faça login novamente.",
+      );
+    }
+
+    const updatedAuth =
+      await changePasswordRequest(
+        auth.accessToken,
+        data,
+      );
+
+    saveAuthSession(
+      updatedAuth,
+    );
+
+    setAuth(
+      updatedAuth,
+    );
   }
 
   async function handleLogout() {
-    const currentSession = auth;
+    const currentSession =
+      auth;
 
     clearAuthSession();
+
     setAuth(null);
 
     if (!currentSession) {
@@ -171,6 +229,7 @@ function AuthProvider({
         isCheckingSession,
         handleLogin,
         handleLogout,
+        handleChangePassword,
       }}
     >
       {children}
