@@ -1,0 +1,9 @@
+export type Screen =
+  | "login"
+  | "admin-dashboard" | "admin-suppliers" | "supplier-details"
+  | "document-analysis" | "expirations" | "notifications" | "history"
+  | "boletim" | "autorizacao-excepcional" | "recebimento-material" | "requisitos";
+
+export type DocStatus = "approved" | "pending" | "expired" | "waiting" | "rejected" | "correction";
+
+export type SupplierStatus = "apt" | "pending" | "blocked";
