@@ -12,7 +12,6 @@ import AutorizacaoExcepcionalPage from "../pages/autorizacoes/AutorizacaoExcepci
 import RecebimentoMaterialPage from "../pages/materiais/RecebimentoMaterial";
 import NotificacoesPage from "../pages/sistema/Notificacoes";
 import HistoricoPage from "../pages/sistema/Historico";
-import RequisitosPage from "../pages/sistema/Requisitos";
 
 export default function AppRouter() {
   const [screen, setScreen] = useState<Screen>("login");
@@ -36,7 +35,6 @@ export default function AppRouter() {
       case "recebimento-material":    return <RecebimentoMaterialPage />;
       case "notifications":           return <NotificacoesPage />;
       case "history":                 return <HistoricoPage />;
-      case "requisitos":              return <RequisitosPage />;
       default:                        return null;
     }
   };

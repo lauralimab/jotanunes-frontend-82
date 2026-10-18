@@ -1,3 +1,17 @@
-export default function PageWrapper({ children }: { children: React.ReactNode }) {
-  return <div style={{ padding: 28, maxWidth: 1180 }}>{children}</div>;
+import type { ReactNode } from "react";
+
+type PageWrapperProps = {
+  children: ReactNode;
+};
+
+export default function PageWrapper({
+  children,
+}: PageWrapperProps) {
+  return (
+    <main className="page-wrapper">
+      <div className="page-wrapper-inner">
+        {children}
+      </div>
+    </main>
+  );
 }

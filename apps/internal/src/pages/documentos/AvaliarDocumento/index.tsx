@@ -19,13 +19,13 @@ export default function AvaliarDocumentoPage({ onNav }: { onNav: (s: Screen) => 
 
   return (
     <>
-      <Header title="Análise de Documento" subtitle={`RF07/RF08/RF09/RF10 — ${doc.name}`}
+      <Header title="Análise de Documento" subtitle={`${doc.name}`}
         actions={<button className="btn btn-secondary btn-sm" onClick={() => onNav("admin-suppliers")}>← Voltar</button>} />
       <PageWrapper>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 20 }}>
           <div className="card" style={{ padding: 0, overflow: "hidden" }}>
             <div style={{ padding: "12px 16px", borderBottom: "1px solid #f3f4f6", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: 13, fontWeight: 600 }}>Visualização do Documento (RNF04)</span>
+              <span style={{ fontSize: 13, fontWeight: 600 }}>Visualização do Documento</span>
               <div style={{ display: "flex", gap: 6 }}>
                 <button className="btn btn-ghost btn-sm"><Icon name="refresh" size={13} />Recarregar</button>
                 <button className="btn btn-ghost btn-sm"><Icon name="eye" size={13} />Tela cheia</button>
@@ -53,8 +53,8 @@ export default function AvaliarDocumentoPage({ onNav }: { onNav: (s: Screen) => 
 
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <div className="card">
-              <h3 style={{ margin: "0 0 14px", fontSize: 14, fontWeight: 700 }}>Informações (RF07)</h3>
-              {[["Tipo", doc.name], ["Fornecedor", doc.person], ["Enviado em", doc.uploadedAt], ["Validade (RF11)", doc.validity], ["Status atual", ""]].map(([l, v]) => (
+              <h3 style={{ margin: "0 0 14px", fontSize: 14, fontWeight: 700 }}>Informações</h3>
+              {[["Tipo", doc.name], ["Fornecedor", doc.person], ["Enviado em", doc.uploadedAt], ["Validade", doc.validity], ["Status atual", ""]].map(([l, v]) => (
                 <div key={l} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px solid #f3f4f6", fontSize: 13 }}>
                   <span style={{ color: "#6b7280", fontWeight: 500 }}>{l}</span>
                   {l === "Status atual" ? <StatusBadge status={doc.status} /> : <span style={{ color: "#0f172a", fontWeight: 500 }}>{v}</span>}
@@ -65,7 +65,7 @@ export default function AvaliarDocumentoPage({ onNav }: { onNav: (s: Screen) => 
             <div className="card" style={{ background: "#fffbeb", border: "1px solid #fde68a" }}>
               <div style={{ display: "flex", gap: 8, alignItems: "flex-start", marginBottom: 10 }}>
                 <Icon name="info" size={16} color="#d97706" />
-                <h4 style={{ margin: 0, fontSize: 13, fontWeight: 700, color: "#92400e" }}>Análise Automática — RF10</h4>
+                <h4 style={{ margin: 0, fontSize: 13, fontWeight: 700, color: "#92400e" }}>Análise Automática</h4>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {[["✓","CNPJ confere com o cadastro do sistema","#16a34a"], ["✓","Documento emitido por órgão reconhecido","#16a34a"], ["⚠","Validade próxima: vence em 32 dias","#d97706"], ["✓","Assinatura digital detectada","#16a34a"]].map(([ic, txt, clr]) => (
@@ -75,7 +75,7 @@ export default function AvaliarDocumentoPage({ onNav }: { onNav: (s: Screen) => 
                   </div>
                 ))}
               </div>
-              <p style={{ margin: "10px 0 0", fontSize: 11, color: "#92400e", fontStyle: "italic" }}>A análise automática é auxiliar. A decisão final é do analista (RF10).</p>
+              <p style={{ margin: "10px 0 0", fontSize: 11, color: "#92400e", fontStyle: "italic" }}>A análise automática é auxiliar. A decisão final é do analista.</p>
             </div>
 
             {decision ? (
@@ -83,9 +83,9 @@ export default function AvaliarDocumentoPage({ onNav }: { onNav: (s: Screen) => 
                 <div style={{ textAlign: "center", padding: "8px 0" }}>
                   <Icon name={decision === "approved" ? "check" : "x"} size={32} color={decision === "approved" ? "#16a34a" : "#dc2626"} />
                   <div style={{ fontWeight: 700, fontSize: 15, color: decision === "approved" ? "#15803d" : "#b91c1c", marginTop: 8 }}>
-                    Documento {decision === "approved" ? "Aprovado" : "Reprovado"} — RF08
+                    Documento {decision === "approved" ? "Aprovado" : "Reprovado"}
                   </div>
-                  <div style={{ fontSize: 12, marginTop: 4, color: "#6b7280" }}>Registrado em histórico (RF18) — {new Date().toLocaleString("pt-BR")}</div>
+                  <div style={{ fontSize: 12, marginTop: 4, color: "#6b7280" }}>Registrado em histórico — {new Date().toLocaleString("pt-BR")}</div>
                 </div>
               </div>
             ) : (

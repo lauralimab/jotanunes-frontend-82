@@ -19,8 +19,8 @@ const filtered = MOCK_SUPPLIERS.filter(s => {
   });
   return (
 <div className="card" style={{ padding: 0, overflow: "hidden" }}>
-          <div style={{ padding: "16px 20px", borderBottom: "1px solid #f3f4f6", display: "flex", gap: 10 }}>
-            <div style={{ position: "relative", flex: 1, maxWidth: 360 }}>
+          <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(15, 23, 42, 0.06)", display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <div style={{ position: "relative", flex: 1, minWidth: 220, maxWidth: 320 }}>
               <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "#9ca3af" }}><Icon name="search" size={15} /></span>
               <input className="input-base" placeholder="Buscar por nome ou CNPJ..." style={{ paddingLeft: 32 }} value={search} onChange={e => setSearch(e.target.value)} />
             </div>
@@ -30,10 +30,11 @@ const filtered = MOCK_SUPPLIERS.filter(s => {
             <select className="select-base" value={unidadeFilter} onChange={e => setUnidadeFilter(e.target.value)}>
               <option value="all">Todas as unidades</option>
               <option value="Belo Horizonte">Belo Horizonte</option>
-              <option value="Petrolina">Petrolina (RF14)</option>
+              <option value="Petrolina">Petrolina</option>
             </select>
           </div>
-          <table className="table-base">
+          <div style={{ overflowX: "auto" }}>
+<table className="table-base">
             <thead><tr><th>Fornecedor</th><th>CNPJ</th><th>Unidade</th><th>Status</th><th>Docs Pendentes</th><th>Última Atualização</th><th>Ações</th></tr></thead>
             <tbody>
               {filtered.map(s => (
@@ -54,7 +55,6 @@ const filtered = MOCK_SUPPLIERS.filter(s => {
                     <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
                       <Icon name="mappin" size={13} color={s.unidade === "Petrolina" ? "#7c3aed" : "#6b7280"} />
                       <span style={{ fontSize: 12.5, color: s.unidade === "Petrolina" ? "#7c3aed" : "#374151", fontWeight: s.unidade === "Petrolina" ? 600 : 400 }}>{s.unidade}</span>
-                      {s.unidade === "Petrolina" && <span className="badge" style={{ background: "#ede9fe", color: "#7c3aed", fontSize: 10 }}>RF14</span>}
                     </div>
                   </td>
                   <td><StatusBadge status={s.status} /></td>
@@ -70,6 +70,7 @@ const filtered = MOCK_SUPPLIERS.filter(s => {
               ))}
             </tbody>
           </table>
+          </div>
           <div style={{ padding: "14px 20px", borderTop: "1px solid #f3f4f6", display: "flex", justifyContent: "space-between" }}>
             <span style={{ fontSize: 12.5, color: "#6b7280" }}>{filtered.length} fornecedor(es)</span>
             <div style={{ display: "flex", gap: 6 }}>{[1,2,3].map(n => <button key={n} className="btn btn-ghost btn-sm" style={{ minWidth: 32, justifyContent: "center", background: n === 1 ? "#fde8ea" : undefined, color: n === 1 ? "#c01a2b" : undefined }}>{n}</button>)}</div>

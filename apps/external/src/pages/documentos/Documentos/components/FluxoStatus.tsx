@@ -34,7 +34,7 @@ export default function FluxoStatus() {
           fontWeight: 600,
         }}
       >
-        Fluxo de status (RF06):
+        Fluxo de status:
       </span>
 
       {statusFlow.map(

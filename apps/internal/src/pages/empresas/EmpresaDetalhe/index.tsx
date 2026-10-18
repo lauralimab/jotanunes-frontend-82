@@ -19,7 +19,7 @@ export default function EmpresaDetalhePage({ onNav }: { onNav: (s: Screen) => vo
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 6 }}>
               <h2 style={{ margin: 0, fontSize: 20, fontFamily: "'DM Sans', sans-serif", fontWeight: 700 }}>{s.name}</h2>
               <StatusBadge status={s.status} />
-              <span className="badge" style={{ background: "#ede9fe", color: "#7c3aed" }}><Icon name="mappin" size={11} />Petrolina — RF14</span>
+              <span className="badge" style={{ background: "#ede9fe", color: "#7c3aed" }}><Icon name="mappin" size={11} />Petrolina</span>
             </div>
             <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
               {[["CNPJ", s.cnpj], ["Contato", s.contact], ["Última atualização", s.lastUpdate], ["Docs pendentes", String(s.pendingDocs)]].map(([l, v]) => (
@@ -33,10 +33,10 @@ export default function EmpresaDetalhePage({ onNav }: { onNav: (s: Screen) => vo
             <div className="progress-bar-track" style={{ width: 80, marginTop: 6 }}><div className="progress-bar-fill" style={{ width: `${pct}%`, background: "#ca8a04" }} /></div>
           </div>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 20 }}>
           <div>
             <div className="card" style={{ marginBottom: 16 }}>
-              <h3 style={{ margin: "0 0 14px", fontSize: 14, fontWeight: 700 }}>Funcionários (RF03)</h3>
+              <h3 style={{ margin: "0 0 14px", fontSize: 14, fontWeight: 700 }}>Funcionários</h3>
               {MOCK_EMPLOYEES.map(e => (
                 <div key={e.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px solid #f3f4f6" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -52,9 +52,10 @@ export default function EmpresaDetalhePage({ onNav }: { onNav: (s: Screen) => vo
           </div>
           <div className="card" style={{ padding: 0, overflow: "hidden" }}>
             <div style={{ padding: "14px 18px", borderBottom: "1px solid #f3f4f6" }}>
-              <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700 }}>Documentos — Fluxo RF06</h3>
+              <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700 }}>Documentos</h3>
             </div>
-            <table className="table-base">
+            <div style={{ overflowX: "auto" }}>
+<table className="table-base">
               <thead><tr><th>Documento</th><th>Status</th><th>Validade</th><th></th></tr></thead>
               <tbody>
                 {MOCK_DOCUMENTS.map(d => (
@@ -67,6 +68,7 @@ export default function EmpresaDetalhePage({ onNav }: { onNav: (s: Screen) => vo
                 ))}
               </tbody>
             </table>
+          </div>
           </div>
         </div>
       </PageWrapper>

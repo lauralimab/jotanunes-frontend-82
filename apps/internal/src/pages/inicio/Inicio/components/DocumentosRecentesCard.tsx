@@ -9,10 +9,11 @@ export default function DocumentosRecentesCard({ onNav }: { onNav: (screen: Scre
   return (
 <div className="card" style={{ padding: 0, overflow: "hidden" }}>
             <div style={{ padding: "16px 20px", borderBottom: "1px solid #f3f4f6", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700 }}>Documentos Aguardando Análise (RF07)</h3>
+              <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700 }}>Documentos Aguardando Análise</h3>
               <button className="btn btn-ghost btn-sm" onClick={() => onNav("admin-suppliers")}>Ver todos</button>
             </div>
-            <table className="table-base">
+            <div style={{ overflowX: "auto" }}>
+<table className="table-base">
               <thead><tr><th>Documento</th><th>Fornecedor</th><th>Status</th><th>Ação</th></tr></thead>
               <tbody>
                 {MOCK_DOCUMENTS.filter(d => ["pending","correction"].includes(d.status)).map(d => (
@@ -25,6 +26,7 @@ export default function DocumentosRecentesCard({ onNav }: { onNav: (screen: Scre
                 ))}
               </tbody>
             </table>
+          </div>
           </div>
   );
 }

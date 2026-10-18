@@ -15,9 +15,9 @@ export default function VencimentosPage() {
   ];
   return (
     <>
-      <Header title="Vencimentos" subtitle="RF11 — Controle de validade dos documentos" />
+      <Header title="Vencimentos" subtitle="Controle de validade dos documentos" />
       <PageWrapper>
-        <div style={{ display: "flex", gap: 16, marginBottom: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16, marginBottom: 24 }}>
           {[{ label: "Vencidos", value: 3, color: "#dc2626", bg: "#fee2e2" }, { label: "Vence em 30 dias", value: 5, color: "#d97706", bg: "#fff7ed" }, { label: "Vence em 60 dias", value: 8, color: "#ca8a04", bg: "#fef9c3" }, { label: "Em dia", value: 42, color: "#16a34a", bg: "#dcfce7" }].map(s => (
             <div key={s.label} className="stat-card" style={{ flex: 1 }}>
               <div className="label">{s.label}</div>
@@ -26,12 +26,13 @@ export default function VencimentosPage() {
           ))}
         </div>
         <div className="card" style={{ padding: 0, overflow: "hidden" }}>
-          <div style={{ padding: "16px 20px", borderBottom: "1px solid #f3f4f6", display: "flex", gap: 10 }}>
+          <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(15, 23, 42, 0.06)", display: "flex", gap: 10, flexWrap: "wrap" }}>
             <select className="select-base"><option>Somente vencidos</option><option>Próximos 7 dias</option><option>Próximos 30 dias</option><option>Próximos 60 dias</option><option>Todos</option></select>
             <select className="select-base"><option>Todos os fornecedores</option>{MOCK_SUPPLIERS.map(s => <option key={s.id}>{s.name}</option>)}</select>
             <button className="btn btn-secondary"><Icon name="refresh" size={14} />Atualizar</button>
           </div>
-          <table className="table-base">
+          <div style={{ overflowX: "auto" }}>
+<table className="table-base">
             <thead><tr><th>Documento</th><th>Fornecedor</th><th>Validade</th><th>Situação</th><th>Status</th><th>Ação</th></tr></thead>
             <tbody>
               {items.map((it, i) => (
@@ -45,11 +46,12 @@ export default function VencimentosPage() {
                     </span>
                   </td>
                   <td><StatusBadge status={it.status} /></td>
-                  <td><button className="btn btn-ghost btn-sm"><Icon name="bell" size={13} />Notificar (RF12)</button></td>
+                  <td><button className="btn btn-ghost btn-sm"><Icon name="bell" size={13} />Notificar</button></td>
                 </tr>
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       </PageWrapper>
     </>

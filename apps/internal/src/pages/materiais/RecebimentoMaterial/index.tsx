@@ -8,19 +8,20 @@ export default function RecebimentoMaterialPage() {
   const [showNew, setShowNew] = useState(false);
   return (
     <>
-      <Header title="Recebimento de Material" subtitle="RF16 — Registro de materiais recebidos de fornecedores"
+      <Header title="Recebimento de Material" subtitle="Registro de materiais recebidos de fornecedores"
         actions={<button className="btn btn-primary" onClick={() => setShowNew(true)}><Icon name="plus" size={15} />Registrar Recebimento</button>} />
       <PageWrapper>
         <div className="card" style={{ padding: 0, overflow: "hidden" }}>
-          <div style={{ padding: "16px 20px", borderBottom: "1px solid #f3f4f6", display: "flex", gap: 10 }}>
-            <div style={{ position: "relative", flex: 1, maxWidth: 320 }}>
+          <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(15, 23, 42, 0.06)", display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <div style={{ position: "relative", flex: 1, minWidth: 220, maxWidth: 320 }}>
               <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "#9ca3af" }}><Icon name="search" size={15} /></span>
               <input className="input-base" placeholder="Buscar por fornecedor ou material..." style={{ paddingLeft: 32 }} />
             </div>
             <select className="select-base"><option>Todos os fornecedores</option>{MOCK_SUPPLIERS.map(s => <option key={s.id}>{s.name}</option>)}</select>
             <input className="select-base" type="date" />
           </div>
-          <table className="table-base">
+          <div style={{ overflowX: "auto" }}>
+<table className="table-base">
             <thead><tr><th>Fornecedor</th><th>Material Recebido</th><th>Recebido por</th><th>Data</th><th>Observações</th><th>Ações</th></tr></thead>
             <tbody>
               {MOCK_MATERIAIS.map(m => (
@@ -49,8 +50,9 @@ export default function RecebimentoMaterialPage() {
               ))}
             </tbody>
           </table>
+          </div>
           <div style={{ padding: "14px 20px", borderTop: "1px solid #f3f4f6" }}>
-            <span style={{ fontSize: 12.5, color: "#6b7280" }}>{MOCK_MATERIAIS.length} registros — RF16 Definido ✅</span>
+            <span style={{ fontSize: 12.5, color: "#6b7280" }}>{MOCK_MATERIAIS.length} registros</span>
           </div>
         </div>
       </PageWrapper>
@@ -59,7 +61,7 @@ export default function RecebimentoMaterialPage() {
         <div className="modal-overlay" onClick={() => setShowNew(false)}>
           <div className="modal-box" onClick={e => e.stopPropagation()}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-              <h3 style={{ margin: 0, fontFamily: "'DM Sans', sans-serif", fontSize: 18, fontWeight: 700 }}>Registrar Recebimento — RF16</h3>
+              <h3 style={{ margin: 0, fontFamily: "'DM Sans', sans-serif", fontSize: 18, fontWeight: 700 }}>Registrar Recebimento</h3>
               <button className="btn btn-ghost btn-sm" onClick={() => setShowNew(false)}><Icon name="x" size={16} /></button>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>

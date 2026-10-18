@@ -12,12 +12,12 @@ export default function HistoricoPage() {
   };
   return (
     <>
-      <Header title="Histórico de Ações" subtitle="RF18 — Rastreabilidade completa de todas as atividades do sistema"
+      <Header title="Histórico de Ações" subtitle="Rastreabilidade completa de todas as atividades do sistema"
         actions={<button className="btn btn-secondary btn-sm"><Icon name="doc" size={14} />Exportar CSV</button>} />
       <PageWrapper>
         <div className="card" style={{ padding: 0, overflow: "hidden" }}>
-          <div style={{ padding: "16px 20px", borderBottom: "1px solid #f3f4f6", display: "flex", gap: 10, flexWrap: "wrap" }}>
-            <div style={{ position: "relative", flex: 1, minWidth: 260 }}>
+          <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(15, 23, 42, 0.06)", display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <div style={{ position: "relative", flex: 1, minWidth: 220, maxWidth: 320 }}>
               <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "#9ca3af" }}><Icon name="search" size={15} /></span>
               <input className="input-base" placeholder="Buscar no histórico..." style={{ paddingLeft: 32 }} />
             </div>
@@ -25,7 +25,8 @@ export default function HistoricoPage() {
             <select className="select-base"><option>Todas as ações</option><option>Aprovação</option><option>Reprovação</option><option>Envio</option><option>Correção</option><option>Autorização</option></select>
             <input className="select-base" type="date" defaultValue="2026-09-01" />
           </div>
-          <table className="table-base">
+          <div style={{ overflowX: "auto" }}>
+<table className="table-base">
             <thead><tr><th>Usuário</th><th>Perfil</th><th>Ação</th><th>Documento</th><th>Fornecedor</th><th>Data / Hora</th></tr></thead>
             <tbody>
               {MOCK_HISTORY.map(h => (
@@ -47,8 +48,9 @@ export default function HistoricoPage() {
               ))}
             </tbody>
           </table>
+          </div>
           <div style={{ padding: "14px 20px", borderTop: "1px solid #f3f4f6" }}>
-            <span style={{ fontSize: 12.5, color: "#6b7280" }}>{MOCK_HISTORY.length} registros — RF18 Validar com cliente</span>
+            <span style={{ fontSize: 12.5, color: "#6b7280" }}>{MOCK_HISTORY.length} registros</span>
           </div>
         </div>
       </PageWrapper>

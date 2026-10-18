@@ -15,7 +15,7 @@ export default function NotificacoesPage() {
   };
   return (
     <>
-      <Header title="Notificações" subtitle={`RF12/RF15 — ${unread} não lida(s)`}
+      <Header title="Notificações" subtitle={`${unread} não lida(s)`}
         actions={<button className="btn btn-secondary btn-sm" onClick={() => setItems(items.map(n => ({ ...n, read: true })))}>Marcar todas como lidas</button>} />
       <PageWrapper>
         <div style={{ maxWidth: 720, display: "flex", flexDirection: "column", gap: 8 }}>

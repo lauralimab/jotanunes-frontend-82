@@ -9,9 +9,9 @@ export default function BoletimPage() {
   const [tab, setTab] = useState<"mensal" | "petrolina">("mensal");
   return (
     <>
-      <Header title="Boletim de Pagamento" subtitle="RF13 — Renovação periódica | RF14 — Regra Petrolina (quinzenal)" />
+      <Header title="Boletim de Pagamento" subtitle="Renovação periódica | Regra Petrolina (quinzenal)" />
       <PageWrapper>
-        <div style={{ display: "flex", gap: 16, marginBottom: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16, marginBottom: 24 }}>
           {[{ label: "Boletins Aprovados", value: 2, color: "#16a34a", bg: "#dcfce7" }, { label: "Aguardando Envio", value: 2, color: "#ca8a04", bg: "#fef9c3" }, { label: "Reprovados", value: 1, color: "#dc2626", bg: "#fee2e2" }, { label: "Vence esta semana", value: 1, color: "#d97706", bg: "#fff7ed" }].map(s => (
             <div key={s.label} className="stat-card" style={{ flex: 1 }}>
               <div className="label">{s.label}</div>
@@ -21,10 +21,63 @@ export default function BoletimPage() {
         </div>
 
         {/* Tabs */}
-        <div style={{ display: "flex", gap: 0, marginBottom: 20, borderRadius: 8, border: "1px solid #e5e7eb", overflow: "hidden", width: "fit-content" }}>
-          {[["mensal", "Padrão Mensal (RF13)"], ["petrolina", "Petrolina — Quinzenal (RF14)"]].map(([t, label]) => (
+        <div style={{
+        display: "flex",
+        gap: 4,
+        marginBottom: 20,
+
+        background:
+          "rgba(226, 232, 240, 0.72)",
+
+        border:
+          "1px solid rgba(148, 163, 184, 0.16)",
+
+        borderRadius: 11,
+        padding: 4,
+
+        width: "fit-content",
+
+        backdropFilter: "blur(10px)",
+        WebkitBackdropFilter: "blur(10px)",
+      }}>
+          {[["mensal", "Padrão Mensal"], ["petrolina", "Petrolina — Quinzenal"]].map(([t, label]) => (
             <button key={t} onClick={() => setTab(t as "mensal" | "petrolina")}
-              style={{ padding: "9px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer", border: "none", background: tab === t ? "#c01a2b" : "#fff", color: tab === t ? "#fff" : "#374151", transition: "all 0.15s" }}>{label}</button>
+              style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 7,
+
+              padding: "8px 18px",
+
+              background: (tab === t)
+                ? "rgba(255, 255, 255, 0.94)"
+                : "transparent",
+
+              border: "none",
+              borderRadius: 8,
+
+              cursor: "pointer",
+
+              fontFamily:
+                "'Inter', sans-serif",
+
+              fontSize: 13,
+
+              fontWeight: (tab === t)
+                ? 700
+                : 500,
+
+              color: (tab === t)
+                ? "#b51224"
+                : "#374151",
+
+              boxShadow: (tab === t)
+                ? "0 2px 6px rgba(15, 23, 42, 0.08)"
+                : "none",
+
+              transition:
+                "background-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease",
+            }}>{label}</button>
           ))}
         </div>
 
@@ -33,11 +86,12 @@ export default function BoletimPage() {
             <div style={{ padding: "16px 20px", borderBottom: "1px solid #f3f4f6", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div>
                 <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700 }}>Boletim Mensal — Setembro/2026</h3>
-                <p style={{ margin: "3px 0 0", fontSize: 12, color: "#6b7280" }}>Renovação obrigatória até o último dia de cada mês (RF13)</p>
+                <p style={{ margin: "3px 0 0", fontSize: 12, color: "#6b7280" }}>Renovação obrigatória até o último dia de cada mês</p>
               </div>
               <div style={{ display: "flex", gap: 8 }}><select className="select-base"><option>Setembro/2026</option><option>Agosto/2026</option><option>Julho/2026</option></select></div>
             </div>
-            <table className="table-base">
+            <div style={{ overflowX: "auto" }}>
+<table className="table-base">
               <thead><tr><th>Fornecedor</th><th>Mês de Referência</th><th>Enviado em</th><th>Vencimento</th><th>Status</th><th>Ações</th></tr></thead>
               <tbody>
                 {MOCK_BOLETINS.filter(b => b.tipo === "mensal").map(b => (
@@ -50,7 +104,7 @@ export default function BoletimPage() {
                     <td>
                       <div style={{ display: "flex", gap: 6 }}>
                         <button className="btn btn-ghost btn-sm"><Icon name="eye" size={13} /></button>
-                        {b.status === "waiting" && <button className="btn btn-warning btn-sm"><Icon name="bell" size={13} />Notificar (RF15)</button>}
+                        {b.status === "waiting" && <button className="btn btn-warning btn-sm"><Icon name="bell" size={13} />Notificar</button>}
                         {b.status === "pending" && <button className="btn btn-primary btn-sm"><Icon name="check" size={13} />Analisar</button>}
                       </div>
                     </td>
@@ -59,12 +113,13 @@ export default function BoletimPage() {
               </tbody>
             </table>
           </div>
+          </div>
         ) : (
           <div>
             <div style={{ padding: "12px 16px", background: "#ede9fe", border: "1px solid #c4b5fd", borderRadius: 8, marginBottom: 16, display: "flex", gap: 10 }}>
               <Icon name="mappin" size={18} color="#7c3aed" />
               <div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "#5b21b6" }}>Regra Específica — Operação Petrolina (RF14)</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#5b21b6" }}>Regra Específica — Operação Petrolina</div>
                 <div style={{ fontSize: 12.5, color: "#6d28d9" }}>Confirmações de pagamento quinzenais: 1ª quinzena (até dia 15) e 2ª quinzena (até último dia do mês). Regra em validação com o cliente.</div>
               </div>
             </div>
@@ -72,7 +127,8 @@ export default function BoletimPage() {
               <div style={{ padding: "16px 20px", borderBottom: "1px solid #f3f4f6" }}>
                 <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700 }}>Confirmações Petrolina — Setembro/2026</h3>
               </div>
-              <table className="table-base">
+              <div style={{ overflowX: "auto" }}>
+<table className="table-base">
                 <thead><tr><th>Fornecedor</th><th>Quinzena</th><th>Prazo</th><th>Status</th><th>Ação</th></tr></thead>
                 <tbody>
                   {MOCK_BOLETINS.filter(b => b.tipo?.startsWith("quinzenal")).map(b => (
@@ -90,6 +146,7 @@ export default function BoletimPage() {
                   ))}
                 </tbody>
               </table>
+          </div>
             </div>
           </div>
         )}

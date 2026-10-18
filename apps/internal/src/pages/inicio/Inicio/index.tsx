@@ -13,7 +13,7 @@ export default function InicioPage({ onNav }: { onNav: (s: Screen) => void }) {
       <PageWrapper>
         <EstatisticasCards />
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 20 }}>
           <div>
             <div className="card" style={{ marginBottom: 16 }}>
               <h3 style={{ margin: "0 0 16px", fontSize: 14, fontWeight: 700 }}>Status dos Fornecedores</h3>
@@ -30,7 +30,7 @@ export default function InicioPage({ onNav }: { onNav: (s: Screen) => void }) {
             <div className="card" style={{ background: "#fde8ea", border: "1px solid #fca5a5" }}>
               <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 10 }}>
                 <Icon name="alert" size={18} color="#c01a2b" />
-                <h4 style={{ margin: 0, fontSize: 13, fontWeight: 700, color: "#7f1d1d" }}>Autorizações Excepcionais (RF17)</h4>
+                <h4 style={{ margin: 0, fontSize: 13, fontWeight: 700, color: "#7f1d1d" }}>Autorizações Excepcionais</h4>
               </div>
               <p style={{ margin: "0 0 10px", fontSize: 12.5, color: "#b91c1c" }}><strong>2</strong> autorizações ativas — fornecedores operando com documentação irregular aprovada pela Jotanunes.</p>
               <button className="btn btn-danger btn-sm" onClick={() => onNav("autorizacao-excepcional")}>Ver autorizações</button>

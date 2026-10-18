@@ -76,7 +76,6 @@ export default function StatusGeralCard({
           regularizados. O status{" "}
           <strong>APTO</strong> exige 100% dos
           documentos obrigatórios aprovados
-          (RF01 / Regra de Negócio).
         </p>
       </div>
 

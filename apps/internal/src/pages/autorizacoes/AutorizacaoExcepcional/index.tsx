@@ -9,13 +9,13 @@ export default function AutorizacaoExcepcionalPage() {
   const [showNew, setShowNew] = useState(false);
   return (
     <>
-      <Header title="Autorizações Excepcionais" subtitle="RF17 — Autorização temporária para fornecedores com documentação irregular"
+      <Header title="Autorizações Excepcionais" subtitle="Autorização temporária para fornecedores com documentação irregular"
         actions={<button className="btn btn-primary" onClick={() => setShowNew(true)}><Icon name="plus" size={15} />Nova Autorização</button>} />
       <PageWrapper>
         <div style={{ padding: "12px 16px", background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 8, marginBottom: 20, display: "flex", gap: 10 }}>
           <Icon name="alert" size={18} color="#d97706" />
           <div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "#92400e" }}>RF17 — Status: Pendente de definição (Validar com cliente)</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#92400e" }}>Status: Pendente de definição (Validar com cliente)</div>
             <div style={{ fontSize: 12.5, color: "#78350f" }}>Fluxo de aprovação, escopo e vigência das autorizações excepcionais ainda está em revisão com a Jotanunes.</div>
           </div>
         </div>
@@ -53,7 +53,7 @@ export default function AutorizacaoExcepcionalPage() {
         <div className="modal-overlay" onClick={() => setShowNew(false)}>
           <div className="modal-box" style={{ maxWidth: 540 }} onClick={e => e.stopPropagation()}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-              <h3 style={{ margin: 0, fontFamily: "'DM Sans', sans-serif", fontSize: 18, fontWeight: 700 }}>Nova Autorização Excepcional — RF17</h3>
+              <h3 style={{ margin: 0, fontFamily: "'DM Sans', sans-serif", fontSize: 18, fontWeight: 700 }}>Nova Autorização Excepcional</h3>
               <button className="btn btn-ghost btn-sm" onClick={() => setShowNew(false)}><Icon name="x" size={16} /></button>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
