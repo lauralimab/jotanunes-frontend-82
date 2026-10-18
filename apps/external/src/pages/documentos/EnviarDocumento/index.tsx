@@ -34,7 +34,7 @@ export default function EnviarDocumentoPage({
     <>
       <Header
         title="Enviar Documento"
-        subtitle="RF04/RF05 — Envio de documentação da empresa e dos funcionários"
+        subtitle="Envio de documentação da empresa e dos funcionários"
       />
 
       <PageWrapper>

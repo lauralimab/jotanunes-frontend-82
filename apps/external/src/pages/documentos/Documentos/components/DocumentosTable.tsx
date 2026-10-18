@@ -305,7 +305,7 @@ export default function DocumentosTable({
         >
           {filtered.length} documento(s)
           {" — "}
-          RNF05: apenas PDF, JPG, PNG
+          apenas PDF, JPG, PNG
           aceitos (máx. 10 MB)
         </span>
       </div>

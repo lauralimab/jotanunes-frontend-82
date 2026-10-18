@@ -335,7 +335,7 @@ export default function AcessoSegurancaTab({
           }}
         >
           <strong>
-            Atenção (RNF01):
+            Atenção:
           </strong>{" "}
           Suas credenciais são pessoais e
           intransferíveis. O acesso ao sistema é

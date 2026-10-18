@@ -67,7 +67,7 @@ export default function TrabalhadoresPage({
     <>
       <Header
         title="Funcionários"
-        subtitle="RF03 — Cadastro de funcionários vinculados ao fornecedor"
+        subtitle="Cadastro de funcionários vinculados ao fornecedor"
         actions={
           <button
             className="btn btn-primary"

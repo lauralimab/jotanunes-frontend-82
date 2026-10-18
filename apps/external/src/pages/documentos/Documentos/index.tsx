@@ -23,7 +23,7 @@ export default function DocumentosPage({
     <>
       <Header
         title="Documentos"
-        subtitle="RF04/RF05/RF06 — Consulta de situação das documentações"
+        subtitle="Consulta de situação das documentações"
         actions={
           <button
             className="btn btn-primary"
