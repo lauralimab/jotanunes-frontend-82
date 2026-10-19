@@ -10,7 +10,7 @@ export default function DadosEmpresaPage() {
     <>
       <Header
         title="Dados da Empresa"
-        subtitle="RF02 — Cadastro e atualização das informações do fornecedor"
+        subtitle="Cadastro e atualização das informações do fornecedor"
       />
 
       <PageWrapper>

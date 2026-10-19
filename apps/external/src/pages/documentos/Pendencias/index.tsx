@@ -36,7 +36,7 @@ export default function PendenciasPage({
     <>
       <Header
         title="Pendências"
-        subtitle="RF06/RF09 — Documentos que necessitam de correção ou reenvio"
+        subtitle="Documentos que necessitam de correção ou reenvio"
       />
 
       <PageWrapper>
