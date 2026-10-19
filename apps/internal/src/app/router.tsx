@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import PortalLayout from "./layouts/PortalLayout";
 import type { Screen } from "../shared/types/portal";
 import LoginPage from "../pages/auth/Login";
@@ -12,43 +13,99 @@ import AutorizacaoExcepcionalPage from "../pages/autorizacoes/AutorizacaoExcepci
 import RecebimentoMaterialPage from "../pages/materiais/RecebimentoMaterial";
 import NotificacoesPage from "../pages/sistema/Notificacoes";
 import HistoricoPage from "../pages/sistema/Historico";
+import Header from "../shared/components/Header";
+import PageWrapper from "../shared/components/PageWrapper";
+
+type ResolvedRoute = { screen: Screen; companyId?: number } | { screen: null };
+
+function resolveRoute(pathname: string): ResolvedRoute {
+  const normalizedPath = pathname.replace(/\/+$/, "") || "/";
+  const paths: Record<string, Screen> = {
+    "/": "login",
+    "/login": "login",
+    "/dashboard": "admin-dashboard",
+    "/fornecedores": "admin-suppliers",
+    "/documentos/analise": "document-analysis",
+    "/vencimentos": "expirations",
+    "/boletim-pagamento": "boletim",
+    "/autorizacoes-excepcionais": "autorizacao-excepcional",
+    "/recebimento-material": "recebimento-material",
+    "/notificacoes": "notifications",
+    "/historico": "history",
+  };
+
+  if (paths[normalizedPath]) return { screen: paths[normalizedPath] };
+
+  const supplierMatch = normalizedPath.match(/^\/fornecedores\/(\d+)$/);
+  if (supplierMatch) {
+    const companyId = Number(supplierMatch[1]);
+    if (Number.isSafeInteger(companyId) && companyId > 0) return { screen: "supplier-details", companyId };
+  }
+
+  return { screen: null };
+}
+
+const screenPaths: Partial<Record<Screen, string>> = {
+  login: "/login",
+  "admin-dashboard": "/dashboard",
+  "admin-suppliers": "/fornecedores",
+  "document-analysis": "/documentos/analise",
+  expirations: "/vencimentos",
+  boletim: "/boletim-pagamento",
+  "autorizacao-excepcional": "/autorizacoes-excepcionais",
+  "recebimento-material": "/recebimento-material",
+  notifications: "/notificacoes",
+  history: "/historico",
+};
 
 export default function AppRouter() {
-  const [screen, setScreen] = useState<Screen>("login");
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
   const [navOpen, setNavOpen] = useState(false);
+  const route = resolveRoute(pathname);
 
-  const handleLogin = () => setScreen("admin-dashboard");
-  const handleLogout = () => setScreen("login");
-  const handleNav = (s: Screen) => setScreen(s);
+  function handleNav(screen: Screen) {
+    const path = screenPaths[screen];
+    if (path) navigate(path);
+    else if (screen === "supplier-details") navigate("/fornecedores");
+  }
 
-  if (screen === "login") return <LoginPage onLogin={handleLogin} />;
+  if (route.screen === "login") {
+    return <LoginPage onLogin={() => navigate("/dashboard")} />;
+  }
 
-  const renderScreen = () => {
-    switch (screen) {
-      case "admin-dashboard":         return <InicioPage onNav={handleNav} />;
-      case "admin-suppliers":         return <EmpresasPage onNav={handleNav} />;
-      case "supplier-details":        return <EmpresaDetalhePage onNav={handleNav} />;
-      case "document-analysis":       return <AvaliarDocumentoPage onNav={handleNav} />;
-      case "expirations":             return <VencimentosPage />;
-      case "boletim":                 return <BoletimPage />;
-      case "autorizacao-excepcional": return <AutorizacaoExcepcionalPage />;
-      case "recebimento-material":    return <RecebimentoMaterialPage />;
-      case "notifications":           return <NotificacoesPage />;
-      case "history":                 return <HistoricoPage />;
-      default:                        return null;
-    }
-  };
+  const activeScreen = route.screen === "supplier-details" ? "admin-suppliers" : route.screen;
 
   return (
     <PortalLayout
-      screen={screen}
+      screen={activeScreen}
       onNav={handleNav}
-      onLogout={handleLogout}
+      onLogout={() => navigate("/login", { replace: true })}
       navOpen={navOpen}
       onOpenNav={() => setNavOpen(true)}
       onCloseNav={() => setNavOpen(false)}
     >
-      {renderScreen()}
+      {route.screen === null ? (
+        <>
+          <Header title="Página não encontrada" />
+          <PageWrapper>
+            <div className="card">
+              <p style={{ marginTop: 0 }}>A página solicitada não existe.</p>
+              <button className="btn btn-primary" onClick={() => navigate("/dashboard")}>Ir para o Dashboard</button>
+            </div>
+          </PageWrapper>
+        </>
+      ) : route.screen === "admin-dashboard" ? <InicioPage onNav={handleNav} />
+        : route.screen === "admin-suppliers" ? <EmpresasPage onSelectCompany={id => navigate(`/fornecedores/${id}`)} />
+          : route.screen === "supplier-details" ? <EmpresaDetalhePage onNav={handleNav} companyId={route.companyId!} />
+            : route.screen === "document-analysis" ? <AvaliarDocumentoPage onNav={handleNav} />
+              : route.screen === "expirations" ? <VencimentosPage />
+                : route.screen === "boletim" ? <BoletimPage />
+                  : route.screen === "autorizacao-excepcional" ? <AutorizacaoExcepcionalPage />
+                    : route.screen === "recebimento-material" ? <RecebimentoMaterialPage />
+                      : route.screen === "notifications" ? <NotificacoesPage />
+                        : route.screen === "history" ? <HistoricoPage />
+                          : null}
     </PortalLayout>
   );
 }

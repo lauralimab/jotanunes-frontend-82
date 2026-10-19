@@ -2,7 +2,7 @@ import BrandLogo from "../../shared/components/BrandLogo";
 import Icon from "../../shared/components/Icon";
 import type { Screen } from "../../shared/types/portal";
 
-export default function Sidebar({ screen, onNav, onLogout, open, onClose, collapsed, onToggleCollapsed }: { screen: Screen; onNav: (s: Screen) => void; onLogout: () => void; open: boolean; onClose: () => void; collapsed: boolean; onToggleCollapsed: () => void }) {
+export default function Sidebar({ screen, onNav, onLogout, open, onClose, collapsed, onToggleCollapsed }: { screen: Screen | null; onNav: (s: Screen) => void; onLogout: () => void; open: boolean; onClose: () => void; collapsed: boolean; onToggleCollapsed: () => void }) {
   const links: { id: Screen; label: string; icon: string; group?: string }[] = [
     { id: "admin-dashboard",         label: "Dashboard",                icon: "home" },
     { id: "admin-suppliers",         label: "Fornecedores",             icon: "building",  group: "Operações" },
@@ -24,6 +24,7 @@ export default function Sidebar({ screen, onNav, onLogout, open, onClose, collap
           type="button"
           className="sidebar-collapse-btn"
           onClick={onToggleCollapsed}
+          aria-expanded={!collapsed}
           title={
             collapsed
               ? "Expandir menu"
@@ -36,7 +37,7 @@ export default function Sidebar({ screen, onNav, onLogout, open, onClose, collap
           }
         >
           <Icon
-            name="list"
+            name={collapsed ? "sidebar-expand" : "sidebar-collapse"}
             size={20}
           />
         </button>

@@ -4,7 +4,7 @@ import type { Screen } from "../../shared/types/portal";
 import Sidebar from "./Sidebar";
 
 type PortalLayoutProps = {
-  screen: Screen;
+  screen: Screen | null;
   onNav: (screen: Screen) => void;
   onLogout: () => void;
   navOpen: boolean;
