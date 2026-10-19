@@ -33,7 +33,7 @@ export default function DocumentoUploadArea({
   ) {
     if (selectedFile.size > 10485760) {
       alert(
-        "Arquivo excede 10 MB (RNF05)",
+        "Arquivo excede 10 MB",
       );
 
       return;
@@ -140,7 +140,7 @@ export default function DocumentoUploadArea({
             color: "#6b7280",
           }}
         >
-          RNF05 — Formatos aceitos: PDF,
+          Formatos aceitos: PDF,
           JPG, PNG — máximo 10 MB por
           arquivo
         </p>

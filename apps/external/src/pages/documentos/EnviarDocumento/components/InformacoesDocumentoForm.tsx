@@ -138,7 +138,7 @@ export default function InformacoesDocumentoForm() {
               marginBottom: 6,
             }}
           >
-            Data de Validade (RF11)
+            Data de Validade
           </label>
 
           <input

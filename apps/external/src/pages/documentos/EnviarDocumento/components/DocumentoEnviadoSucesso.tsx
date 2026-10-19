@@ -57,7 +57,7 @@ export default function DocumentoEnviadoSucesso({
           Aguardando Análise
         </strong>{" "}
         — a equipe Jotanunes será
-        notificada (RF15).
+        notificada.
       </p>
 
       <button
