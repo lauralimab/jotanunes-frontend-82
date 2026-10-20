@@ -19,7 +19,7 @@ export default function Sidebar({ screen, onNav, onLogout, open, onClose, collap
   return (
     <>
       {open && <div className="sidebar-backdrop" onClick={onClose} />}
-      <aside className={`app-sidebar${open ? " open" : ""}${collapsed ? " collapsed" : ""}`} style={{ width: 232, minHeight: "100vh", background: "#8f1320", display: "flex", flexDirection: "column", position: "fixed", left: 0, top: 0, bottom: 0, zIndex: 100, overflowY: "auto", boxShadow: "4px 0 14px rgba(15, 23, 60, 0.10)" }}>
+      <aside className={`app-sidebar${open ? " open" : ""}${collapsed ? " collapsed" : ""}`} style={{ width: 232, height: "100dvh", minHeight: 0, background: "#8f1320", display: "flex", flexDirection: "column", position: "fixed", left: 0, top: 0, bottom: 0, zIndex: 100, overflow: "hidden", boxShadow: "4px 0 14px rgba(15, 23, 60, 0.10)" }}>
       <button
           type="button"
           className="sidebar-collapse-btn"

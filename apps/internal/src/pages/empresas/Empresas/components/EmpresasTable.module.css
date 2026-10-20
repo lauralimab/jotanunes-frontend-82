@@ -1,0 +1,19 @@
+.actionButton:global(.btn) {
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.actionButton > svg {
+  flex-shrink: 0;
+}
+
+.editAction {
+  background: #fad1d6;
+  color: #c01a2b;
+}
+
+.editAction:hover:not(:disabled) {
+  background: #f7bcc4;
+}

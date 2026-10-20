@@ -62,7 +62,7 @@ export default function RecebimentoMaterialPage() {
           <div className="modal-box" onClick={e => e.stopPropagation()}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
               <h3 style={{ margin: 0, fontFamily: "'DM Sans', sans-serif", fontSize: 18, fontWeight: 700 }}>Registrar Recebimento</h3>
-              <button className="btn btn-ghost btn-sm" onClick={() => setShowNew(false)}><Icon name="x" size={16} /></button>
+              <button type="button" className="btn btn-ghost btn-icon" aria-label="Fechar formulário" onClick={() => setShowNew(false)}><Icon name="x" size={16} /></button>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <div><label style={{ fontSize: 12.5, fontWeight: 600, color: "#374151", display: "block", marginBottom: 6 }}>Fornecedor *</label><select className="select-base" style={{ width: "100%" }}>{MOCK_SUPPLIERS.map(s => <option key={s.id}>{s.name}</option>)}</select></div>
