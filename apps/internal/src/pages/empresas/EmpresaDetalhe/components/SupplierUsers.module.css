@@ -1,0 +1,22 @@
+.card { margin-top: 1.25rem; padding: 0; overflow: hidden; }
+.header { padding: 1.25rem; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.header h3 { margin: 0; font-size: 0.9375rem; font-weight: 700; color: #0f172a; }
+.header p { margin: 0.375rem 0 0; font-size: 0.8125rem; color: #6b7280; }
+.tableWrapper { overflow-x: auto; }
+.message { padding: 1.5rem; text-align: center; color: #6b7280; }
+.error { color: #b91c1c; font-size: 0.8125rem; }
+.actions { display: flex; gap: 0.375rem; }
+.softAction { background: #fad1d6; color: #c01a2b; }
+.softAction:hover:not(:disabled) { background: #f7bcc4; }
+.name { color: #0f172a; font-weight: 600; }
+.email { color: #6b7280; overflow-wrap: anywhere; }
+.dialog:global(.modal-box) { width: min(32rem, calc(100vw - 2rem)); max-height: calc(100dvh - 2rem); padding: 1.5rem; overflow-y: auto; color: #374151; }
+.dialog::backdrop { background: rgba(15, 23, 42, 0.42); backdrop-filter: blur(3px); }
+.modalHeader { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.modalHeader h3 { margin: 0; color: #0f172a; font-size: 1.125rem; }
+.description { line-height: 1.6; font-size: 0.875rem; overflow-wrap: anywhere; }
+.fields { display: grid; gap: 1rem; margin: 1.25rem 0; }
+.field { display: flex; flex-direction: column; gap: 0.375rem; font-size: 0.8125rem; font-weight: 600; }
+.footer { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.5rem; }
+.pagination { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; padding: 0.875rem 1.25rem; border-top: 1px solid #f3f4f6; font-size: 0.78125rem; color: #6b7280; }
+.currentPage { background: #fde8ea; color: #c01a2b; }

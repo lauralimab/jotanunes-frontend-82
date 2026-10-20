@@ -63,11 +63,6 @@ export default function InicioPage({ onNav }: { onNav: (s: Screen) => void }) {
       <Header title="Dashboard Administrativo" subtitle="Visão geral da plataforma"
         actions={<><button className="btn btn-secondary btn-sm" onClick={refreshSupplierTotal} disabled={suppliersLoading}><Icon name="refresh" size={14} />Atualizar</button></>} />
       <PageWrapper>
-        {suppliersError && (
-          <p role="alert" style={{ color: "#b91c1c", margin: "0 0 16px", fontSize: 13 }}>
-            Não foi possível carregar os dados dos fornecedores. Clique em Atualizar para tentar novamente.
-          </p>
-        )}
         <EstatisticasCards supplierTotal={supplierTotal} suppliersLoading={suppliersLoading} />
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 20 }}>

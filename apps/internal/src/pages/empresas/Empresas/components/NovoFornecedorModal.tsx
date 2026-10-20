@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent, type InputHTMLAttributes } from "react";
-import { createCompany } from "../../../../shared/api/company";
+import { createCompany, updateCompany } from "../../../../shared/api/company";
 import { getAddressByCep, type CepAddress } from "../../../../shared/api/cep";
-import type { Company, CompanyCreateRequest, SupplierType } from "../../../../shared/types/company";
+import type { Company, CompanyCreateRequest, CompanyUpdateRequest, SupplierType } from "../../../../shared/types/company";
 import Icon from "../../../../shared/components/Icon";
 import Select from "../../../../shared/components/Select";
 import styles from "./NovoFornecedorModal.module.css";
@@ -10,7 +10,8 @@ const states = ["AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT"
 
 type Props = {
   onClose: () => void;
-  onCreated: (company: Company) => void;
+  onSaved: (company: Company) => void;
+  initialCompany?: Company;
 };
 
 const MAX_TEXT_LENGTH = 100;
@@ -132,7 +133,8 @@ function validateFields(data: FormData, fields: string[], withoutNumber = false)
   return errors;
 }
 
-export default function NovoFornecedorModal({ onClose, onCreated }: Props) {
+export default function NovoFornecedorModal({ onClose, onSaved, initialCompany }: Props) {
+  const isEditing = Boolean(initialCompany);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const submittingRef = useRef(false);
   const bodyRef = useRef<HTMLDivElement>(null);
@@ -140,8 +142,15 @@ export default function NovoFornecedorModal({ onClose, onCreated }: Props) {
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [address, setAddress] = useState({ street: "", number: "", complement: "", neighborhood: "", city: "", state: "" });
-  const [withoutNumber, setWithoutNumber] = useState(false);
+  const [address, setAddress] = useState(() => ({
+    street: initialCompany?.address.street ?? "",
+    number: initialCompany?.address.number === "S/N" ? "" : initialCompany?.address.number ?? "",
+    complement: initialCompany?.address.complement ?? "",
+    neighborhood: initialCompany?.address.neighborhood ?? "",
+    city: initialCompany?.address.city ?? "",
+    state: initialCompany?.address.state ?? "",
+  }));
+  const [withoutNumber, setWithoutNumber] = useState(initialCompany?.address.number === "S/N");
   const cepRequestRef = useRef<AbortController | null>(null);
   const cepValueRef = useRef("");
   const autoFilledRef = useRef<CepAddress | null>(null);
@@ -232,7 +241,8 @@ export default function NovoFornecedorModal({ onClose, onCreated }: Props) {
     if (withoutNumber) data.set("number", "S/N");
     const text = (name: string) => String(data.get(name) ?? "").trim();
 
-    const fields = step === steps.length - 1 ? stepFields.flat() : stepFields[step];
+    const fields = (step === steps.length - 1 ? stepFields.flat() : stepFields[step])
+      .filter(name => !isEditing || (name !== "cnpj" && name !== "supplierType"));
     const nextErrors = validateFields(data, fields, withoutNumber);
     setFieldErrors(nextErrors);
     setError("");
@@ -254,15 +264,13 @@ export default function NovoFornecedorModal({ onClose, onCreated }: Props) {
     const cnpj = text("cnpj").replace(/\D/g, "");
     const phone = text("phone").replace(/\D/g, "");
 
-    const payload: CompanyCreateRequest = {
-      cnpj,
+    const updatePayload: CompanyUpdateRequest = {
       corporateName: text("corporateName"),
       tradeName: text("tradeName"),
       stateRegistration: text("stateRegistration") || null,
       email: text("email"),
       phone,
       responsibleName: text("responsibleName"),
-      supplierType: Number(text("supplierType")) as SupplierType,
       address: {
         street: text("street"),
         number: text("number"),
@@ -279,10 +287,16 @@ export default function NovoFornecedorModal({ onClose, onCreated }: Props) {
     setIsSubmitting(true);
     setError("");
     try {
-      const company = await createCompany(payload);
-      onCreated(company);
+      const company = initialCompany
+        ? await updateCompany(initialCompany.id, updatePayload)
+        : await createCompany({
+          ...updatePayload,
+          cnpj,
+          supplierType: Number(text("supplierType")) as SupplierType,
+        } satisfies CompanyCreateRequest);
+      onSaved(company);
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Não foi possível cadastrar o fornecedor. Tente novamente.");
+      setError(cause instanceof Error ? cause.message : "Falha ao salvar os dados do fornecedor. Tente novamente.");
     } finally {
       submittingRef.current = false;
       setIsSubmitting(false);
@@ -296,11 +310,11 @@ export default function NovoFornecedorModal({ onClose, onCreated }: Props) {
         <div className={styles.heading}>
           <span className={styles.icon}><Icon name="building" size={22} /></span>
           <div>
-            <h3 id="novo-fornecedor-title">Novo Fornecedor</h3>
-            <p id="novo-fornecedor-description">Preencha os dados abaixo para cadastrar o fornecedor.</p>
+            <h3 id="novo-fornecedor-title">{isEditing ? "Editar Fornecedor" : "Novo Fornecedor"}</h3>
+            <p id="novo-fornecedor-description">{isEditing ? "Atualize os dados do fornecedor." : "Preencha os dados abaixo para cadastrar o fornecedor."}</p>
           </div>
         </div>
-        <button type="button" className="btn btn-ghost btn-sm" aria-label="Fechar cadastro" onClick={close} disabled={isSubmitting}><Icon name="x" size={18} /></button>
+        <button type="button" className="btn btn-ghost btn-icon" aria-label={isEditing ? "Fechar edição" : "Fechar cadastro"} onClick={close} disabled={isSubmitting}><Icon name="x" size={18} /></button>
       </header>
       <ol className={styles.steps} aria-label="Etapas do cadastro">
         {steps.map((label, index) => (
@@ -318,37 +332,36 @@ export default function NovoFornecedorModal({ onClose, onCreated }: Props) {
         }
       }}>
         <div ref={bodyRef} className={styles.body}>
-          <p className={styles.hint}>Os campos com * são obrigatórios.</p>
           {error && <div className={styles.error} role="alert">{error}</div>}
           <fieldset hidden={step !== 0} data-step={0} disabled={isSubmitting} className={styles.section}>
             <legend>Dados da empresa</legend>
             <div className={styles.grid}>
-              <Field label="CNPJ" name="cnpj" error={fieldErrors.cnpj} placeholder="00.000.000/0000-00" inputMode="numeric" onChange={handleCnpjChange} autoFocus />
+              <Field label="CNPJ" name="cnpj" error={fieldErrors.cnpj} placeholder="00.000.000/0000-00" inputMode="numeric" onChange={handleCnpjChange} defaultValue={initialCompany ? maskCnpj(initialCompany.cnpj) : undefined} disabled={isSubmitting || isEditing} autoFocus />
               <div className={styles.field}><span>Tipo de fornecedor *</span>
-                <Select name="supplierType" label="Tipo de fornecedor" placeholder="Selecione o tipo" required disabled={isSubmitting}
+                <Select name="supplierType" label="Tipo de fornecedor" placeholder="Selecione o tipo" required disabled={isSubmitting || isEditing} defaultValue={initialCompany ? String(initialCompany.supplierType) : undefined}
                   options={[{ value: "1", label: "Material" }, { value: "2", label: "Mão de obra" }]}
                   invalid={Boolean(fieldErrors.supplierType)} describedBy={fieldErrors.supplierType ? "supplierType-error" : undefined}
                   onChange={() => setFieldErrors(current => ({ ...current, supplierType: "" }))} />
                 {fieldErrors.supplierType && <span id="supplierType-error" className={styles.fieldError}>{fieldErrors.supplierType}</span>}
               </div>
-              <Field label="Razão social" placeholder="Ex.: Jotanunes Construtora Ltda." name="corporateName" error={fieldErrors.corporateName} autoComplete="organization" />
-              <Field label="Nome fantasia" placeholder="Ex.: Jotanunes" name="tradeName" error={fieldErrors.tradeName} />
-              <Field label="Inscrição estadual" placeholder="Ex.: 123456789" name="stateRegistration" error={fieldErrors.stateRegistration} required={false} />
+              <Field label="Razão social" placeholder="Ex.: Jotanunes Construtora Ltda." name="corporateName" error={fieldErrors.corporateName} autoComplete="organization" defaultValue={initialCompany?.corporateName} />
+              <Field label="Nome fantasia" placeholder="Ex.: Jotanunes" name="tradeName" error={fieldErrors.tradeName} defaultValue={initialCompany?.tradeName} />
+              <Field label="Inscrição estadual" placeholder="Ex.: 123456789" name="stateRegistration" error={fieldErrors.stateRegistration} required={false} defaultValue={initialCompany?.stateRegistration ?? ""} />
             </div>
           </fieldset>
           <fieldset hidden={step !== 1} data-step={1} disabled={isSubmitting} className={styles.section}>
             <legend>Contato</legend>
             <div className={styles.grid}>
-              <Field label="Responsável" name="responsibleName" error={fieldErrors.responsibleName} autoComplete="name" placeholder="Ex.: João da Silva"/>
-              <Field label="E-mail" name="email" error={fieldErrors.email} type="email" autoComplete="email" placeholder="contato@empresa.com" />
-              <Field label="Telefone com DDD" name="phone" error={fieldErrors.phone} type="tel" inputMode="numeric" autoComplete="tel-national" placeholder="(11) 99999-9999" onChange={handlePhoneChange} />
+              <Field label="Responsável" name="responsibleName" error={fieldErrors.responsibleName} autoComplete="name" placeholder="Ex.: João da Silva" defaultValue={initialCompany?.responsibleName} />
+              <Field label="E-mail" name="email" error={fieldErrors.email} type="email" autoComplete="email" placeholder="contato@empresa.com" defaultValue={initialCompany?.email} />
+              <Field label="Telefone com DDD" name="phone" error={fieldErrors.phone} type="tel" inputMode="numeric" autoComplete="tel-national" placeholder="(11) 99999-9999" onChange={handlePhoneChange} defaultValue={initialCompany ? maskPhone(initialCompany.phone) : undefined} />
             </div>
           </fieldset>
           <fieldset hidden={step !== 2} data-step={2} disabled={isSubmitting} className={styles.section}>
             <legend>Endereço</legend>
             <div className={styles.grid}>
               <div className={styles.cepField}>
-                <Field label="CEP" name="zipCode" error={fieldErrors.zipCode} autoComplete="postal-code" inputMode="numeric" placeholder="Ex.: 01001-000" onChange={handleCepChange} />
+                <Field label="CEP" name="zipCode" error={fieldErrors.zipCode} autoComplete="postal-code" inputMode="numeric" placeholder="Ex.: 01001-000" onChange={handleCepChange} defaultValue={initialCompany ? maskCep(initialCompany.address.zipCode) : undefined} />
               </div>
               <div className={styles.field}><span>Estado *</span>
                 <Select name="state" label="Estado" placeholder="Selecione a UF (ex.: SP)" required disabled={isSubmitting} value={address.state}
@@ -373,8 +386,8 @@ export default function NovoFornecedorModal({ onClose, onCreated }: Props) {
           <div className={styles.navigation}>
             {step > 0 && <button type="button" className="btn btn-secondary" disabled={isSubmitting} onClick={() => { setStep(current => current - 1); setFieldErrors({}); setError(""); }}>Voltar</button>}
             <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-              {step === steps.length - 1 && <Icon name="plus" size={15} />}
-              {isSubmitting ? "Cadastrando..." : step === steps.length - 1 ? "Cadastrar fornecedor" : "Continuar"}
+              {step === steps.length - 1 && <Icon name={isEditing ? "check" : "plus"} size={15} />}
+              {isSubmitting ? (isEditing ? "Salvando..." : "Cadastrando...") : step === steps.length - 1 ? (isEditing ? "Salvar alterações" : "Cadastrar fornecedor") : "Continuar"}
             </button>
           </div>
         </footer>

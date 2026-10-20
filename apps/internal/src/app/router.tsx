@@ -60,9 +60,10 @@ const screenPaths: Partial<Record<Screen, string>> = {
 
 export default function AppRouter() {
   const navigate = useNavigate();
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
   const [navOpen, setNavOpen] = useState(false);
   const route = resolveRoute(pathname);
+  const editSupplierOnOpen = new URLSearchParams(search).get("editar") === "true";
 
   function handleNav(screen: Screen) {
     const path = screenPaths[screen];
@@ -96,8 +97,8 @@ export default function AppRouter() {
           </PageWrapper>
         </>
       ) : route.screen === "admin-dashboard" ? <InicioPage onNav={handleNav} />
-        : route.screen === "admin-suppliers" ? <EmpresasPage onSelectCompany={id => navigate(`/fornecedores/${id}`)} />
-          : route.screen === "supplier-details" ? <EmpresaDetalhePage onNav={handleNav} companyId={route.companyId!} />
+        : route.screen === "admin-suppliers" ? <EmpresasPage onSelectCompany={id => navigate(`/fornecedores/${id}`)} onEditCompany={id => navigate(`/fornecedores/${id}?editar=true`)} />
+          : route.screen === "supplier-details" ? <EmpresaDetalhePage onNav={handleNav} companyId={route.companyId!} editOnOpen={editSupplierOnOpen} onEditClose={() => navigate(`/fornecedores/${route.companyId}`, { replace: true })} />
             : route.screen === "document-analysis" ? <AvaliarDocumentoPage onNav={handleNav} />
               : route.screen === "expirations" ? <VencimentosPage />
                 : route.screen === "boletim" ? <BoletimPage />

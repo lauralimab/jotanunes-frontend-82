@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import Icon from "./Icon";
 import styles from "./Toast.module.css";
 
@@ -23,10 +24,11 @@ export default function Toast({ message, duration = 4000, variant = "success", o
     return () => window.clearTimeout(timeout);
   }, [duration]);
 
-  return (
+  return createPortal(
     <div className={`${styles.toast} ${styles[variant]}`} role={variant === "error" ? "alert" : "status"} aria-live={variant === "error" ? "assertive" : "polite"}>
       <Icon name={variantIcons[variant]} size={17} />
       <span>{message}</span>
-    </div>
+    </div>,
+    document.body,
   );
 }

@@ -45,6 +45,8 @@ async function requestCompany<T>(
     throw new Error(await getErrorMessage(response, fallback))
   }
 
+  if (options?.method === 'DELETE') return undefined as T
+
   return response.json() as Promise<T>
 }
 
@@ -114,8 +116,8 @@ export function changeCompanySupplierType(
   )
 }
 
-export function deleteCompany(id: number): Promise<Company> {
-  return requestCompany<Company>(
+export function deleteCompany(id: number): Promise<void> {
+  return requestCompany<void>(
     `/${id}`,
     'Não foi possível excluir a empresa.',
     { method: 'DELETE' },
