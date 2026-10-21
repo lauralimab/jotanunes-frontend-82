@@ -8,7 +8,7 @@ export default function SolicitarCorrecaoModal({ doc, setShowModal, correctionTy
           <div className="modal-box" onClick={e => e.stopPropagation()}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
               <h3 style={{ margin: 0, fontFamily: "'DM Sans', sans-serif", fontSize: 18, fontWeight: 700 }}>Solicitar Correção</h3>
-              <button className="btn btn-ghost btn-sm" onClick={() => setShowModal(false)}><Icon name="x" size={16} /></button>
+              <button type="button" className="btn btn-ghost btn-icon" aria-label="Fechar formulário" onClick={() => setShowModal(false)}><Icon name="x" size={16} /></button>
             </div>
             <p style={{ color: "#6b7280", fontSize: 13.5, margin: "0 0 20px" }}>Informe ao fornecedor o que precisa ser corrigido. O status mudará para <strong>Correção Solicitada</strong>.</p>
             <div style={{ marginBottom: 14 }}>

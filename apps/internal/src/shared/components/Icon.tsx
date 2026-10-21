@@ -1,6 +1,12 @@
 export default function Icon({ name, size = 18, color }: { name: string; size?: number; color?: string }) {
   const s = { width: size, height: size, stroke: color || "currentColor", fill: "none", strokeWidth: 1.75, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
   const icons: Record<string, React.ReactElement> = {
+    key: <svg viewBox="0 0 24 24" style={s}><circle cx="8" cy="8" r="5" /><path d="m12 12 9 9m-4-4 3-3m-6 0 3-3" /></svg>,
+    "user-check": <svg viewBox="0 0 24 24" style={s}><circle cx="8" cy="7" r="4" /><path d="M2 21v-2a6 6 0 0 1 12 0v2m2-10 2 2 4-4" /></svg>,
+    "user-minus": <svg viewBox="0 0 24 24" style={s}><circle cx="8" cy="7" r="4" /><path d="M2 21v-2a6 6 0 0 1 12 0v2m2-10h6" /></svg>,
+    trash: <svg viewBox="0 0 24 24" style={s}><path d="M3 6h18M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M5 6l1 14a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1l1-14M10 10v7M14 10v7" /></svg>,
+    "chevron-left": <svg viewBox="0 0 24 24" style={s}><polyline points="15 18 9 12 15 6" /></svg>,
+    "chevron-right": <svg viewBox="0 0 24 24" style={s}><polyline points="9 18 15 12 9 6" /></svg>,
     home:     <svg viewBox="0 0 24 24" style={s}><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
     building: <svg viewBox="0 0 24 24" style={s}><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h.01M9 12h.01M9 15h.01M12 9h.01M12 12h.01M12 15h.01M15 9h.01M15 12h.01M15 15h.01"/></svg>,
     users:    <svg viewBox="0 0 24 24" style={s}><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>,

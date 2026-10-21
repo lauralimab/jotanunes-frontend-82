@@ -269,6 +269,13 @@ body {
   font-size: 12px;
 }
 
+.btn-icon {
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  flex-shrink: 0;
+}
+
 
 .btn-lg {
   padding: 11px 24px;
@@ -998,6 +1005,12 @@ body {
 
 .sidebar-nav {
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
 
   display: flex;
   flex-direction: column;
@@ -1005,6 +1018,10 @@ body {
   gap: 4px;
 
   padding: 0 10px;
+}
+
+.sidebar-nav > div {
+  flex-shrink: 0;
 }
 
 
