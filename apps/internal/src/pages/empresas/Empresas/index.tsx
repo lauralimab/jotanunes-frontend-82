@@ -19,7 +19,7 @@ export default function EmpresasPage({ onSelectCompany, onEditCompany }: { onSel
 
   return (
     <>
-      <Header title="Fornecedores" subtitle="Gestão de todos os fornecedores cadastrados"
+      <Header title="Fornecedores" subtitle="Gestão dos fornecedores"
         actions={<button className="btn btn-primary" onClick={() => setShowCreateModal(true)}><Icon name="plus" size={15} />Novo Fornecedor</button>} />
       <PageWrapper>
         <EmpresasTable key={tableVersion} onSelectCompany={onSelectCompany} onEditCompany={onEditCompany} />

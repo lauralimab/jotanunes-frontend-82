@@ -10,6 +10,8 @@ import type {
   SupplierUserResetPasswordRequest,
 } from '../types/company'
 
+import ApiError from './ApiError'
+
 const API_URL = import.meta.env.VITE_API_URL?.trim().replace(/\/+$/, '')
 
 type ApiErrorResponse = {
@@ -36,18 +38,27 @@ async function requestCompany<T>(
   options?: RequestInit,
 ): Promise<T> {
   if (!API_URL) {
-    throw new Error('Configure VITE_API_URL com a URL da API interna.')
+    throw new ApiError('configuration', 'O serviço está indisponível no momento. Entre em contato com o suporte.')
   }
 
-  const response = await fetch(`${API_URL}/api/company${path}`, options)
+  let response: Response
+  try {
+    response = await fetch(`${API_URL}/api/company${path}`, options)
+  } catch {
+    throw new ApiError('connection', 'Não foi possível conectar ao serviço. Verifique sua conexão e tente mais tarde.')
+  }
 
   if (!response.ok) {
-    throw new Error(await getErrorMessage(response, fallback))
+    throw new ApiError('http', await getErrorMessage(response, fallback), response.status)
   }
 
   if (options?.method === 'DELETE') return undefined as T
 
-  return response.json() as Promise<T>
+  try {
+    return await response.json() as T
+  } catch {
+    throw new ApiError('invalid-response', 'Não foi possível carregar as informações. O serviço está temporariamente indisponível.')
+  }
 }
 
 function jsonRequest(method: 'POST' | 'PUT', body: object): RequestInit {

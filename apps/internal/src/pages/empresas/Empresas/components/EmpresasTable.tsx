@@ -94,7 +94,7 @@ export default function EmpresasTable({ onSelectCompany, onEditCompany }: { onSe
           <span style={{ display: "block", marginBottom: 5, marginLeft: 5, fontSize: 11.5, fontWeight: 600, color: "#6b7280" }}>Buscar fornecedor</span>
           <div style={{ position: "relative" }}>
             <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "#9ca3af" }}><Icon name="search" size={15} /></span>
-            <input className="input-base" aria-label="Buscar por razão social ou CNPJ" placeholder="Buscar por razão social ou CNPJ..." style={{ paddingLeft: 32 }} value={filters.search} onChange={event => changeFilters({ search: event.target.value })} />
+            <input className="input-base" aria-label="Buscar por razão social ou CNPJ" placeholder="Buscar por razão social ou CNPJ" style={{ paddingLeft: 32 }} value={filters.search} onChange={event => changeFilters({ search: event.target.value })} />
           </div>
         </div>
         <div style={{ flex: "1 1 14rem", maxWidth: "18rem" }}>
@@ -111,27 +111,34 @@ export default function EmpresasTable({ onSelectCompany, onEditCompany }: { onSe
         </div>
       </div>
       <div style={{ overflowX: "auto" }} aria-busy={loading}>
-        <table className="table-base">
-          {error && <tr><td colSpan={6} style={{ textAlign: "center", padding: 24 }}>Nenhum fornecedor encontrado.</td></tr>}
-          <thead><tr><th style={{ width: 380 }}>Razão Social</th><th>CNPJ</th><th>Tipo</th><th>Status</th><th>Atualizado em</th><th>Ações</th></tr></thead>
+        <table className={`table-base ${styles.table}`}>
+          <colgroup>
+            <col />
+            <col className={styles.cnpjColumn} />
+            <col className={styles.typeColumn} />
+            <col className={styles.statusColumn} />
+            <col className={styles.updatedColumn} />
+            <col className={styles.actionsColumn} />
+          </colgroup>
+          <thead><tr><th>Razão Social</th><th>CNPJ</th><th>Tipo</th><th>Status</th><th>Atualizado em</th><th>Ações</th></tr></thead>
           <tbody>
             {loading ? Array.from({ length: PAGE_SIZE }, (_, index) => (
               <tr key={index} aria-hidden="true">
-                <td><div style={{ display: "flex", alignItems: "center", gap: 10 }}><Skeleton width={36} height={36} borderRadius={8} /><div style={{ flex: 1 }}><Skeleton width="100%" height={14} /><div style={{ marginTop: 5 }}><Skeleton width="65%" height={12} /></div></div></div></td>
-                <td><Skeleton width={145} height={15} /></td>
-                <td><Skeleton width={85} height={15} /></td>
-                <td><Skeleton width={130} height={24} borderRadius={999} /></td>
+                <td><div className={styles.supplierIdentity}><div className={styles.avatarSlot}><Skeleton width="100%" height="100%" borderRadius={8} /></div><div className={styles.supplierText}><div className={styles.nameLine}><Skeleton width="100%" height={14} /></div><div className={styles.emailLine}><Skeleton width="65%" height={12} /></div></div></div></td>
+                <td style={{ fontFamily: "monospace", fontSize: 13 }}><Skeleton width="18ch" height={15} /></td>
+                <td><Skeleton width={90} height={15} /></td>
+                <td><Skeleton width={80} height={18} borderRadius={999} /></td>
                 <td><Skeleton width={80} height={15} /></td>
-                <td><Skeleton width={70} height={28} borderRadius={8} /></td>
+                <td><div style={{ display: "flex", gap: 6 }}>{Array.from({ length: 3 }, (_, actionIndex) => <Skeleton key={actionIndex} width="2rem" height="2rem" borderRadius={9} />)}</div></td>
               </tr>
             )) : page?.items.map(company => {
               const name = company.corporateName || company.tradeName || "Fornecedor";
               const status = companyStatuses.find(item => item.value === company.status);
               return (
                 <tr key={company.id}>
-                  <td><div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
+                  <td><div className={styles.supplierIdentity}>
                     <div style={{ width: 36, height: 36, borderRadius: 8, background: "#fde8ea", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 13, color: "#c01a2b", flexShrink: 0 }}>{name.trim().split(/\s+/).map(part => part[0]).join("").slice(0, 2).toUpperCase()}</div>
-                    <div style={{ minWidth: 0, maxWidth: 300 }}><div title={name} style={{ fontWeight: 600, color: "#0f172a", fontSize: 13.5, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</div><div style={{ fontSize: 11.5, color: "#9ca3af", overflowWrap: "anywhere" }}>{company.email || "—"}</div></div>
+                    <div className={styles.supplierText}><div className={styles.nameLine} title={name} style={{ fontWeight: 600, color: "#0f172a", fontSize: 13.5 }}>{name}</div><div className={styles.emailLine} title={company.email || undefined} style={{ fontSize: 11.5, color: "#9ca3af" }}>{company.email || "—"}</div></div>
                   </div></td>
                   <td style={{ fontFamily: "monospace", fontSize: 13, color: "#374151" }}>{company.formattedCnpj || formatCnpj(company.cnpj || "") || "—"}</td>
                   <td>{company.supplierType === 1 ? "Material" : company.supplierType === 2 ? "Mão de obra" : "—"}</td>
@@ -145,7 +152,7 @@ export default function EmpresasTable({ onSelectCompany, onEditCompany }: { onSe
                 </tr>
               );
             })}
-            {!loading && !error && !page?.items.length && <tr><td colSpan={6} style={{ textAlign: "center", padding: 24 }}>Nenhum fornecedor encontrado.</td></tr>}
+            {!loading && !page?.items.length && <tr><td colSpan={6} style={{ textAlign: "center", padding: 24 }}>Nenhum fornecedor encontrado.</td></tr>}
           </tbody>
         </table>
       </div>
