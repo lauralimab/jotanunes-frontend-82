@@ -56,8 +56,7 @@ export default function DocumentoEnviadoSucesso({
         <strong>
           Aguardando Análise
         </strong>{" "}
-        — a equipe Jotanunes será
-        notificada.
+        — documento recebido e aguardando análise pela equipe Jotanunes.
       </p>
 
       <button
