@@ -9,6 +9,7 @@ import Toast from "../../../shared/components/Toast";
 import NovoFornecedorModal from "../Empresas/components/NovoFornecedorModal";
 import ExcluirFornecedorModal from "../Empresas/components/ExcluirFornecedorModal";
 import SupplierUsers, { SupplierUsersSkeleton } from "./components/SupplierUsers";
+import ErrorState from "../../../shared/components/ErrorState";
 import type { Screen } from "../../../shared/types/portal";
 
 type Props = { onNav: (screen: Screen) => void; companyId: number | null; editOnOpen: boolean; onEditClose: () => void };
@@ -90,8 +91,7 @@ function CompanyDetailsSkeleton() {
 }
 
 export default function EmpresaDetalhePage({ onNav, companyId, editOnOpen, onEditClose }: Props) {
-  const [result, setResult] = useState<{ companyId: number; retry: number; company: Company | null; error: string } | null>(null);
-  const [retry, setRetry] = useState(0);
+  const [result, setResult] = useState<{ companyId: number; company: Company | null; error: string; cause?: unknown } | null>(null);
   const [localEditOpen, setLocalEditOpen] = useState(false);
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -100,15 +100,15 @@ export default function EmpresaDetalhePage({ onNav, companyId, editOnOpen, onEdi
     let active = true;
     if (companyId === null) return () => { active = false; };
     getCompany(companyId).then(result => {
-      if (active) setResult({ companyId, retry, company: result, error: "" });
+      if (active) setResult({ companyId, company: result, error: "" });
     }).catch(cause => {
-      if (active) setResult({ companyId, retry, company: null, error: cause instanceof Error ? cause.message : "Não foi possível carregar os dados do fornecedor." });
+      if (active) setResult({ companyId, company: null, error: cause instanceof Error ? cause.message : "Não foi possível carregar os dados do fornecedor.", cause });
     });
 
     return () => { active = false; };
-  }, [companyId, retry]);
+  }, [companyId]);
 
-  const resultMatchesRoute = result?.companyId === companyId && result.retry === retry;
+  const resultMatchesRoute = result?.companyId === companyId;
   const loading = companyId !== null && !resultMatchesRoute;
   const company = resultMatchesRoute ? result.company : null;
   const error = companyId === null ? "Selecione um fornecedor na lista para ver os detalhes." : resultMatchesRoute ? result.error : "";
@@ -123,7 +123,7 @@ export default function EmpresaDetalhePage({ onNav, companyId, editOnOpen, onEdi
   }
 
   function handleUpdated(updated: Company) {
-    setResult({ companyId: updated.id, retry, company: updated, error: "" });
+    setResult({ companyId: updated.id, company: updated, error: "" });
     setLocalEditOpen(false);
     onEditClose();
     setShowSuccessNotification(true);
@@ -135,10 +135,7 @@ export default function EmpresaDetalhePage({ onNav, companyId, editOnOpen, onEdi
         actions={<><button className="btn btn-secondary btn-sm" onClick={() => onNav("admin-suppliers")}>← Voltar</button>{company && <><button className="btn btn-secondary btn-sm" onClick={() => setLocalEditOpen(true)}><Icon name="edit" size={14} />Editar fornecedor</button><button type="button" className="btn btn-primary btn-sm" onClick={() => setShowDeleteModal(true)}><Icon name="trash" size={14} />Excluir fornecedor</button></>}</>} />
       <PageWrapper>
         {loading ? <CompanyDetailsSkeleton />
-          : error ? <div className="card" role="alert" style={{ color: "#b91c1c" }}>
-            {error}{companyId !== null && <> <button className="btn btn-secondary btn-sm" onClick={() => setRetry(value => value + 1)}>Tentar novamente</button></>}
-            {companyId === null && <> <button className="btn btn-secondary btn-sm" onClick={() => onNav("admin-suppliers")}>Voltar para fornecedores</button></>}
-          </div>
+          : error ? companyId === null ? <div className="card" role="alert">{error} <button className="btn btn-secondary btn-sm" onClick={() => onNav("admin-suppliers")}>Voltar para fornecedores</button></div> : <ErrorState error={result?.cause} />
             : company && <>
               <div className="card" style={{ marginBottom: 20, display: "flex", gap: 24, alignItems: "flex-start", flexWrap: "wrap" }}>
                 <div aria-hidden="true" style={{ width: 64, height: 64, borderRadius: 12, background: "#fde8ea", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 800, color: "#c01a2b", flexShrink: 0 }}>{initials}</div>

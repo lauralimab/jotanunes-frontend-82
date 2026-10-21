@@ -4,6 +4,7 @@ import type { SupplierUser } from "../../../../shared/types/company";
 import Icon from "../../../../shared/components/Icon";
 import Skeleton from "../../../../shared/components/Skeleton";
 import Toast from "../../../../shared/components/Toast";
+import ErrorState from "../../../../shared/components/ErrorState";
 import SupplierUserModal, { type UserAction } from "./SupplierUserModal";
 import styles from "./SupplierUsers.module.css";
 
@@ -32,8 +33,7 @@ export function SupplierUsersSkeleton() {
 }
 
 export default function SupplierUsers({ companyId }: { companyId: number }) {
-  const [result, setResult] = useState<{ users: SupplierUser[]; error: string } | null>(null);
-  const [retry, setRetry] = useState(0);
+  const [result, setResult] = useState<{ users: SupplierUser[]; error: boolean; cause?: unknown } | null>(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [action, setAction] = useState<UserAction | null>(null);
   const [notification, setNotification] = useState<{ message: string; id: number } | null>(null);
@@ -41,16 +41,16 @@ export default function SupplierUsers({ companyId }: { companyId: number }) {
   useEffect(() => {
     let active = true;
     getCompanyUsers(companyId).then(users => {
-      if (active) setResult({ users, error: "" });
+      if (active) setResult({ users, error: false });
     }).catch(cause => {
-      if (active) setResult({ users: [], error: cause instanceof Error ? cause.message : "Não foi possível carregar os usuários." });
+      if (active) setResult({ users: [], error: true, cause });
     });
     return () => { active = false; };
-  }, [companyId, retry]);
+  }, [companyId]);
 
   function handleSaved(user: SupplierUser) {
     if (action?.type === "create" && result) setPageNumber(Math.ceil((result.users.length + 1) / PAGE_SIZE));
-    setResult(current => current ? { users: current.users.some(item => item.id === user.id) ? current.users.map(item => item.id === user.id ? user : item) : [...current.users, user], error: "" } : current);
+    setResult(current => current ? { users: current.users.some(item => item.id === user.id) ? current.users.map(item => item.id === user.id ? user : item) : [...current.users, user], error: false } : current);
     if (action) setNotification({ message: successMessages[action.type], id: Date.now() });
     setAction(null);
   }
@@ -71,7 +71,7 @@ export default function SupplierUsers({ companyId }: { companyId: number }) {
           <div><h3 id="supplier-users-title">Usuários</h3><p>Usuários com acesso ao Portal do Fornecedor.</p></div>
           <button type="button" className="btn btn-primary btn-sm" disabled={Boolean(result.error)} onClick={() => setAction({ type: "create" })}><Icon name="plus" size={15} />Novo usuário</button>
         </header>
-        {result.error ? <div className={styles.message}><p role="alert" className={styles.error}>{result.error}</p><button type="button" className="btn btn-secondary btn-sm" onClick={() => { setResult(null); setRetry(value => value + 1); }}>Tentar novamente</button></div> : <div className={styles.tableWrapper}>
+        {result.error ? <ErrorState error={result.cause} compact /> : <div className={styles.tableWrapper}>
           <table className="table-base">
             <thead><tr><th scope="col">Usuário</th><th scope="col">Status</th><th scope="col">Senha</th><th scope="col">Último acesso</th><th scope="col">Cadastrado em</th><th scope="col">Ações</th></tr></thead>
             <tbody>
