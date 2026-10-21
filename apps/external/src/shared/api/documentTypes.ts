@@ -1,6 +1,6 @@
 import type {
   SupplierDocumentType,
-} from "../types/documentsTypes";
+} from "../types/documentTypes";
 
 const API_URL =
   import.meta.env.VITE_API_URL;

@@ -1,10 +1,10 @@
 import type {
   SupplierDocumentType,
-} from "../../../../shared/types/documentsTypes";
+} from "../../../../shared/types/documentTypes";
 
 import {
   DOCUMENT_SUBJECT,
-} from "../../../../shared/types/documentsTypes";
+} from "../../../../shared/types/documentTypes";
 
 import type {
   Worker,

@@ -11,7 +11,7 @@ import PageWrapper from "../../../shared/components/PageWrapper";
 
 import {
   getDocumentTypes,
-} from "../../../shared/api/documentsTypes";
+} from "../../../shared/api/documentTypes";
 
 import {
   getWorkers,
@@ -20,7 +20,7 @@ import {
 import {
   DOCUMENT_SUBJECT,
   type SupplierDocumentType,
-} from "../../../shared/types/documentsTypes";
+} from "../../../shared/types/documentTypes";
 
 import type {
   Worker,
