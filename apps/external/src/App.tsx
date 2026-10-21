@@ -1,9 +1,11 @@
 import AppRouter from "./app/router";
-import { useAuth } from "./app/providers";
+
+import {
+  useAuth,
+} from "./app/providers";
 
 import {
   MOCK_DOCUMENTS,
-  MOCK_EMPLOYEES,
 } from "./shared/mocks/portal";
 
 export default function App() {
@@ -38,7 +40,6 @@ export default function App() {
       onLogin={handleLogin}
       onLogout={handleLogout}
       documents={MOCK_DOCUMENTS}
-      workers={MOCK_EMPLOYEES}
     />
   );
 }

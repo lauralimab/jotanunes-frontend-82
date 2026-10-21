@@ -1,115 +1,187 @@
 import type {
   AuthenticatedUser,
   AuthToken,
+  ChangePasswordRequest,
   LoginRequest,
-} from '../types/auth'
+} from "../types/auth";
 
-const API_URL = import.meta.env.VITE_API_URL
+const API_URL =
+  import.meta.env.VITE_API_URL;
 
 type ApiErrorResponse = {
-  Message?: string
-  message?: string
-}
+  Message?: string;
+  message?: string;
+};
 
 async function getErrorMessage(
   response: Response,
   fallback: string,
 ): Promise<string> {
   try {
-    const error: ApiErrorResponse = await response.json()
+    const error =
+      (await response.json()) as ApiErrorResponse;
 
-    return error.Message ?? error.message ?? fallback
+    return (
+      error.Message ??
+      error.message ??
+      fallback
+    );
   } catch {
-    return fallback
+    return fallback;
   }
 }
 
 export async function login(
   credentials: LoginRequest,
 ): Promise<AuthToken> {
-  const response = await fetch(`${API_URL}/api/auth/login`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
+  const response = await fetch(
+    `${API_URL}/api/auth/login`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type":
+          "application/json",
+      },
+      body:
+        JSON.stringify(credentials),
     },
-    body: JSON.stringify(credentials),
-  })
+  );
 
   if (!response.ok) {
-    const message = await getErrorMessage(
-      response,
-      'Não foi possível realizar o login.',
-    )
+    const message =
+      await getErrorMessage(
+        response,
+        "Não foi possível realizar o login.",
+      );
 
-    throw new Error(message)
+    throw new Error(message);
   }
 
-  return response.json() as Promise<AuthToken>
+  const data =
+    (await response.json()) as AuthToken;
+
+  return data;
 }
 
 export async function getAuthenticatedUser(
   accessToken: string,
 ): Promise<AuthenticatedUser> {
-  const response = await fetch(`${API_URL}/api/auth/me`, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
+  const response = await fetch(
+    `${API_URL}/api/auth/me`,
+    {
+      method: "GET",
+      headers: {
+        Authorization:
+          `Bearer ${accessToken}`,
+      },
     },
-  })
+  );
 
   if (!response.ok) {
-    const message = await getErrorMessage(
-      response,
-      'Não foi possível validar a sessão.',
-    )
+    const message =
+      await getErrorMessage(
+        response,
+        "Não foi possível validar a sessão.",
+      );
 
-    throw new Error(message)
+    throw new Error(message);
   }
 
-  return response.json() as Promise<AuthenticatedUser>
+  const data =
+    (await response.json()) as AuthenticatedUser;
+
+  return data;
 }
 
 export async function refreshAuthSession(
   refreshToken: string,
 ): Promise<AuthToken> {
-  const response = await fetch(`${API_URL}/api/auth/refresh`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
+  const response = await fetch(
+    `${API_URL}/api/auth/refresh`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type":
+          "application/json",
+      },
+      body: JSON.stringify({
+        refreshToken,
+      }),
     },
-    body: JSON.stringify({
-      refreshToken,
-    }),
-  })
+  );
 
   if (!response.ok) {
-    const message = await getErrorMessage(
-      response,
-      'Não foi possível renovar a sessão.',
-    )
+    const message =
+      await getErrorMessage(
+        response,
+        "Não foi possível renovar a sessão.",
+      );
 
-    throw new Error(message)
+    throw new Error(message);
   }
 
-  return response.json() as Promise<AuthToken>
+  const data =
+    (await response.json()) as AuthToken;
+
+  return data;
+}
+
+export async function changePassword(
+  accessToken: string,
+  data: ChangePasswordRequest,
+): Promise<AuthToken> {
+  const response = await fetch(
+    `${API_URL}/api/auth/change-password`,
+    {
+      method: "POST",
+      headers: {
+        Authorization:
+          `Bearer ${accessToken}`,
+
+        "Content-Type":
+          "application/json",
+      },
+      body: JSON.stringify(data),
+    },
+  );
+
+  if (!response.ok) {
+    const message =
+      await getErrorMessage(
+        response,
+        "Não foi possível alterar a senha.",
+      );
+
+    throw new Error(message);
+  }
+
+  const authToken =
+    (await response.json()) as AuthToken;
+
+  return authToken;
 }
 
 export async function logout(
   accessToken: string,
 ): Promise<void> {
-  const response = await fetch(`${API_URL}/api/auth/logout`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
+  const response = await fetch(
+    `${API_URL}/api/auth/logout`,
+    {
+      method: "POST",
+      headers: {
+        Authorization:
+          `Bearer ${accessToken}`,
+      },
     },
-  })
+  );
 
   if (!response.ok) {
-    const message = await getErrorMessage(
-      response,
-      'Não foi possível encerrar a sessão.',
-    )
+    const message =
+      await getErrorMessage(
+        response,
+        "Não foi possível encerrar a sessão.",
+      );
 
-    throw new Error(message)
+    throw new Error(message);
   }
 }

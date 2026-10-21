@@ -15,6 +15,7 @@ import PortalLayout from "./layouts/PortalLayout";
 
 import LoginPage from "../pages/auth/Login";
 import EsqueciSenhaPage from "../pages/auth/EsqueciSenha";
+import TrocarSenhaPage from "../pages/auth/TrocarSenha";
 
 import InicioPage from "../pages/inicio/Inicio";
 
@@ -34,17 +35,18 @@ import { ROUTES } from "../shared/constants/routes";
 import type { AuthToken } from "../shared/types/auth";
 
 type Documents =
-  ComponentProps<typeof DocumentosPage>["documents"];
-
-type Workers =
   ComponentProps<
-    typeof TrabalhadoresPage
-  >["trabalhadores"];
+    typeof PendenciasPage
+  >["documents"];
 
 const PAGE_ROUTES = {
   documents: ROUTES.documents,
-  "send-document": ROUTES.sendDocument,
-  pendencies: ROUTES.pendencies,
+
+  "send-document":
+    ROUTES.sendDocument,
+
+  pendencies:
+    ROUTES.pendencies,
 } as const;
 
 type PageDestination =
@@ -57,11 +59,11 @@ type AppRouterProps = {
     authToken: AuthToken,
   ) => void;
 
-  onLogout: () => void | Promise<void>;
+  onLogout: () =>
+    | void
+    | Promise<void>;
 
   documents: Documents;
-
-  workers: Workers;
 };
 
 type PortalRouteLayoutProps = {
@@ -76,13 +78,29 @@ function PortalRouteLayout({
   auth,
   onLogout,
 }: PortalRouteLayoutProps) {
-  const [navOpen, setNavOpen] =
-    useState(false);
+  const [
+    navOpen,
+    setNavOpen,
+  ] = useState(false);
 
   if (!auth) {
     return (
       <Navigate
         to={ROUTES.login}
+        replace
+      />
+    );
+  }
+
+  if (
+    auth.user
+      .mustChangePassword
+  ) {
+    return (
+      <Navigate
+        to={
+          ROUTES.changePassword
+        }
         replace
       />
     );
@@ -111,15 +129,18 @@ export default function AppRouter({
   onLogin,
   onLogout,
   documents,
-  workers,
 }: AppRouterProps) {
-  const navigate = useNavigate();
+  const navigate =
+    useNavigate();
 
   function navigateByDestination(
-    destination: PageDestination,
+    destination:
+      PageDestination,
   ) {
     navigate(
-      PAGE_ROUTES[destination],
+      PAGE_ROUTES[
+      destination
+      ],
     );
   }
 
@@ -131,12 +152,19 @@ export default function AppRouter({
         element={
           auth ? (
             <Navigate
-              to={ROUTES.home}
+              to={
+                auth.user
+                  .mustChangePassword
+                  ? ROUTES.changePassword
+                  : ROUTES.home
+              }
               replace
             />
           ) : (
             <LoginPage
-              onLogin={onLogin}
+              onLogin={
+                onLogin
+              }
               onForgotPassword={() =>
                 navigate(
                   ROUTES.forgotPassword,
@@ -147,19 +175,55 @@ export default function AppRouter({
         }
       />
 
+      {/* TROCA OBRIGATÓRIA DE SENHA */}
+      <Route
+        path={
+          ROUTES.changePassword
+        }
+        element={
+          !auth ? (
+            <Navigate
+              to={
+                ROUTES.login
+              }
+              replace
+            />
+          ) : auth.user
+            .mustChangePassword ? (
+            <TrocarSenhaPage />
+          ) : (
+            <Navigate
+              to={
+                ROUTES.home
+              }
+              replace
+            />
+          )
+        }
+      />
+
       {/* ESQUECI MINHA SENHA */}
       <Route
-        path={ROUTES.forgotPassword}
+        path={
+          ROUTES.forgotPassword
+        }
         element={
           auth ? (
             <Navigate
-              to={ROUTES.home}
+              to={
+                auth.user
+                  .mustChangePassword
+                  ? ROUTES.changePassword
+                  : ROUTES.home
+              }
               replace
             />
           ) : (
             <EsqueciSenhaPage
               onBack={() =>
-                navigate(ROUTES.login)
+                navigate(
+                  ROUTES.login,
+                )
               }
             />
           )
@@ -171,7 +235,9 @@ export default function AppRouter({
         element={
           <PortalRouteLayout
             auth={auth}
-            onLogout={onLogout}
+            onLogout={
+              onLogout
+            }
           />
         }
       >
@@ -180,7 +246,9 @@ export default function AppRouter({
           path={ROUTES.home}
           element={
             <InicioPage
-              documents={documents}
+              documents={
+                documents
+              }
               onNav={
                 navigateByDestination
               }
@@ -190,7 +258,9 @@ export default function AppRouter({
 
         {/* DADOS DA EMPRESA */}
         <Route
-          path={ROUTES.companyData}
+          path={
+            ROUTES.companyData
+          }
           element={
             <DadosEmpresaPage />
           }
@@ -198,10 +268,11 @@ export default function AppRouter({
 
         {/* DOCUMENTOS */}
         <Route
-          path={ROUTES.documents}
+          path={
+            ROUTES.documents
+          }
           element={
             <DocumentosPage
-              documents={documents}
               onNav={
                 navigateByDestination
               }
@@ -211,7 +282,9 @@ export default function AppRouter({
 
         {/* ENVIAR DOCUMENTO */}
         <Route
-          path={ROUTES.sendDocument}
+          path={
+            ROUTES.sendDocument
+          }
           element={
             <EnviarDocumentoPage
               onCancel={() =>
@@ -225,10 +298,14 @@ export default function AppRouter({
 
         {/* PENDÊNCIAS */}
         <Route
-          path={ROUTES.pendencies}
+          path={
+            ROUTES.pendencies
+          }
           element={
             <PendenciasPage
-              documents={documents}
+              documents={
+                documents
+              }
               onNav={
                 navigateByDestination
               }
@@ -238,10 +315,11 @@ export default function AppRouter({
 
         {/* TRABALHADORES */}
         <Route
-          path={ROUTES.workers}
+          path={
+            ROUTES.workers
+          }
           element={
             <TrabalhadoresPage
-              trabalhadores={workers}
               onNav={
                 navigateByDestination
               }
@@ -251,7 +329,9 @@ export default function AppRouter({
 
         {/* MINHA CONTA */}
         <Route
-          path={ROUTES.account}
+          path={
+            ROUTES.account
+          }
           element={
             <MinhaContaPage />
           }

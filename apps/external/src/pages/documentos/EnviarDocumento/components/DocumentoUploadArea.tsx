@@ -7,50 +7,68 @@ import {
 import Icon from "../../../../shared/components/Icon";
 
 export type SelectedFile = {
+  file: File;
   name: string;
   size: string;
 };
 
 type DocumentoUploadAreaProps = {
   file: SelectedFile | null;
+
   onFileChange: (
     file: SelectedFile | null,
   ) => void;
 };
 
+const MAX_FILE_SIZE =
+  20 * 1024 * 1024;
+
 export default function DocumentoUploadArea({
   file,
   onFileChange,
 }: DocumentoUploadAreaProps) {
-  const [dragging, setDragging] =
-    useState(false);
+  const [
+    dragging,
+    setDragging,
+  ] = useState(false);
 
   const inputRef =
-    useRef<HTMLInputElement>(null);
+    useRef<HTMLInputElement>(
+      null,
+    );
 
   function handleSelectedFile(
     selectedFile: File,
   ) {
-    if (selectedFile.size > 10485760) {
+    if (
+      selectedFile.size >
+      MAX_FILE_SIZE
+    ) {
       alert(
-        "Arquivo excede 10 MB",
+        "O arquivo excede o tamanho máximo de 20 MB.",
       );
 
       return;
     }
 
     onFileChange({
+      file: selectedFile,
       name: selectedFile.name,
+
       size: `${(
-        selectedFile.size / 1024
-      ).toFixed(0)} KB`,
+        selectedFile.size /
+        1024 /
+        1024
+      ).toFixed(2)} MB`,
     });
   }
 
   function handleDrop(
-    event: DragEvent<HTMLDivElement>,
+    event:
+      DragEvent<HTMLDivElement>,
   ) {
     event.preventDefault();
+
     setDragging(false);
 
     const selectedFile =
@@ -60,17 +78,22 @@ export default function DocumentoUploadArea({
       return;
     }
 
-    handleSelectedFile(selectedFile);
+    handleSelectedFile(
+      selectedFile,
+    );
   }
 
   return (
     <>
       <div
         className={`drag-zone${
-          dragging ? " active" : ""
+          dragging
+            ? " active"
+            : ""
         }`}
         onDragOver={(event) => {
           event.preventDefault();
+
           setDragging(true);
         }}
         onDragLeave={() =>
@@ -129,8 +152,8 @@ export default function DocumentoUploadArea({
             color: "#0f172a",
           }}
         >
-          Arraste o arquivo aqui ou clique
-          para selecionar
+          Arraste o arquivo aqui
+          ou clique para selecionar
         </p>
 
         <p
@@ -141,8 +164,8 @@ export default function DocumentoUploadArea({
           }}
         >
           Formatos aceitos: PDF,
-          JPG, PNG — máximo 10 MB por
-          arquivo
+          JPG, JPEG e PNG — máximo
+          20 MB
         </p>
       </div>
 
@@ -196,10 +219,13 @@ export default function DocumentoUploadArea({
           </div>
 
           <button
+            type="button"
             className="btn btn-ghost btn-sm"
-            onClick={() =>
-              onFileChange(null)
-            }
+            onClick={(event) => {
+              event.stopPropagation();
+
+              onFileChange(null);
+            }}
           >
             <Icon
               name="x"
