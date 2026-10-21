@@ -1,41 +1,170 @@
+
+import { useState } from "react";
 import Icon from "../../../../shared/components/Icon";
 
-type SolicitarCorrecaoModalProps = { doc: { name: string }; setShowModal: (value: boolean) => void; correctionType: string; setCorrectionType: (value: string) => void; correctionReason: string; setCorrectionReason: (value: string) => void; };
+type Props = {
+  doc: {
+    name: string;
+    person: string;
+  };
+  onClose: () => void;
+  onConfirm: (type: string, reason: string) => Promise<void>;
+  loading: boolean;
+  error: string | null;
+};
 
-export default function SolicitarCorrecaoModal({ doc, setShowModal, correctionType, setCorrectionType, correctionReason, setCorrectionReason }: SolicitarCorrecaoModalProps) {
+export default function SolicitarCorrecaoModal({
+  doc,
+  onClose,
+  onConfirm,
+  loading,
+  error,
+}: Props) {
+  const [correctionType, setCorrectionType] = useState("");
+  const [correctionReason, setCorrectionReason] = useState("");
+
+  const canSubmit =
+    correctionType.trim().length > 0 &&
+    correctionReason.trim().length > 0 &&
+    !loading;
+
   return (
-<div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal-box" onClick={e => e.stopPropagation()}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-              <h3 style={{ margin: 0, fontFamily: "'DM Sans', sans-serif", fontSize: 18, fontWeight: 700 }}>Solicitar Correção</h3>
-              <button type="button" className="btn btn-ghost btn-icon" aria-label="Fechar formulário" onClick={() => setShowModal(false)}><Icon name="x" size={16} /></button>
-            </div>
-            <p style={{ color: "#6b7280", fontSize: 13.5, margin: "0 0 20px" }}>Informe ao fornecedor o que precisa ser corrigido. O status mudará para <strong>Correção Solicitada</strong>.</p>
-            <div style={{ marginBottom: 14 }}>
-              <label style={{ fontSize: 12.5, fontWeight: 600, color: "#374151", display: "block", marginBottom: 6 }}>Documento</label>
-              <input className="input-base" value={doc.name} readOnly style={{ background: "#f9fafb" }} />
-            </div>
-            <div style={{ marginBottom: 14 }}>
-              <label style={{ fontSize: 12.5, fontWeight: 600, color: "#374151", display: "block", marginBottom: 6 }}>Motivo Principal *</label>
-              <select className="select-base" style={{ width: "100%" }} value={correctionType} onChange={e => setCorrectionType(e.target.value)}>
-                <option value="">Selecione o motivo...</option>
-                <option>Documento ilegível ou com baixa qualidade</option>
-                <option>CNPJ/CPF divergente do cadastro</option>
-                <option>Documento vencido</option>
-                <option>Assinatura ausente ou inválida</option>
-                <option>Documento incompleto</option>
-                <option>Outro</option>
-              </select>
-            </div>
-            <div style={{ marginBottom: 14 }}>
-              <label style={{ fontSize: 12.5, fontWeight: 600, color: "#374151", display: "block", marginBottom: 6 }}>Descrição detalhada *</label>
-              <textarea className="input-base" rows={4} placeholder="Descreva com detalhes o que precisa ser corrigido..." style={{ resize: "vertical" }} value={correctionReason} onChange={e => setCorrectionReason(e.target.value)} />
-            </div>
-            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-              <button className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancelar</button>
-              <button className="btn btn-warning" onClick={() => setShowModal(false)}><Icon name="edit" size={15} />Enviar Solicitação</button>
-            </div>
+    <div
+      className="modal-overlay"
+      onClick={() => {
+        if (!loading) onClose();
+      }}
+    >
+      <div
+        className="modal-box correction-modal-modern"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="correction-title"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="correction-top">
+          <h3 id="correction-title">Solicitar correção</h3>
+
+          <button
+            type="button"
+            className="correction-close"
+            onClick={onClose}
+            disabled={loading}
+            aria-label="Fechar modal"
+          >
+            ×
+          </button>
+        </div>
+
+        <p className="correction-description">
+          Informe quais informações precisam ser corrigidas
+          ou qual documento deverá ser substituído.
+        </p>
+
+        <div className="correction-document">
+          <span className="correction-document-label">
+            DOCUMENTO SELECIONADO
+          </span>
+          <strong>{doc.name}</strong>
+          <span>{doc.person}</span>
+        </div>
+
+        <div className="correction-field">
+          <label htmlFor="correction-type">
+            Motivo principal <span>*</span>
+          </label>
+
+          <select
+            id="correction-type"
+            className="select-base"
+            value={correctionType}
+            onChange={(event) =>
+              setCorrectionType(event.target.value)
+            }
+            disabled={loading}
+          >
+            <option value="">Selecione o motivo...</option>
+            <option>Documento ilegível ou com baixa qualidade</option>
+            <option>CNPJ/CPF divergente do cadastro</option>
+            <option>Documento vencido</option>
+            <option>Assinatura ausente ou inválida</option>
+            <option>Documento incompleto</option>
+            <option>Outro</option>
+          </select>
+        </div>
+
+        <div className="correction-field">
+          <label htmlFor="correction-reason">
+            Descrição detalhada <span>*</span>
+          </label>
+
+          <textarea
+            id="correction-reason"
+            rows={4}
+            value={correctionReason}
+            onChange={(event) =>
+              setCorrectionReason(event.target.value)
+            }
+            placeholder="Explique o que precisa ser corrigido..."
+            disabled={loading}
+            maxLength={1000}
+          />
+
+          <div className="correction-counter">
+            {correctionReason.length}/1000
           </div>
         </div>
+
+        <div className="correction-warning">
+          <Icon name="info" size={17} color="#d97706" />
+          <span>
+            Atualmente, o backend registra esta solicitação
+            como <strong>Reprovado</strong>, incluindo o motivo
+            da correção na justificativa.
+          </span>
+        </div>
+
+        {error && (
+          <div
+            role="alert"
+            style={{
+              color: "#b91c1c",
+              fontSize: 12,
+              padding: 10,
+              background: "#fef2f2",
+              borderRadius: 8,
+            }}
+          >
+            {error}
+          </div>
+        )}
+
+        <div className="correction-footer">
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={onClose}
+            disabled={loading}
+          >
+            Cancelar
+          </button>
+
+          <button
+            type="button"
+            className="btn btn-warning"
+            disabled={!canSubmit}
+            onClick={() =>
+              void onConfirm(
+                correctionType,
+                correctionReason.trim()
+              )
+            }
+          >
+            <Icon name="edit" size={15} />
+            {loading ? "Enviando..." : "Enviar solicitação"}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
