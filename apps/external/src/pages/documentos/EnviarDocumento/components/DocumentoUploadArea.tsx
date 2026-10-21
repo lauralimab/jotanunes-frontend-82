@@ -21,7 +21,7 @@ type DocumentoUploadAreaProps = {
 };
 
 const MAX_FILE_SIZE =
-  20 * 1024 * 1024;
+  10 * 1024 * 1024;
 
 export default function DocumentoUploadArea({
   file,
@@ -45,7 +45,7 @@ export default function DocumentoUploadArea({
       MAX_FILE_SIZE
     ) {
       alert(
-        "O arquivo excede o tamanho máximo de 20 MB.",
+        "O arquivo excede o tamanho máximo de 10 MB.",
       );
 
       return;
@@ -165,7 +165,7 @@ export default function DocumentoUploadArea({
         >
           Formatos aceitos: PDF,
           JPG, JPEG e PNG — máximo
-          20 MB
+          10 MB
         </p>
       </div>
 
