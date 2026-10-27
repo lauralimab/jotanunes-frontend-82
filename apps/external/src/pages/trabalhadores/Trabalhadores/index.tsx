@@ -26,6 +26,7 @@ import AdicionarTrabalhadorModal, {
 import EditarTrabalhadorModal from "./components/EditarTrabalhadorModal";
 
 import TrabalhadoresTable from "./components/TrabalhadoresTable";
+import TrabalhadoresTableSkeleton from "./components/TrabalhadoresTableSkeleton";
 
 type TrabalhadoresPageProps = {
   onNav: (
@@ -182,7 +183,7 @@ export default function TrabalhadoresPage({
         current.map(
           (trabalhador) =>
             trabalhador.id ===
-            atualizado.id
+              atualizado.id
               ? atualizado
               : trabalhador,
         ),
@@ -210,20 +211,20 @@ export default function TrabalhadoresPage({
       const atualizado =
         trabalhador.active
           ? await deactivateWorker(
-              auth.accessToken,
-              trabalhador.id,
-            )
+            auth.accessToken,
+            trabalhador.id,
+          )
           : await activateWorker(
-              auth.accessToken,
-              trabalhador.id,
-            );
+            auth.accessToken,
+            trabalhador.id,
+          );
 
       setTrabalhadores(
         (current) =>
           current.map(
             (item) =>
               item.id ===
-              atualizado.id
+                atualizado.id
                 ? atualizado
                 : item,
           ),
@@ -289,18 +290,7 @@ export default function TrabalhadoresPage({
         )}
 
         {isLoading ? (
-          <div
-            className="card"
-            style={{
-              padding: 32,
-              textAlign:
-                "center",
-              color:
-                "#64748b",
-            }}
-          >
-            Carregando funcionários...
-          </div>
+          <TrabalhadoresTableSkeleton />
         ) : (
           <TrabalhadoresTable
             trabalhadores={
