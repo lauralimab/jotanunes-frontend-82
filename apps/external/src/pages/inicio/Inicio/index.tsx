@@ -1,3 +1,5 @@
+import { useAuth } from "../../../app/providers";
+
 import Header from "../../../shared/components/Header";
 import PageWrapper from "../../../shared/components/PageWrapper";
 
@@ -23,11 +25,20 @@ export default function InicioPage({
   onNav,
   documents,
 }: InicioPageProps) {
+  const { auth } = useAuth();
+
+  const companyName =
+    auth?.user.companyCorporateName;
+
   return (
     <>
       <Header
         title="Dashboard"
-        subtitle="Visão geral da sua documentação — Serviços e Logística SA"
+        subtitle={
+          companyName
+            ? `Visão geral da sua documentação — ${companyName}`
+            : "Visão geral da sua documentação"
+        }
       />
 
       <PageWrapper>

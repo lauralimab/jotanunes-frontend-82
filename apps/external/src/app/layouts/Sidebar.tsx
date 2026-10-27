@@ -3,9 +3,27 @@ import {
   useNavigate,
 } from "react-router-dom";
 
+import { useAuth } from "../providers";
+
 import BrandLogo from "../../shared/components/BrandLogo";
 import Icon from "../../shared/components/Icon";
 import { ROUTES } from "../../shared/constants/routes";
+
+function getInitials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+
+  if (parts.length === 0) {
+    return "";
+  }
+
+  const first = parts[0][0];
+  const last =
+    parts.length > 1
+      ? parts[parts.length - 1][0]
+      : "";
+
+  return (first + last).toUpperCase();
+}
 
 type SidebarProps = {
   onLogout: () => void;
@@ -24,6 +42,9 @@ export default function Sidebar({
 }: SidebarProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { auth } = useAuth();
+
+  const userName = auth?.user.name ?? "";
 
   const links = [
     {
@@ -200,7 +221,7 @@ export default function Sidebar({
         <div className="sidebar-footer">
           <div className="sidebar-user">
             <div className="sidebar-user-avatar">
-              FL
+              {getInitials(userName)}
             </div>
 
             <div className="sidebar-user-info">
@@ -211,7 +232,7 @@ export default function Sidebar({
                   color: "#ffffff",
                 }}
               >
-                Felipe Lima
+                {userName}
               </div>
 
               <div
