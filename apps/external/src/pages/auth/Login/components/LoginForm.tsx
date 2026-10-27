@@ -79,7 +79,15 @@ export default function LoginForm({
   }
 
   return (
-    <div
+    <form
+      onSubmit={(event) => {
+        event.preventDefault();
+
+        if (!isLoading) {
+          void handleLogin();
+        }
+      }}
+      noValidate
       style={{
         flex: "1 1 320px",
         maxWidth: 420,
@@ -287,15 +295,12 @@ export default function LoginForm({
         }}
       >
         <button
+          type="submit"
           className="btn btn-primary btn-lg"
           style={{
             width: "100%",
-            justifyContent:
-              "center",
+            justifyContent: "center",
           }}
-          onClick={() =>
-            void handleLogin()
-          }
           disabled={isLoading}
         >
           {isLoading
@@ -303,6 +308,6 @@ export default function LoginForm({
             : "Entrar como Fornecedor"}
         </button>
       </div>
-    </div>
+    </form>
   );
 }
