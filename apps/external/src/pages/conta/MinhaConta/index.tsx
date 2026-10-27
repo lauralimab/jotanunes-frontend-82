@@ -23,10 +23,12 @@ import DadosCadastraisTab, {
 import AcessoSegurancaTab from "./components/AcessoSegurancaTab";
 
 import HistoricoTab from "./components/HistoricoTab";
+import { useToast } from "../../../shared/components/ToastContext";
 
 export default function MinhaContaPage() {
 
   const [editMode, setEditMode] = useState(false);
+  const { showToast } = useToast();
 
   const [activeTab, setActiveTab] =
     useState<ProfileTabId>("dados");
@@ -44,8 +46,6 @@ export default function MinhaContaPage() {
     confirmar: "",
 
   });
-
-  const [saved, setSaved] = useState(false);
 
   const [form, setForm] = useState<AccountForm>({
 
@@ -124,17 +124,12 @@ export default function MinhaContaPage() {
   }
 
   function handleSave() {
-
-    setSaved(true);
-
     setEditMode(false);
 
-    setTimeout(() => {
-
-      setSaved(false);
-
-    }, 3000);
-
+    showToast(
+      "Alteração realizada com sucesso.",
+      "success",
+    );
   }
 
   return (
@@ -238,54 +233,6 @@ export default function MinhaContaPage() {
       />
 
       <PageWrapper>
-
-        {saved && (
-
-          <div
-
-            style={{
-
-              background: "#dcfce7",
-
-              border: "1px solid #bbf7d0",
-
-              borderRadius: 10,
-
-              padding: "12px 18px",
-
-              marginBottom: 20,
-
-              display: "flex",
-
-              alignItems: "center",
-
-              gap: 10,
-
-              fontSize: 13.5,
-
-              color: "#166534",
-
-              fontWeight: 500,
-
-            }}
-
-          >
-
-            <Icon
-
-              name="check"
-
-              size={16}
-
-              color="#16a34a"
-
-            />
-
-            Alteração realizada com sucesso.
-
-          </div>
-
-        )}
 
         <div
 
@@ -581,7 +528,7 @@ export default function MinhaContaPage() {
 
         </div>
 
-                <ProfileTabs
+        <ProfileTabs
           activeTab={activeTab}
           onChange={setActiveTab}
         />
@@ -629,11 +576,10 @@ export default function MinhaContaPage() {
               confirmar: "",
             });
 
-            setSaved(true);
-
-            setTimeout(() => {
-              setSaved(false);
-            }, 3000);
+            showToast(
+              "Senha alterada com sucesso.",
+              "success",
+            );
           }}
         />
       )}
