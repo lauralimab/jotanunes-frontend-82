@@ -1,3 +1,6 @@
+.filters { padding: 16px 20px; border-bottom: 1px solid rgba(15, 23, 42, 0.06); display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap; }
+.searchButton { height: 42px; flex-shrink: 0; }
+
 .table:global(.table-base) {
   table-layout: fixed;
   min-width: 64rem;

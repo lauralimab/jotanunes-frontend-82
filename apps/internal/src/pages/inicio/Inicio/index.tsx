@@ -23,7 +23,6 @@ export default function InicioPage({ onNav }: { onNav: (s: Screen) => void }) {
   const [statusCounts, setStatusCounts] = useState<SupplierStatusCount[]>([]);
   const [suppliersLoading, setSuppliersLoading] = useState(true);
   const [suppliersError, setSuppliersError] = useState(false);
-  const [refreshCount, setRefreshCount] = useState(0);
 
   useEffect(() => {
     let active = true;
@@ -48,20 +47,11 @@ export default function InicioPage({ onNav }: { onNav: (s: Screen) => void }) {
       });
 
     return () => { active = false; };
-  }, [refreshCount]);
-
-  function refreshSupplierTotal() {
-    setSupplierTotal(null);
-    setStatusCounts([]);
-    setSuppliersError(false);
-    setSuppliersLoading(true);
-    setRefreshCount((count) => count + 1);
-  }
+  }, []);
 
   return (
     <>
-      <Header title="Dashboard Administrativo" subtitle="Visão geral da plataforma"
-        actions={<><button className="btn btn-secondary btn-sm" onClick={refreshSupplierTotal} disabled={suppliersLoading}><Icon name="refresh" size={14} />Atualizar</button></>} />
+      <Header title="Dashboard Administrativo" subtitle="Visão geral da plataforma" />
       <PageWrapper>
         <EstatisticasCards supplierTotal={supplierTotal} suppliersLoading={suppliersLoading} />
 
