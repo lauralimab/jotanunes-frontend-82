@@ -15,7 +15,7 @@ export default function HistoricoPage() {
       <Header title="Histórico de Ações" subtitle="Rastreabilidade completa de todas as atividades do sistema"
         actions={<button className="btn btn-secondary btn-sm"><Icon name="doc" size={14} />Exportar CSV</button>} />
       <PageWrapper>
-        <div className="card" style={{ padding: 0, overflow: "hidden" }}>
+        <div className="card table-card" style={{ padding: 0, overflow: "hidden" }}>
           <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(15, 23, 42, 0.06)", display: "flex", gap: 10, flexWrap: "wrap" }}>
             <div style={{ position: "relative", flex: 1, minWidth: 220, maxWidth: 320 }}>
               <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "#9ca3af" }}><Icon name="search" size={15} /></span>
@@ -49,8 +49,8 @@ export default function HistoricoPage() {
             </tbody>
           </table>
           </div>
-          <div style={{ padding: "14px 20px", borderTop: "1px solid #f3f4f6" }}>
-            <span style={{ fontSize: 12.5, color: "#6b7280" }}>{MOCK_HISTORY.length} registros</span>
+          <div className="table-footer">
+            <span>{MOCK_HISTORY.length} registros</span>
           </div>
         </div>
       </PageWrapper>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Header from "../../../shared/components/Header";
 import Icon from "../../../shared/components/Icon";
+import TableActions from "../../../shared/components/TableActions";
 import PageWrapper from "../../../shared/components/PageWrapper";
 import StatusBadge from "../../../shared/components/StatusBadge";
 import { MOCK_BOLETINS } from "../../../shared/mocks/portal";
@@ -27,7 +28,7 @@ export default function BoletimPage() {
         marginBottom: 20,
 
         background:
-          "rgba(226, 232, 240, 0.72)",
+          "var(--glass-background)",
 
         border:
           "1px solid rgba(148, 163, 184, 0.16)",
@@ -50,7 +51,7 @@ export default function BoletimPage() {
               padding: "8px 18px",
 
               background: (tab === t)
-                ? "rgba(255, 255, 255, 0.94)"
+                ? "transparent"
                 : "transparent",
 
               border: "none",
@@ -82,7 +83,7 @@ export default function BoletimPage() {
         </div>
 
         {tab === "mensal" ? (
-          <div className="card" style={{ padding: 0, overflow: "hidden" }}>
+          <div className="card table-card" style={{ padding: 0, overflow: "hidden" }}>
             <div style={{ padding: "16px 20px", borderBottom: "1px solid #f3f4f6", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div>
                 <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700 }}>Boletim Mensal — Setembro/2026</h3>
@@ -102,11 +103,10 @@ export default function BoletimPage() {
                     <td style={{ color: b.dataVenc === "30/09/2026" ? "#d97706" : "#374151" }}>{b.dataVenc}</td>
                     <td><StatusBadge status={b.status} /></td>
                     <td>
-                      <div style={{ display: "flex", gap: 6 }}>
-                        <button className="btn btn-ghost btn-sm"><Icon name="eye" size={13} /></button>
-                        {b.status === "waiting" && <button className="btn btn-warning btn-sm"><Icon name="bell" size={13} />Notificar</button>}
-                        {b.status === "pending" && <button className="btn btn-primary btn-sm"><Icon name="check" size={13} />Analisar</button>}
-                      </div>
+                      <TableActions actions={[
+                        { label: "Ver detalhes", icon: "eye" },
+                        ...(b.status === "waiting" ? [{ label: "Notificar", icon: "bell" }] : b.status === "pending" ? [{ label: "Analisar", icon: "check" }] : []),
+                      ]} />
                     </td>
                   </tr>
                 ))}
@@ -123,7 +123,7 @@ export default function BoletimPage() {
                 <div style={{ fontSize: 12.5, color: "#6d28d9" }}>Confirmações de pagamento quinzenais: 1ª quinzena (até dia 15) e 2ª quinzena (até último dia do mês). Regra em validação com o cliente.</div>
               </div>
             </div>
-            <div className="card" style={{ padding: 0, overflow: "hidden" }}>
+            <div className="card table-card" style={{ padding: 0, overflow: "hidden" }}>
               <div style={{ padding: "16px 20px", borderBottom: "1px solid #f3f4f6" }}>
                 <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700 }}>Confirmações Petrolina — Setembro/2026</h3>
               </div>
@@ -138,8 +138,8 @@ export default function BoletimPage() {
                       <td>{b.dataVenc}</td>
                       <td><StatusBadge status={b.status} /></td>
                       <td>
-                        {b.status === "waiting" ? <button className="btn btn-primary btn-sm"><Icon name="check" size={13} />Confirmar</button>
-                          : b.status === "pending" ? <button className="btn btn-warning btn-sm"><Icon name="bell" size={13} />Notificar</button>
+                        {b.status === "waiting" ? <TableActions actions={[{ label: "Confirmar", icon: "check" }]}/>
+                          : b.status === "pending" ? <TableActions actions={[{ label: "Notificar", icon: "bell" }]}/>
                           : <span style={{ color: "#16a34a", fontSize: 12.5, fontWeight: 600 }}>✓ Confirmado</span>}
                       </td>
                     </tr>

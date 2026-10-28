@@ -10,9 +10,9 @@
 .typeColumn { width: 8rem; }
 .statusColumn { width: 8rem; }
 .updatedColumn { width: 9rem; }
-.actionsColumn { width: 8.5rem; }
+.actionsColumn { width: 5rem; }
 
-.table tbody td { height: 3.75rem; }
+
 .table td:not(:first-child) { white-space: nowrap; }
 .supplierIdentity { display: flex; align-items: center; gap: 10px; min-width: 0; min-height: 36px; }
 .avatarSlot { width: 36px; height: 36px; flex-shrink: 0; }
@@ -20,23 +20,3 @@
 .nameLine, .emailLine { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .nameLine { height: 20px; line-height: 20px; }
 .emailLine { height: 16px; line-height: 16px; }
-
-.actionButton:global(.btn) {
-  width: 2rem;
-  height: 2rem;
-  padding: 0;
-  flex-shrink: 0;
-}
-
-.actionButton > svg {
-  flex-shrink: 0;
-}
-
-.editAction {
-  background: #fad1d6;
-  color: #c01a2b;
-}
-
-.editAction:hover:not(:disabled) {
-  background: #f7bcc4;
-}

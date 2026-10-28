@@ -8,7 +8,7 @@ import Skeleton from "../../../shared/components/Skeleton";
 import Toast from "../../../shared/components/Toast";
 import NovoFornecedorModal from "../Empresas/components/NovoFornecedorModal";
 import ExcluirFornecedorModal from "../Empresas/components/ExcluirFornecedorModal";
-import SupplierUsers, { SupplierUsersSkeleton } from "./components/SupplierUsers";
+import SupplierPeople, { SupplierPeopleSkeleton } from "./components/SupplierPeople";
 import ErrorState from "../../../shared/components/ErrorState";
 import type { Screen } from "../../../shared/types/portal";
 
@@ -85,7 +85,7 @@ function CompanyDetailsSkeleton() {
           </div>
         </section>
       </div>
-      <SupplierUsersSkeleton />
+      <SupplierPeopleSkeleton />
     </div>
   );
 }
@@ -176,7 +176,7 @@ export default function EmpresaDetalhePage({ onNav, companyId, editOnOpen, onEdi
                   </div>
                 </section>
               </div>
-              <SupplierUsers key={company.id} companyId={company.id} />
+              <SupplierPeople key={company.id} companyId={company.id} />
             </>}
       </PageWrapper>
       {company && editOpen && <NovoFornecedorModal initialCompany={company} onClose={closeEdit} onSaved={handleUpdated} />}

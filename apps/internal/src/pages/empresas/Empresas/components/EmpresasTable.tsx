@@ -8,6 +8,8 @@ import Select from "../../../../shared/components/Select";
 import styles from "./EmpresasTable.module.css";
 import ExcluirFornecedorModal from "./ExcluirFornecedorModal";
 import Toast from "../../../../shared/components/Toast";
+import TableActions, { TableActionsSkeleton } from "../../../../shared/components/TableActions";
+import TablePagination from "../../../../shared/components/TablePagination";
 
 const PAGE_SIZE = 10;
 const companyStatuses = [
@@ -72,8 +74,6 @@ export default function EmpresasTable({ onSelectCompany, onEditCompany }: { onSe
   const { page, loading, error } = state;
   const currentPage = page?.currentPage ?? filters.pageNumber;
   const totalPages = page?.totalPages ?? 0;
-  const firstPageButton = Math.max(1, Math.min(currentPage - 2, totalPages - 4));
-  const pageButtons = Array.from({ length: Math.min(5, totalPages) }, (_, index) => firstPageButton + index);
 
   function handleDeleted() {
     setCompanyToDelete(null);
@@ -87,7 +87,7 @@ export default function EmpresasTable({ onSelectCompany, onEditCompany }: { onSe
   }
 
   return (
-    <div className="card" style={{ padding: 0, overflow: "hidden" }}>
+    <div className="card table-card" style={{ padding: 0, overflow: "hidden" }}>
       <form className={styles.filters} onSubmit={event => { event.preventDefault(); changeFilters(draftFilters); }}>
         <div style={{ flex: 1, minWidth: 220, maxWidth: 320 }}>
           <span style={{ display: "block", marginBottom: 5, marginLeft: 5, fontSize: 11.5, fontWeight: 600, color: "#6b7280" }}>Buscar fornecedor</span>
@@ -130,7 +130,7 @@ export default function EmpresasTable({ onSelectCompany, onEditCompany }: { onSe
                 <td><Skeleton width={90} height={15} /></td>
                 <td><Skeleton width={80} height={18} borderRadius={999} /></td>
                 <td><Skeleton width={80} height={15} /></td>
-                <td><div style={{ display: "flex", gap: 6 }}>{Array.from({ length: 3 }, (_, actionIndex) => <Skeleton key={actionIndex} width="2rem" height="2rem" borderRadius={9} />)}</div></td>
+                <td><TableActionsSkeleton count={3} /></td>
               </tr>
             )) : page?.items.map(company => {
               const name = company.corporateName || company.tradeName || "Fornecedor";
@@ -139,17 +139,17 @@ export default function EmpresasTable({ onSelectCompany, onEditCompany }: { onSe
                 <tr key={company.id}>
                   <td><div className={styles.supplierIdentity}>
                     <div style={{ width: 36, height: 36, borderRadius: 8, background: "#fde8ea", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 13, color: "#c01a2b", flexShrink: 0 }}>{name.trim().split(/\s+/).map(part => part[0]).join("").slice(0, 2).toUpperCase()}</div>
-                    <div className={styles.supplierText}><div className={styles.nameLine} title={name} style={{ fontWeight: 600, color: "#0f172a", fontSize: 13.5 }}>{name}</div><div className={styles.emailLine} title={company.email || undefined} style={{ fontSize: 11.5, color: "#9ca3af" }}>{company.email || "—"}</div></div>
+                    <div className={styles.supplierText}><div className={`${styles.nameLine} table-primary`} title={name}>{name}</div><div className={`${styles.emailLine} table-secondary`} title={company.email || undefined}>{company.email || "—"}</div></div>
                   </div></td>
                   <td style={{ fontFamily: "monospace", fontSize: 13, color: "#374151" }}>{company.formattedCnpj || formatCnpj(company.cnpj || "") || "—"}</td>
                   <td>{company.supplierType === 1 ? "Material" : company.supplierType === 2 ? "Mão de obra" : "—"}</td>
                   <td><span className={`badge ${status?.className ?? "badge-gray"}`}>{status?.label ?? "Status indisponível"}</span></td>
                   <td style={{ color: "#6b7280", fontSize: 13 }}>{formatDate(company.updatedAt)}</td>
-                  <td><div style={{ display: "flex", gap: 6 }}>
-                    <button className={`btn ${styles.actionButton} ${styles.editAction}`} aria-label={`Ver detalhes`} title="Ver detalhes" onClick={() => onSelectCompany(company.id)}><Icon name="eye" size={15} /></button>
-                    <button className={`btn ${styles.actionButton} ${styles.editAction}`} aria-label={`Editar fornecedor`} title="Editar fornecedor" onClick={() => onEditCompany(company.id)}><Icon name="edit" size={15} /></button>
-                    <button type="button" className={`btn btn-primary ${styles.actionButton}`} aria-label={`Excluir ${name}`} title="Excluir fornecedor" onClick={() => setCompanyToDelete(company)}><Icon name="trash" size={15} /></button>
-                  </div></td>
+                  <td><TableActions label={`Ações de ${name}`} actions={[
+                    { label: "Ver detalhes", icon: "eye", onClick: () => onSelectCompany(company.id) },
+                    { label: "Editar fornecedor", icon: "edit", onClick: () => onEditCompany(company.id) },
+                    { label: "Excluir fornecedor", icon: "trash", danger: true, onClick: () => setCompanyToDelete(company) },
+                  ]} /></td>
                 </tr>
               );
             })}
@@ -157,14 +157,7 @@ export default function EmpresasTable({ onSelectCompany, onEditCompany }: { onSe
           </tbody>
         </table>
       </div>
-      <div style={{ padding: "14px 20px", borderTop: "1px solid #f3f4f6", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-        <span aria-live="polite" style={{ fontSize: 12.5, color: "#6b7280" }}>{loading ? "Carregando fornecedores..." : error ? "0 fornecedor(es)" : `${page?.totalCount ?? 0} fornecedor(es)${totalPages > 0 ? ` · Página ${currentPage} de ${totalPages}` : ""}`}</span>
-        <nav aria-label="Páginas de fornecedores" style={{ display: "flex", gap: 6 }}>
-          <button type="button" className="btn btn-ghost btn-icon" aria-label="Página anterior" title="Página anterior" disabled={loading || error || currentPage <= 1} onClick={() => changeFilters({ pageNumber: currentPage - 1 })}><Icon name="chevron-left" size={16} /></button>
-          {pageButtons.map(number => <button key={number} className="btn btn-ghost btn-sm" aria-current={number === currentPage ? "page" : undefined} disabled={loading || number === currentPage} style={{ minWidth: 32, justifyContent: "center", background: number === currentPage ? "#fde8ea" : undefined, color: number === currentPage ? "#c01a2b" : undefined }} onClick={() => changeFilters({ pageNumber: number })}>{number}</button>)}
-          <button type="button" className="btn btn-ghost btn-icon" aria-label="Próxima página" title="Próxima página" disabled={loading || error || currentPage >= totalPages} onClick={() => changeFilters({ pageNumber: currentPage + 1 })}><Icon name="chevron-right" size={16} /></button>
-        </nav>
-      </div>
+      <TablePagination totalCount={page?.totalCount ?? 0} currentPage={currentPage} totalPages={totalPages} itemLabel="fornecedor(es)" ariaLabel="Páginas de fornecedores" loading={loading} disabled={error} loadingText="Carregando fornecedores..." onPageChange={pageNumber => changeFilters({ pageNumber })} />
       {companyToDelete && <ExcluirFornecedorModal company={companyToDelete} onClose={() => setCompanyToDelete(null)} onDeleted={handleDeleted} />}
       {showDeleteSuccess && <Toast message="Fornecedor excluído com sucesso!" onClose={() => setShowDeleteSuccess(false)} />}
     </div>

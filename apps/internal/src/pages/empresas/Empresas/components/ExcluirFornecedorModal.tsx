@@ -3,6 +3,7 @@ import { deleteCompany } from "../../../../shared/api/company";
 import type { Company } from "../../../../shared/types/company";
 import Icon from "../../../../shared/components/Icon";
 import styles from "./ExcluirFornecedorModal.module.css";
+import confirmationStyles from "../../../../shared/components/ConfirmationModal.module.css";
 
 type Props = { company: Company; onClose: () => void; onDeleted: () => void };
 
@@ -44,17 +45,23 @@ export default function ExcluirFornecedorModal({ company, onClose, onDeleted }: 
   }
 
   return (
-    <dialog ref={dialogRef} className={`modal-box ${styles.dialog}`} aria-labelledby="excluir-fornecedor-title" aria-describedby="excluir-fornecedor-description" aria-busy={submitting}
+    <dialog ref={dialogRef} className={`modal-box ${styles.dialog}`} aria-labelledby="excluir-fornecedor-title" aria-describedby="excluir-fornecedor-impact" aria-busy={submitting}
       onCancel={event => { event.preventDefault(); close(); }}>
       <header className={styles.header}>
-        <h3 id="excluir-fornecedor-title">Excluir fornecedor</h3>
+        <div className={confirmationStyles.actionHeading}>
+          <span className={confirmationStyles.actionIcon} aria-hidden="true"><Icon name="trash" size={21} /></span>
+          <div><h3 id="excluir-fornecedor-title">Excluir fornecedor</h3><p className={confirmationStyles.subtitle}>Confirmar exclusão do fornecedor</p></div>
+        </div>
         <button type="button" className="btn btn-ghost btn-icon" aria-label="Fechar confirmação" disabled={submitting} onClick={close}><Icon name="x" size={18} /></button>
       </header>
-      <p id="excluir-fornecedor-description" className={styles.description}>Deseja excluir <strong>{company.corporateName || company.tradeName || "este fornecedor"}</strong>? Esta ação não pode ser desfeita.</p>
+      <div id="excluir-fornecedor-impact" className={`${confirmationStyles.impact} ${confirmationStyles.impactWarning}`}>
+        <span className={confirmationStyles.impactIcon} aria-hidden="true"><Icon name="alert" size={19} /></span>
+        <div><h4>Após a exclusão</h4><p>O fornecedor <strong>{company.corporateName || company.tradeName || "selecionado"}</strong> será excluído. Esta ação não pode ser desfeita.</p></div>
+      </div>
       {error && <p role="alert" className={styles.error}>{error}</p>}
       <footer className={styles.footer}>
         <button type="button" className="btn btn-secondary" disabled={submitting} onClick={close} autoFocus>Cancelar</button>
-        <button type="button" className="btn btn-danger" disabled={submitting} onClick={() => void confirmDelete()}><Icon name="trash" size={16} />{submitting ? "Excluindo..." : "Excluir fornecedor"}</button>
+        <button type="button" className="btn btn-primary" disabled={submitting} onClick={() => void confirmDelete()}>{submitting ? "Excluindo..." : "Excluir fornecedor"}</button>
       </footer>
     </dialog>
   );
