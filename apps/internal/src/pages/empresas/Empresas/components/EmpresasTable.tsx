@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getCompanies } from "../../../../shared/api/company";
 import { CompanyStatus, type Company, type CompanyPage, type SupplierType } from "../../../../shared/types/company";
 import Icon from "../../../../shared/components/Icon";
+import ClearSearchButton from "../../../../shared/components/ClearSearchButton";
 import Skeleton from "../../../../shared/components/Skeleton";
 import Select from "../../../../shared/components/Select";
 import styles from "./EmpresasTable.module.css";
@@ -38,6 +39,7 @@ function formatDate(value?: string | null) {
 
 export default function EmpresasTable({ onSelectCompany, onEditCompany }: { onSelectCompany: (id: number) => void; onEditCompany: (id: number) => void }) {
   const [filters, setFilters] = useState<Filters>({ search: "", status: "all", supplierType: "all", pageNumber: 1 });
+  const [draftFilters, setDraftFilters] = useState(filters);
   const [state, setState] = useState<TableState>({ page: null, loading: true, error: false });
   const [retryCount, setRetryCount] = useState(0);
   const [companyToDelete, setCompanyToDelete] = useState<Company | null>(null);
@@ -45,7 +47,6 @@ export default function EmpresasTable({ onSelectCompany, onEditCompany }: { onSe
 
   useEffect(() => {
     let active = true;
-    const timer = setTimeout(() => {
       const search = filters.search.trim();
       const isCnpj = /^[\d./\s-]+$/.test(search);
       getCompanies({
@@ -60,9 +61,7 @@ export default function EmpresasTable({ onSelectCompany, onEditCompany }: { onSe
       }).catch(() => {
         if (active) setState({ page: null, loading: false, error: true });
       });
-    }, 300);
-
-    return () => { active = false; clearTimeout(timer); };
+    return () => { active = false; };
   }, [filters, retryCount]);
 
   function changeFilters(next: Partial<Filters>) {
@@ -89,27 +88,29 @@ export default function EmpresasTable({ onSelectCompany, onEditCompany }: { onSe
 
   return (
     <div className="card" style={{ padding: 0, overflow: "hidden" }}>
-      <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(15, 23, 42, 0.06)", display: "flex", gap: 10, flexWrap: "wrap" }}>
+      <form className={styles.filters} onSubmit={event => { event.preventDefault(); changeFilters(draftFilters); }}>
         <div style={{ flex: 1, minWidth: 220, maxWidth: 320 }}>
           <span style={{ display: "block", marginBottom: 5, marginLeft: 5, fontSize: 11.5, fontWeight: 600, color: "#6b7280" }}>Buscar fornecedor</span>
-          <div style={{ position: "relative" }}>
+          <div style={{ position: "relative", display: "flex" }}>
             <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "#9ca3af" }}><Icon name="search" size={15} /></span>
-            <input className="input-base" aria-label="Buscar por razão social ou CNPJ" placeholder="Buscar por razão social ou CNPJ" style={{ paddingLeft: 32 }} value={filters.search} onChange={event => changeFilters({ search: event.target.value })} />
+            <input className="input-base" aria-label="Buscar por razão social ou CNPJ" placeholder="Buscar por razão social ou CNPJ" style={{ paddingLeft: 32, paddingRight: "2.75rem" }} value={draftFilters.search} onChange={event => setDraftFilters(current => ({ ...current, search: event.target.value }))} />
+            {draftFilters.search && <ClearSearchButton onClear={() => setDraftFilters(current => ({ ...current, search: "" }))} />}
           </div>
         </div>
         <div style={{ flex: "1 1 14rem", maxWidth: "18rem" }}>
           <span style={{ display: "block", marginBottom: 5, marginLeft: 5, fontSize: 11.5, fontWeight: 600, color: "#6b7280" }}>Status do fornecedor</span>
-          <Select label="Filtrar por status" value={String(filters.status)} style={{ width: "100%" }}
+          <Select label="Filtrar por status" value={String(draftFilters.status)} style={{ width: "100%" }}
             options={[{ value: "all", label: "Todos" }, ...companyStatuses.map(status => ({ value: String(status.value), label: status.label }))]}
-            onChange={value => changeFilters({ status: value === "all" ? "all" : Number(value) as CompanyStatus })} />
+            onChange={value => setDraftFilters(current => ({ ...current, status: value === "all" ? "all" : Number(value) as CompanyStatus }))} />
         </div>
         <div style={{ flex: "1 1 14rem", maxWidth: "18rem" }}>
           <span style={{ display: "block", marginBottom: 5, marginLeft: 5, fontSize: 11.5, fontWeight: 600, color: "#6b7280" }}>Tipo de fornecedor</span>
-          <Select label="Filtrar por tipo de fornecedor" value={String(filters.supplierType)} style={{ width: "100%" }}
+          <Select label="Filtrar por tipo de fornecedor" value={String(draftFilters.supplierType)} style={{ width: "100%" }}
             options={[{ value: "all", label: "Todos" }, { value: "1", label: "Material" }, { value: "2", label: "Mão de obra" }]}
-            onChange={value => changeFilters({ supplierType: value === "all" ? "all" : Number(value) as SupplierType })} />
+            onChange={value => setDraftFilters(current => ({ ...current, supplierType: value === "all" ? "all" : Number(value) as SupplierType }))} />
         </div>
-      </div>
+        <button type="submit" className={`btn btn-primary ${styles.searchButton}`} disabled={loading}><Icon name="search" size={15} />Buscar</button>
+      </form>
       <div style={{ overflowX: "auto" }} aria-busy={loading}>
         <table className={`table-base ${styles.table}`}>
           <colgroup>

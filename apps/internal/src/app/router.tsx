@@ -6,6 +6,8 @@ import LoginPage from "../pages/auth/Login";
 import InicioPage from "../pages/inicio/Inicio";
 import EmpresasPage from "../pages/empresas/Empresas";
 import EmpresaDetalhePage from "../pages/empresas/EmpresaDetalhe";
+import ObrasPage from "../pages/obras/Obras";
+import ObraDetalhePage from "../pages/obras/ObraDetalhe";
 import AvaliarDocumentoPage from "../pages/documentos/AvaliarDocumento";
 import VencimentosPage from "../pages/documentos/Vencimentos";
 import BoletimPage from "../pages/documentos/Boletim";
@@ -16,7 +18,7 @@ import HistoricoPage from "../pages/sistema/Historico";
 import Header from "../shared/components/Header";
 import PageWrapper from "../shared/components/PageWrapper";
 
-type ResolvedRoute = { screen: Screen; companyId?: number } | { screen: null };
+type ResolvedRoute = { screen: Screen; companyId?: number; workSiteId?: number } | { screen: null };
 
 function resolveRoute(pathname: string): ResolvedRoute {
   const normalizedPath = pathname.replace(/\/+$/, "") || "/";
@@ -25,6 +27,7 @@ function resolveRoute(pathname: string): ResolvedRoute {
     "/login": "login",
     "/dashboard": "admin-dashboard",
     "/fornecedores": "admin-suppliers",
+    "/obras": "worksites",
     "/documentos/analise": "document-analysis",
     "/vencimentos": "expirations",
     "/boletim-pagamento": "boletim",
@@ -42,6 +45,12 @@ function resolveRoute(pathname: string): ResolvedRoute {
     if (Number.isSafeInteger(companyId) && companyId > 0) return { screen: "supplier-details", companyId };
   }
 
+  const workSiteMatch = normalizedPath.match(/^\/obras\/(\d+)$/);
+  if (workSiteMatch) {
+    const workSiteId = Number(workSiteMatch[1]);
+    if (Number.isSafeInteger(workSiteId) && workSiteId > 0) return { screen: "worksite-details", workSiteId };
+  }
+
   return { screen: null };
 }
 
@@ -49,6 +58,7 @@ const screenPaths: Partial<Record<Screen, string>> = {
   login: "/login",
   "admin-dashboard": "/dashboard",
   "admin-suppliers": "/fornecedores",
+  worksites: "/obras",
   "document-analysis": "/documentos/analise",
   expirations: "/vencimentos",
   boletim: "/boletim-pagamento",
@@ -75,7 +85,7 @@ export default function AppRouter() {
     return <LoginPage onLogin={() => navigate("/dashboard")} />;
   }
 
-  const activeScreen = route.screen === "supplier-details" ? "admin-suppliers" : route.screen;
+  const activeScreen = route.screen === "supplier-details" ? "admin-suppliers" : route.screen === "worksite-details" ? "worksites" : route.screen;
 
   return (
     <PortalLayout
@@ -96,7 +106,9 @@ export default function AppRouter() {
             </div>
           </PageWrapper>
         </>
-      ) : route.screen === "admin-dashboard" ? <InicioPage onNav={handleNav} />
+      ) : route.screen === "worksites" ? <ObrasPage onSelectWorkSite={id => navigate(`/obras/${id}`)} />
+        : route.screen === "worksite-details" ? <ObraDetalhePage key={route.workSiteId} workSiteId={route.workSiteId!} onBack={() => navigate("/obras")} />
+        : route.screen === "admin-dashboard" ? <InicioPage onNav={handleNav} />
         : route.screen === "admin-suppliers" ? <EmpresasPage onSelectCompany={id => navigate(`/fornecedores/${id}`)} onEditCompany={id => navigate(`/fornecedores/${id}?editar=true`)} />
           : route.screen === "supplier-details" ? <EmpresaDetalhePage onNav={handleNav} companyId={route.companyId!} editOnOpen={editSupplierOnOpen} onEditClose={() => navigate(`/fornecedores/${route.companyId}`, { replace: true })} />
             : route.screen === "document-analysis" ? <AvaliarDocumentoPage onNav={handleNav} />
