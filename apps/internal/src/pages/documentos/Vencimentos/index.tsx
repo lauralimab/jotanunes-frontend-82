@@ -1,5 +1,6 @@
 import Header from "../../../shared/components/Header";
 import Icon from "../../../shared/components/Icon";
+import TableActions from "../../../shared/components/TableActions";
 import PageWrapper from "../../../shared/components/PageWrapper";
 import StatusBadge from "../../../shared/components/StatusBadge";
 import type { DocStatus } from "../../../shared/types/portal";
@@ -25,7 +26,7 @@ export default function VencimentosPage() {
             </div>
           ))}
         </div>
-        <div className="card" style={{ padding: 0, overflow: "hidden" }}>
+        <div className="card table-card" style={{ padding: 0, overflow: "hidden" }}>
           <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(15, 23, 42, 0.06)", display: "flex", gap: 10, flexWrap: "wrap" }}>
             <select className="select-base"><option>Somente vencidos</option><option>Próximos 7 dias</option><option>Próximos 30 dias</option><option>Próximos 60 dias</option><option>Todos</option></select>
             <select className="select-base"><option>Todos os fornecedores</option>{MOCK_SUPPLIERS.map(s => <option key={s.id}>{s.name}</option>)}</select>
@@ -41,12 +42,12 @@ export default function VencimentosPage() {
                   <td>{it.supplier}</td>
                   <td style={{ color: it.days < 0 ? "#dc2626" : "#374151", fontWeight: it.days < 0 ? 600 : 400 }}>{it.validity}</td>
                   <td>
-                    <span style={{ fontWeight: 700, fontSize: 12, padding: "3px 8px", borderRadius: 999, background: it.days < 0 ? "#fee2e2" : it.days <= 30 ? "#fff7ed" : "#f1f5f9", color: it.days < 0 ? "#dc2626" : it.days <= 30 ? "#d97706" : "#6b7280" }}>
+                    <span className={`badge ${it.days < 0 ? "badge-danger" : it.days <= 30 ? "badge-orange" : "badge-gray"}`}>
                       {it.days < 0 ? `${Math.abs(it.days)}d em atraso` : `${it.days}d restantes`}
                     </span>
                   </td>
                   <td><StatusBadge status={it.status} /></td>
-                  <td><button className="btn btn-ghost btn-sm"><Icon name="bell" size={13} />Notificar</button></td>
+                  <td><TableActions actions={[{ label: "Notificar", icon: "bell" }]} /></td>
                 </tr>
               ))}
             </tbody>

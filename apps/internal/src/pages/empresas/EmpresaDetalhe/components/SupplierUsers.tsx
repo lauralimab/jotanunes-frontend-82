@@ -7,6 +7,8 @@ import Toast from "../../../../shared/components/Toast";
 import ErrorState from "../../../../shared/components/ErrorState";
 import SupplierUserModal, { type UserAction } from "./SupplierUserModal";
 import styles from "./SupplierUsers.module.css";
+import TableActions, { TableActionsSkeleton } from "../../../../shared/components/TableActions";
+import TablePagination from "../../../../shared/components/TablePagination";
 
 const PAGE_SIZE = 5;
 
@@ -18,21 +20,21 @@ function formatDate(value: string | null) {
   return Number.isNaN(date.getTime()) ? "—" : date.toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
 }
 
-export function SupplierUsersSkeleton() {
+export function SupplierUsersSkeleton({ embedded = false }: { embedded?: boolean }) {
   return (
-    <section className={`card ${styles.card}`} role="status" aria-label="Carregando usuários do fornecedor" aria-busy="true">
-      <div className={styles.header} style={{ padding: "0 0 1.25rem" }}><div><Skeleton width={190} height={17} /><div style={{ marginTop: 8 }}><Skeleton width={240} height={13} /></div></div><Skeleton width={120} height={34} borderRadius={9} /></div>
+    <section className={embedded ? styles.embedded : `card table-card ${styles.card}`} role="status" aria-label="Carregando usuários do fornecedor" aria-busy="true">
+      <div className={styles.header} style={embedded ? undefined : { padding: "0 0 1.25rem" }}><div><Skeleton width={190} height={17} /><div style={{ marginTop: 8 }}><Skeleton width="min(100%, 15rem)" height={13} /></div></div><Skeleton width={120} height={34} borderRadius={9} /></div>
       <div className={styles.tableWrapper}>
         <table className="table-base" aria-hidden="true">
           <thead><tr>{[90, 50, 55, 90, 90, 55].map((width, index) => <th key={index}><Skeleton width={width} height={12} /></th>)}</tr></thead>
-          <tbody>{Array.from({ length: 3 }, (_, index) => <tr key={index}><td><Skeleton width={170} height={14} /><div style={{ marginTop: 6 }}><Skeleton width={190} height={12} /></div></td><td><Skeleton width={65} height={24} borderRadius={999} /></td><td><Skeleton width={110} height={24} borderRadius={999} /></td><td><Skeleton width={100} height={14} /></td><td><Skeleton width={100} height={14} /></td><td><div className={styles.actions}><Skeleton width={32} height={32} borderRadius={9} /><Skeleton width={32} height={32} borderRadius={9} /></div></td></tr>)}</tbody>
+          <tbody>{Array.from({ length: 3 }, (_, index) => <tr key={index}><td><Skeleton width={170} height={14} /><div style={{ marginTop: 6 }}><Skeleton width={190} height={12} /></div></td><td><Skeleton width={65} height={24} borderRadius={999} /></td><td><Skeleton width={110} height={24} borderRadius={999} /></td><td><Skeleton width={100} height={14} /></td><td><Skeleton width={100} height={14} /></td><td><TableActionsSkeleton count={1} /></td></tr>)}</tbody>
         </table>
       </div>
     </section>
   );
 }
 
-export default function SupplierUsers({ companyId }: { companyId: number }) {
+export default function SupplierUsers({ companyId, embedded = false, onTotalChange }: { companyId: number; embedded?: boolean; onTotalChange?: (total: number | null) => void }) {
   const [result, setResult] = useState<{ users: SupplierUser[]; error: boolean; cause?: unknown } | null>(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [action, setAction] = useState<UserAction | null>(null);
@@ -48,6 +50,10 @@ export default function SupplierUsers({ companyId }: { companyId: number }) {
     return () => { active = false; };
   }, [companyId]);
 
+  useEffect(() => {
+    if (result) onTotalChange?.(result.error ? null : result.users.length);
+  }, [result, onTotalChange]);
+
   function handleSaved(user: SupplierUser) {
     if (action?.type === "create" && result) setPageNumber(Math.ceil((result.users.length + 1) / PAGE_SIZE));
     setResult(current => current ? { users: current.users.some(item => item.id === user.id) ? current.users.map(item => item.id === user.id ? user : item) : [...current.users, user], error: false } : current);
@@ -55,19 +61,17 @@ export default function SupplierUsers({ companyId }: { companyId: number }) {
     setAction(null);
   }
 
-  if (!result) return <SupplierUsersSkeleton />;
+  if (!result) return <SupplierUsersSkeleton embedded={embedded} />;
 
   const totalCount = result.users.length;
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
   const currentPage = Math.min(pageNumber, totalPages);
   const visibleUsers = result.users.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
-  const firstPageButton = Math.max(1, Math.min(currentPage - 2, totalPages - 4));
-  const pageButtons = Array.from({ length: Math.min(5, totalPages) }, (_, index) => firstPageButton + index);
 
   return (
     <>
-      <section className={`card ${styles.card}`} aria-labelledby="supplier-users-title">
-        <header className={styles.header} style={{ padding: "0 0.8rem 1.25rem" }}>
+      <section className={embedded ? styles.embedded : `card table-card ${styles.card}`} aria-labelledby="supplier-users-title">
+        <header className={styles.header} style={embedded ? undefined : { padding: "0 0.8rem 1.25rem" }}>
           <div><h3 id="supplier-users-title">Usuários</h3><p>Usuários com acesso ao Portal do Fornecedor.</p></div>
           <button type="button" className="btn btn-primary btn-sm" disabled={Boolean(result.error)} onClick={() => setAction({ type: "create" })}><Icon name="plus" size={15} />Novo usuário</button>
         </header>
@@ -81,23 +85,16 @@ export default function SupplierUsers({ companyId }: { companyId: number }) {
                 <td><span className={`badge ${user.mustChangePassword ? "badge-warning" : "badge-success"}`}>{user.mustChangePassword ? "Troca pendente" : "Atualizada"}</span></td>
                 <td>{formatDate(user.lastAccessAt)}</td>
                 <td>{formatDate(user.createdAt)}</td>
-                <td><div className={styles.actions}>
-                  <button type="button" className={`btn btn-icon ${styles.softAction}`} aria-label={`${user.active ? "Inativar" : "Ativar"} ${user.name}`} title={user.active ? "Inativar usuário" : "Ativar usuário"} onClick={() => setAction({ type: user.active ? "deactivate" : "activate", user })}><Icon name={user.active ? "user-minus" : "user-check"} size={16} /></button>
-                  <button type="button" className={`btn btn-icon ${styles.softAction}`} aria-label={`Redefinir senha de ${user.name}`} title="Redefinir senha" onClick={() => setAction({ type: "reset", user })}><Icon name="key" size={16} /></button>
-                </div></td>
+                <td><TableActions forceMenu label={`Ações do usuário ${user.name}`} actions={[
+                  { label: user.active ? "Inativar usuário" : "Ativar usuário", ariaLabel: `${user.active ? "Inativar" : "Ativar"} ${user.name}`, icon: user.active ? "user-minus" : "user-check", onClick: () => setAction({ type: user.active ? "deactivate" : "activate", user }) },
+                  { label: "Redefinir senha", ariaLabel: `Redefinir senha de ${user.name}`, icon: "key", onClick: () => setAction({ type: "reset", user }) },
+                ]} /></td>
               </tr>)}
               {!result.users.length && <tr><td colSpan={6} className={styles.message}>Nenhum usuário cadastrado para este fornecedor.</td></tr>}
             </tbody>
           </table>
         </div>}
-        {!result.error && <footer className={styles.pagination}>
-          <span aria-live="polite">{totalCount} usuário(s){totalCount > 0 && ` · Página ${currentPage} de ${totalPages}`}</span>
-          <nav aria-label="Páginas de usuários" className={styles.actions}>
-            <button type="button" className="btn btn-ghost btn-icon" aria-label="Página anterior" title="Página anterior" disabled={currentPage <= 1} onClick={() => setPageNumber(currentPage - 1)}><Icon name="chevron-left" size={16} /></button>
-            {totalCount > 0 && pageButtons.map(number => <button key={number} type="button" className={`btn btn-ghost btn-icon ${number === currentPage ? styles.currentPage : ""}`} aria-label={`Página ${number}`} aria-current={number === currentPage ? "page" : undefined} disabled={number === currentPage} onClick={() => setPageNumber(number)}>{number}</button>)}
-            <button type="button" className="btn btn-ghost btn-icon" aria-label="Próxima página" title="Próxima página" disabled={currentPage >= totalPages} onClick={() => setPageNumber(currentPage + 1)}><Icon name="chevron-right" size={16} /></button>
-          </nav>
-        </footer>}
+        {!result.error && <TablePagination totalCount={totalCount} currentPage={currentPage} totalPages={totalPages} itemLabel="usuário(s)" ariaLabel="Páginas de usuários" onPageChange={setPageNumber} />}
       </section>
       {action && <SupplierUserModal companyId={companyId} action={action} onClose={() => setAction(null)} onSaved={handleSaved} />}
       {notification && <Toast key={notification.id} message={notification.message} onClose={() => setNotification(null)} />}

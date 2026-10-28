@@ -77,7 +77,7 @@ export default function InicioPage({ onNav }: { onNav: (s: Screen) => void }) {
                 })}
               </div>
             </div>
-            <div className="card" aria-busy={suppliersLoading} style={{ background: suppliersLoading ? "rgba(255, 255, 255, 0.10)" : "#fde8ea", border: suppliersLoading ? "1px solid rgba(15, 23, 42, 0.08)" : "1px solid #fca5a5" }}>
+            <div className="card" aria-busy={suppliersLoading} style={{ background: suppliersLoading ? "var(--glass-background)" : "#fde8ea", border: suppliersLoading ? "1px solid rgba(15, 23, 42, 0.08)" : "1px solid #fca5a5" }}>
               <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 10 }}>
                 <Skeleton loading={suppliersLoading} width={18} height={18}><Icon name="alert" size={18} color="#c01a2b" /></Skeleton>
                 <h4 style={{ margin: 0, fontSize: 13, fontWeight: 700, color: "#7f1d1d" }}><Skeleton loading={suppliersLoading}>Autorizações Excepcionais</Skeleton></h4>

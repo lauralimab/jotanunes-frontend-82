@@ -13,6 +13,12 @@
 
   --bg-page: #f3f4f6;
   --bg-soft: #f8fafc;
+  --surface-functional: #fff;
+  --glass-opacity: 0.25;
+  --glass-background: rgba(255, 255, 255, var(--glass-opacity));
+  --glass-background-hover: rgba(255, 255, 255, 0.40);
+  --glass-border-color: rgba(15, 23, 42, 0.10);
+  --glass-border-radius: 16px;
 
   --text-primary: #111827;
   --text-secondary: #6b7280;
@@ -289,12 +295,12 @@ body {
 
 .card,
 .stat-card {
-  background: rgba(255, 255, 255, 0.10);
+  background: var(--glass-background);
 
   border:
-    1px solid rgba(15, 23, 42, 0.08);
+    1px solid var(--glass-border-color);
 
-  border-radius: 16px;
+  border-radius: var(--glass-border-radius);
 
   box-shadow:
     0 4px 18px rgba(15, 23, 42, 0.05);
@@ -322,8 +328,9 @@ body {
 }
 
 .card:hover,
-.stat-card:hover {
-  background: rgba(255, 255, 255, 0.40);
+.stat-card:hover,
+.table-card.card:hover {
+  background: var(--glass-background-hover);
 
   border-color:
     rgba(255, 255, 255, 0.72);
@@ -336,7 +343,7 @@ body {
 
 .card:active,
 .stat-card:active {
-  background: rgba(255, 255, 255, 0.82);
+  background: var(--glass-background);
 
   transform: translateY(-1px);
 }
@@ -433,38 +440,43 @@ body {
 
   border-collapse: collapse;
 
-  font-size: 13.5px;
+  font-size: 13px;
+  line-height: 1.4;
+  background: transparent;
 }
 
 
 .table-base th {
-  padding: 12px 14px;
+  padding: 10px 14px;
 
   text-align: left;
 
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 600;
 
-  color: #6b7280;
+  color: #475569;
 
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.035em;
+  white-space: nowrap;
 
   border-bottom:
-    1px solid rgba(15, 23, 42, 0.08);
+    1px solid rgba(15, 23, 42, 0.10);
 
   background:
-    rgba(248, 250, 252, 0.76);
+    transparent;
 }
 
 
 .table-base td {
-  padding: 12px 14px;
+  padding: 8px 14px;
+  height: 3.25rem;
+  background: transparent;
 
   border-bottom:
-    1px solid rgba(15, 23, 42, 0.055);
+    1px solid rgba(15, 23, 42, 0.07);
 
-  color: #374151;
+  color: #334155;
 
   vertical-align: middle;
 
@@ -480,8 +492,23 @@ body {
 
 .table-base tbody tr:hover td {
   background:
-    rgba(255, 255, 255, 0.48);
+    transparent;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), inset 0 -1px 0 rgba(255, 255, 255, 0.25);
 }
+
+.table-card.card { background: var(--glass-background); border-color: var(--glass-border-color); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04); }
+.table-base .badge { min-height: 1.375rem; padding: 0.125rem 0.5rem; justify-content: center; border-radius: 999px; font-size: 0.6875rem; line-height: 1.25; white-space: nowrap; vertical-align: middle; }
+.table-primary { color: #0f172a; font-size: 0.8125rem; font-weight: 600; line-height: 1.4; }
+.table-secondary { color: #64748b; font-size: 0.75rem; line-height: 1.4; }
+.table-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; padding: 0.75rem 1rem; border-top: 1px solid rgba(15, 23, 42, 0.10); background: transparent; color: #475569; font-size: 0.75rem; }
+.table-pagination-nav { display: flex; align-items: center; flex-wrap: wrap; gap: 0.25rem; }
+.table-page-slot { display: inline-flex; align-items: center; gap: 0.25rem; }
+.table-page-button { display: inline-flex; align-items: center; justify-content: center; min-width: 2rem; height: 2rem; padding: 0 0.375rem; border: 0; border-radius: 6px; background: transparent; color: #64748b; font: inherit; cursor: pointer; }
+.table-page-button:hover:not(:disabled) { background: #f1f5f9; color: #334155; }
+.table-page-button[aria-current="page"] { background: #fde8ea; color: var(--red-primary); font-weight: 600; }
+.table-page-button:focus-visible { outline: 2px solid var(--red-primary); outline-offset: 2px; }
+.table-page-button:disabled:not([aria-current="page"]) { opacity: 0.4; cursor: not-allowed; }
+.table-page-gap { padding-inline: 0.25rem; color: #94a3b8; }
 
 
 /* =========================================================
@@ -503,7 +530,7 @@ body {
   color: #111827;
 
   background:
-    rgba(255, 255, 255, 0.92);
+    var(--surface-functional);
 
   outline: none;
 
@@ -522,7 +549,7 @@ body {
 .input-base:focus {
   border-color: var(--red-primary);
 
-  background: #ffffff;
+  background: var(--surface-functional);
 
   box-shadow:
     0 0 0 3px rgba(192, 26, 43, 0.10);
@@ -552,7 +579,7 @@ body {
   color: #374151;
 
   background:
-    rgba(255, 255, 255, 0.92);
+    var(--surface-functional);
 
   outline: none;
 
@@ -573,7 +600,7 @@ body {
 .select-base:focus {
   border-color: var(--red-primary);
 
-  background: #ffffff;
+  background: var(--surface-functional);
 
   box-shadow:
     0 0 0 3px rgba(192, 26, 43, 0.10);
@@ -698,18 +725,18 @@ body {
   padding: 28px;
 
   border:
-    1px solid rgba(15, 23, 42, 0.08);
+    1px solid var(--glass-border-color);
 
-  border-radius: 14px;
+  border-radius: var(--glass-border-radius);
 
   background:
-    rgba(255, 255, 255, 0.96);
+    var(--surface-functional);
 
   box-shadow:
     0 24px 70px rgba(15, 23, 42, 0.18);
 
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 
   animation:
     slideUp 0.2s ease;
@@ -1144,6 +1171,7 @@ body {
 
 .sidebar-logout-btn {
   width: 100%;
+  min-height: 40px;
 
   justify-content: center;
 
@@ -1499,9 +1527,11 @@ body {
 
 @media (max-width: 600px) {
 
+  :root { --glass-border-radius: 13px; }
+
   .card,
   .stat-card {
-    border-radius: 13px;
+    border-radius: var(--glass-border-radius);
   }
 
 

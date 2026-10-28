@@ -4,6 +4,8 @@ import type { WorkSite } from "../../../shared/types/worksite";
 import WorkSiteDialog from "./WorkSiteDialog";
 import { validateWorkSite } from "./workSiteValidation";
 import styles from "../obras.module.css";
+import Icon from "../../../shared/components/Icon";
+import confirmationStyles from "../../../shared/components/ConfirmationModal.module.css";
 
 export default function WorkSiteFormModal({ workSite, onClose, onSaved }: { workSite?: WorkSite; onClose: () => void; onSaved: (workSite: WorkSite) => void }) {
   const id = useId();
@@ -28,9 +30,13 @@ export default function WorkSiteFormModal({ workSite, onClose, onSaved }: { work
     catch (cause) { setError(cause instanceof Error ? cause.message : "Não foi possível salvar a obra."); }
     finally { submitting.current = false; setBusy(false); }
   }
-  return <WorkSiteDialog title={workSite ? "Editar obra" : "Nova obra"} busy={busy} onClose={onClose}>
+  return <WorkSiteDialog title={workSite ? "Editar obra" : "Nova obra"} subtitle={workSite ? "Atualizar os dados da obra" : "Cadastrar uma nova obra"} icon={workSite ? "edit" : "crane"} busy={busy} onClose={onClose}>
     <form noValidate className={styles.form} onSubmit={submit} aria-busy={busy} onInput={event => { if (event.target instanceof HTMLInputElement) { const name = event.target.name; setErrors(current => ({ ...current, [name]: "" })); } }}>
       <div className={styles.body}>
+        <div className={`${confirmationStyles.impact} ${confirmationStyles.impactInfo} ${styles.formNotice}`}>
+          <span className={confirmationStyles.impactIcon} aria-hidden="true"><Icon name="info" size={19} /></span>
+          <div><h4>{workSite ? "Após a atualização" : "Após o cadastro"}</h4><p>{workSite ? <>Os dados de <strong>{workSite.name}</strong> serão atualizados com as informações deste formulário.</> : "A obra será cadastrada com o nome e o período de renovação informados."}</p></div>
+        </div>
         {error && <p className={styles.error} role="alert">{error}</p>}
         <div className={styles.fields}>
           <label className={styles.field}><span>Nome da obra *</span><input autoFocus className="input-base" name="name" maxLength={100} placeholder="Ex.: Residencial Jardim das Flores" defaultValue={workSite?.name ?? ""} disabled={busy} required aria-invalid={Boolean(errors.name)} aria-describedby={errors.name ? `${id}-name-error` : undefined} />{errors.name && <span id={`${id}-name-error`} className={styles.fieldError}>{errors.name}</span>}</label>

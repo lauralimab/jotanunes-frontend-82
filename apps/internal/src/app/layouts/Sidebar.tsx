@@ -45,12 +45,12 @@ export default function Sidebar({ screen, onNav, onLogout, open, onClose, collap
       <div className="sidebar-brand" style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.14)", flexShrink: 0 }}>
         <div className="sidebar-logo-full"><BrandLogo alternate compact white /></div>
       </div>
-      <div className="sidebar-hide-collapsed" style={{ padding: "10px 18px 6px", flexShrink: 0 }}>
+      <nav className="sidebar-nav">
+      <div className="sidebar-hide-collapsed" style={{ padding: "10px 4px 6px" }}>
         <div style={{ fontSize: 10, color: "rgba(255, 255, 255, 0.65)", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
           Painel Interno
         </div>
       </div>
-      <nav className="sidebar-nav">
         {links.map((l) => {
           const showHeader = l.group && l.group !== lastGroup;
           if (showHeader) lastGroup = l.group!;
@@ -66,15 +66,6 @@ export default function Sidebar({ screen, onNav, onLogout, open, onClose, collap
         })}
       </nav>
       <div className="sidebar-footer">
-        <div className="sidebar-user">
-          <div className="sidebar-user-avatar">
-            AC
-          </div>
-          <div className="sidebar-user-info">
-            <div style={{ fontSize: 12.5, fontWeight: 600, color: "#ffffff" }}>Ana Carvalho</div>
-            <div style={{ fontSize: 11, color: "rgba(255, 255, 255, 0.62)" }}>Analista Jotanunes</div>
-          </div>
-        </div>
         <button className="btn btn-sm sidebar-logout-btn" onClick={onLogout} title={collapsed ? "Sair" : undefined}>
           <Icon name="logout" size={15} /><span className="sidebar-logout-label">Sair</span>
         </button>

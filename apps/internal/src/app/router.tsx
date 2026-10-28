@@ -7,7 +7,6 @@ import InicioPage from "../pages/inicio/Inicio";
 import EmpresasPage from "../pages/empresas/Empresas";
 import EmpresaDetalhePage from "../pages/empresas/EmpresaDetalhe";
 import ObrasPage from "../pages/obras/Obras";
-import ObraDetalhePage from "../pages/obras/ObraDetalhe";
 import AvaliarDocumentoPage from "../pages/documentos/AvaliarDocumento";
 import VencimentosPage from "../pages/documentos/Vencimentos";
 import BoletimPage from "../pages/documentos/Boletim";
@@ -48,7 +47,7 @@ function resolveRoute(pathname: string): ResolvedRoute {
   const workSiteMatch = normalizedPath.match(/^\/obras\/(\d+)$/);
   if (workSiteMatch) {
     const workSiteId = Number(workSiteMatch[1]);
-    if (Number.isSafeInteger(workSiteId) && workSiteId > 0) return { screen: "worksite-details", workSiteId };
+    if (Number.isSafeInteger(workSiteId) && workSiteId > 0) return { screen: "worksites", workSiteId };
   }
 
   return { screen: null };
@@ -85,7 +84,7 @@ export default function AppRouter() {
     return <LoginPage onLogin={() => navigate("/dashboard")} />;
   }
 
-  const activeScreen = route.screen === "supplier-details" ? "admin-suppliers" : route.screen === "worksite-details" ? "worksites" : route.screen;
+  const activeScreen = route.screen === "supplier-details" ? "admin-suppliers" : route.screen;
 
   return (
     <PortalLayout
@@ -106,8 +105,7 @@ export default function AppRouter() {
             </div>
           </PageWrapper>
         </>
-      ) : route.screen === "worksites" ? <ObrasPage onSelectWorkSite={id => navigate(`/obras/${id}`)} />
-        : route.screen === "worksite-details" ? <ObraDetalhePage key={route.workSiteId} workSiteId={route.workSiteId!} onBack={() => navigate("/obras")} />
+      ) : route.screen === "worksites" ? <ObrasPage initialWorkSiteId={route.workSiteId} onDetailsClose={() => { if (route.workSiteId) navigate("/obras", { replace: true }); }} />
         : route.screen === "admin-dashboard" ? <InicioPage onNav={handleNav} />
         : route.screen === "admin-suppliers" ? <EmpresasPage onSelectCompany={id => navigate(`/fornecedores/${id}`)} onEditCompany={id => navigate(`/fornecedores/${id}?editar=true`)} />
           : route.screen === "supplier-details" ? <EmpresaDetalhePage onNav={handleNav} companyId={route.companyId!} editOnOpen={editSupplierOnOpen} onEditClose={() => navigate(`/fornecedores/${route.companyId}`, { replace: true })} />
