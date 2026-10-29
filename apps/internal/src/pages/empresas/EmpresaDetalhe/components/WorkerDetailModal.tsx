@@ -4,6 +4,7 @@ import ApiError from "../../../../shared/api/ApiError";
 import type { Worker } from "../../../../shared/types/worker";
 import Icon from "../../../../shared/components/Icon";
 import Skeleton from "../../../../shared/components/Skeleton";
+import StatusBadge from "../../../../shared/components/StatusBadge";
 import ErrorState from "../../../../shared/components/ErrorState";
 import { formatWorkerCpf, formatWorkerDate } from "./workerFormatters";
 import styles from "./SupplierWorkers.module.css";
@@ -64,7 +65,7 @@ export default function WorkerDetailModal({ workerId, companyId, onClose }: Prop
             <h4><Skeleton loading={loading} width="min(100%, 12rem)" height={20}>{worker?.name}</Skeleton></h4>
             <div className={styles.identityCode}><Skeleton loading={loading} width={105} height={15}>{worker && `Funcionário #${worker.id}`}</Skeleton></div>
           </div>
-          <div className={styles.identityStatus}><Skeleton loading={loading} width={65} height={22} borderRadius={999}><span className={`badge ${worker?.active ? "badge-success" : "badge-gray"}`}>{worker?.active ? "Ativo" : "Inativo"}</span></Skeleton></div>
+          <div className={styles.identityStatus}><Skeleton loading={loading} width={65} height={22} borderRadius={999}><StatusBadge status={worker?.active ? "active" : "inactive"} /></Skeleton></div>
         </div>
         <div className={styles.details}>{sections.map((section, index) => <section key={section.title} className={`${styles.detailCard} ${section.fullWidth ? styles.fullWidth : ""}`} aria-labelledby={`${id}-section-${index}`}>
           <h4 id={`${id}-section-${index}`} className={styles.sectionTitle}>

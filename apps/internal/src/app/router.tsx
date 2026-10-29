@@ -7,6 +7,7 @@ import InicioPage from "../pages/inicio/Inicio";
 import EmpresasPage from "../pages/empresas/Empresas";
 import EmpresaDetalhePage from "../pages/empresas/EmpresaDetalhe";
 import ObrasPage from "../pages/obras/Obras";
+import TiposDocumentosPage from "../pages/documentos/TiposDocumentos";
 import AvaliarDocumentoPage from "../pages/documentos/AvaliarDocumento";
 import VencimentosPage from "../pages/documentos/Vencimentos";
 import BoletimPage from "../pages/documentos/Boletim";
@@ -27,6 +28,7 @@ function resolveRoute(pathname: string): ResolvedRoute {
     "/dashboard": "admin-dashboard",
     "/fornecedores": "admin-suppliers",
     "/obras": "worksites",
+    "/tipos-documentos": "document-types",
     "/documentos/analise": "document-analysis",
     "/vencimentos": "expirations",
     "/boletim-pagamento": "boletim",
@@ -58,6 +60,7 @@ const screenPaths: Partial<Record<Screen, string>> = {
   "admin-dashboard": "/dashboard",
   "admin-suppliers": "/fornecedores",
   worksites: "/obras",
+  "document-types": "/tipos-documentos",
   "document-analysis": "/documentos/analise",
   expirations: "/vencimentos",
   boletim: "/boletim-pagamento",
@@ -106,6 +109,7 @@ export default function AppRouter() {
           </PageWrapper>
         </>
       ) : route.screen === "worksites" ? <ObrasPage initialWorkSiteId={route.workSiteId} onDetailsClose={() => { if (route.workSiteId) navigate("/obras", { replace: true }); }} />
+        : route.screen === "document-types" ? <TiposDocumentosPage />
         : route.screen === "admin-dashboard" ? <InicioPage onNav={handleNav} />
         : route.screen === "admin-suppliers" ? <EmpresasPage onSelectCompany={id => navigate(`/fornecedores/${id}`)} onEditCompany={id => navigate(`/fornecedores/${id}?editar=true`)} />
           : route.screen === "supplier-details" ? <EmpresaDetalhePage onNav={handleNav} companyId={route.companyId!} editOnOpen={editSupplierOnOpen} onEditClose={() => navigate(`/fornecedores/${route.companyId}`, { replace: true })} />

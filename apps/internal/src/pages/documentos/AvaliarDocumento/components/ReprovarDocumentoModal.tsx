@@ -1,4 +1,5 @@
 import Icon from "../../../../shared/components/Icon";
+import Switch from "../../../../shared/components/Switch";
 
 type ReprovarDocumentoModalProps = { doc: { name: string; person: string }; setShowRejectModal: (value: boolean) => void; rejectConfirmed: boolean; setRejectConfirmed: (value: boolean) => void; setDecision: (value: "approved" | "rejected" | null) => void; };
 
@@ -11,14 +12,11 @@ export default function ReprovarDocumentoModal({ doc, setShowRejectModal, reject
             <p>
               Esta ação reprovará <strong>{doc.name}</strong> de <strong>{doc.person}</strong> e será registrada no histórico.
             </p>
-            <label className="rejection-check">
-              <input
-                type="checkbox"
+            <Switch className="rejection-check"
                 checked={rejectConfirmed}
                 onChange={e => setRejectConfirmed(e.target.checked)}
+                label="Revisei o documento e tenho certeza de que desejo reprová-lo."
               />
-              <span>Revisei o documento e tenho certeza de que desejo reprová-lo.</span>
-            </label>
             <div className="rejection-actions">
               <button className="btn btn-secondary" onClick={() => { setShowRejectModal(false); setRejectConfirmed(false); }}>
                 Cancelar

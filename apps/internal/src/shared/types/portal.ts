@@ -1,7 +1,7 @@
 export type Screen =
   | "login"
   | "admin-dashboard" | "admin-suppliers" | "supplier-details"
-  | "worksites"
+  | "worksites" | "document-types"
   | "document-analysis" | "expirations" | "notifications" | "history"
   | "boletim" | "autorizacao-excepcional" | "recebimento-material";
 

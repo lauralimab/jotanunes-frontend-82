@@ -4,6 +4,7 @@ import { getAddressByCep, type CepAddress } from "../../../../shared/api/cep";
 import type { Company, CompanyCreateRequest, CompanyUpdateRequest, SupplierType } from "../../../../shared/types/company";
 import Icon from "../../../../shared/components/Icon";
 import Select from "../../../../shared/components/Select";
+import Switch from "../../../../shared/components/Switch";
 import styles from "./NovoFornecedorModal.module.css";
 
 const states = ["AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"];
@@ -376,7 +377,7 @@ export default function NovoFornecedorModal({ onClose, onSaved, initialCompany }
               <Field label="Complemento" name="complement" error={fieldErrors.complement} autoComplete="address-line2" placeholder="Ex.: Sala 2, bloco A" required={false} value={address.complement} onChange={event => changeAddress("complement", event.target.value)} />
               <div className={styles.numberField}>
                 <Field label="Número" name="number" error={fieldErrors.number} placeholder={withoutNumber ? "Sem número" : "Ex.: 123"} inputMode="numeric" required={!withoutNumber} disabled={withoutNumber} value={withoutNumber ? "" : address.number} onChange={event => { applyMask(event, value => value.replace(/\D/g, "").slice(0, MAX_TEXT_LENGTH)); changeAddress("number", event.currentTarget.value); }} />
-                <label className={styles.withoutNumber}><input type="checkbox" checked={withoutNumber} onChange={event => { setWithoutNumber(event.target.checked); setFieldErrors(current => ({ ...current, number: "" })); }} />Este endereço não possui número</label>
+                <Switch className={styles.withoutNumber} checked={withoutNumber} onChange={event => { setWithoutNumber(event.target.checked); setFieldErrors(current => ({ ...current, number: "" })); }} label="Este endereço não possui número" />
               </div>
             </div>
           </fieldset>

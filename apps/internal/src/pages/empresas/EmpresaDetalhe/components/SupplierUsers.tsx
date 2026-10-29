@@ -3,6 +3,7 @@ import { getCompanyUsers } from "../../../../shared/api/company";
 import type { SupplierUser } from "../../../../shared/types/company";
 import Icon from "../../../../shared/components/Icon";
 import Skeleton from "../../../../shared/components/Skeleton";
+import StatusBadge from "../../../../shared/components/StatusBadge";
 import Toast from "../../../../shared/components/Toast";
 import ErrorState from "../../../../shared/components/ErrorState";
 import SupplierUserModal, { type UserAction } from "./SupplierUserModal";
@@ -81,7 +82,7 @@ export default function SupplierUsers({ companyId, embedded = false, onTotalChan
             <tbody>
               {visibleUsers.map(user => <tr key={user.id}>
                 <td><div className={styles.name}>{user.name}</div><div className={styles.email}>{user.email}</div></td>
-                <td><span className={`badge ${user.active ? "badge-success" : "badge-gray"}`}>{user.active ? "Ativo" : "Inativo"}</span></td>
+                <td><StatusBadge status={user.active ? "active" : "inactive"} /></td>
                 <td><span className={`badge ${user.mustChangePassword ? "badge-warning" : "badge-success"}`}>{user.mustChangePassword ? "Troca pendente" : "Atualizada"}</span></td>
                 <td>{formatDate(user.lastAccessAt)}</td>
                 <td>{formatDate(user.createdAt)}</td>

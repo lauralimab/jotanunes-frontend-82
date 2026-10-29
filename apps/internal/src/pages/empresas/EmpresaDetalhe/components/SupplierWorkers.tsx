@@ -3,6 +3,7 @@ import { getWorkers } from "../../../../shared/api/worker";
 import type { Worker, WorkerPage } from "../../../../shared/types/worker";
 import Icon from "../../../../shared/components/Icon";
 import Skeleton from "../../../../shared/components/Skeleton";
+import StatusBadge from "../../../../shared/components/StatusBadge";
 import Select from "../../../../shared/components/Select";
 import ClearSearchButton from "../../../../shared/components/ClearSearchButton";
 import ErrorState from "../../../../shared/components/ErrorState";
@@ -32,7 +33,7 @@ function WorkersTable({ loading, workers = [], onSelect }: { loading: boolean; w
         </tr>) : workers.map(worker => <tr key={worker.id}>
           <td><div className={styles.name} title={worker.name}>{worker.name}</div><div className={styles.secondary}>#{worker.id}</div></td>
           <td className={styles.cpf}>{formatWorkerCpf(worker)}</td>
-          <td><span className={`badge ${worker.active ? "badge-success" : "badge-gray"}`}>{worker.active ? "Ativo" : "Inativo"}</span></td>
+          <td><StatusBadge status={worker.active ? "active" : "inactive"} /></td>
           <td>{formatWorkerDate(worker.createdAt)}</td><td>{formatWorkerDate(worker.updatedAt)}</td>
           <td><TableActions forceMenu label={`Ações do funcionário ${worker.name}`} actions={[{ label: "Ver detalhes", ariaLabel: `Ver detalhes de ${worker.name}`, icon: "eye", onClick: () => onSelect?.(worker.id) }]} /></td>
         </tr>)}
