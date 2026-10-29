@@ -20,13 +20,6 @@ export const MOCK_DOCUMENTS = [
   { id: 9, name: "Certidão Negativa Municipal",            person: "Vigilância Suprema Eireli",type:"company",   status: "pending"     as DocStatus, validity: "20/10/2026", uploadedAt: "08/09/2026" },
 ];
 
-export const MOCK_EMPLOYEES = [
-  { id: 1, name: "Carlos Souza",   cpf: "123.456.789-00", role: "Auxiliar de Limpeza", status: "pending" as SupplierStatus, pendingDocs: 2 },
-  { id: 2, name: "Ana Lima",       cpf: "987.654.321-00", role: "Supervisora",          status: "apt"     as SupplierStatus, pendingDocs: 0 },
-  { id: 3, name: "João Ferreira",  cpf: "456.789.123-00", role: "Eletricista",          status: "pending" as SupplierStatus, pendingDocs: 1 },
-  { id: 4, name: "Marcia Ramos",   cpf: "321.654.987-00", role: "Pintura",              status: "apt"     as SupplierStatus, pendingDocs: 0 },
-];
-
 export const MOCK_NOTIFICATIONS = [
   { id: 1, type: "success", msg: "Documento 'Certidão Negativa Federal' aprovado para Construtora BH Ltda", time: "Há 2 horas",  read: false },
   { id: 2, type: "warning", msg: "Documento 'ASO' de Carlos Souza vence em 7 dias", time: "Há 5 horas", read: false },

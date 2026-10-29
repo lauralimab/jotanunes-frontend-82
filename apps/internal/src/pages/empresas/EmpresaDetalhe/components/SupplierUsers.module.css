@@ -16,7 +16,6 @@
 .confirmationDialog:global(.modal-box) { width: min(30rem, calc(100vw - 2rem)); }
 .confirmationDialog .modalHeader { align-items: flex-start; }
 .confirmationDialog .footer { margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid #f1f5f9; }
-.description { line-height: 1.6; font-size: 0.875rem; overflow-wrap: anywhere; }
 .fields { display: grid; gap: 1rem; margin: 1.25rem 0; }
 .field { display: flex; flex-direction: column; gap: 0.375rem; font-size: 0.8125rem; font-weight: 600; }
 .footer { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.5rem; }

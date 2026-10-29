@@ -5,4 +5,3 @@ export function optionLabel(options: { value: string; label: string }[], value: 
   return options.find(option => option.value === String(value))?.label ?? fallback ?? "—";
 }
 export function normalizeSearch(value: string) { return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("pt-BR").trim(); }
-export function formatDate(value: string) { const date = new Date(value); return Number.isNaN(date.getTime()) ? "—" : date.toLocaleDateString("pt-BR"); }
