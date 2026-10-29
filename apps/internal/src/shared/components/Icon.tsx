@@ -1,6 +1,7 @@
 export default function Icon({ name, size = 18, color }: { name: string; size?: number; color?: string }) {
   const s = { width: size, height: size, stroke: color || "currentColor", fill: "none", strokeWidth: 1.75, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
   const icons: Record<string, React.ReactElement> = {
+    ban: <svg viewBox="0 0 24 24" style={s}><circle cx="12" cy="12" r="9" /><path d="m5.6 5.6 12.8 12.8" /></svg>,
     "more-horizontal": <svg viewBox="0 0 24 24" style={s}><circle cx="5" cy="12" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /></svg>,
     crane: <svg viewBox="0 0 24 24" style={s}><path d="M3 21h10M6 21V3h4v18M2 7h20M2 7l6-5 14 5M18 7v7M16 14h2v2a2 2 0 0 0 4 0M6 11l4 4-4 4M6 7l4 4" /></svg>,
     dashboard: <svg viewBox="0 0 24 24" style={s}><rect x="3" y="3" width="7" height="9" rx="1.5" /><rect x="14" y="3" width="7" height="5" rx="1.5" /><rect x="3" y="16" width="7" height="5" rx="1.5" /><rect x="14" y="12" width="7" height="9" rx="1.5" /></svg>,

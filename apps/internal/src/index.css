@@ -815,16 +815,6 @@ body {
 }
 
 
-.rejection-check input {
-  width: 16px;
-  height: 16px;
-
-  margin: 1px 0 0;
-
-  accent-color: #dc2626;
-
-  flex-shrink: 0;
-}
 
 
 .rejection-actions {

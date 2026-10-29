@@ -7,12 +7,9 @@ export default function Sidebar({ screen, onNav, onLogout, open, onClose, collap
     { id: "admin-dashboard",         label: "Dashboard",                icon: "dashboard" },
     { id: "admin-suppliers",         label: "Fornecedores",             icon: "companies", group: "Operações" },
     { id: "worksites",               label: "Obras",                    icon: "crane",     group: "Operações" },
+    { id: "document-types",          label: "Tipos de documentos",      icon: "doc",       group: "Operações" },
     { id: "document-analysis",       label: "Análise de Documentos",    icon: "eye",       group: "Operações" },
     { id: "expirations",             label: "Vencimentos",              icon: "calendar",  group: "Operações" },
-    { id: "boletim",                 label: "Boletim de Pagamento",     icon: "money",     group: "Operações" },
-    { id: "recebimento-material",    label: "Recebimento de Material",  icon: "package",   group: "Controle" },
-    { id: "notifications",           label: "Notificações",             icon: "bell",      group: "Sistema" },
-    { id: "history",                 label: "Histórico",                icon: "list",      group: "Sistema" },
   ];
 
   let lastGroup = "";
