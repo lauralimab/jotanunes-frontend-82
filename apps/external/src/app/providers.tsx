@@ -26,6 +26,8 @@ import type {
   ChangePasswordRequest,
 } from "../shared/types/auth";
 
+import ToastProvider from "../shared/components/ToastProvider";
+
 type AuthContextValue = {
   auth: AuthToken | null;
 
@@ -256,7 +258,9 @@ export default function AppProviders({
   return (
     <BrowserRouter>
       <AuthProvider>
-        {children}
+        <ToastProvider>
+          {children}
+        </ToastProvider>
       </AuthProvider>
     </BrowserRouter>
   );

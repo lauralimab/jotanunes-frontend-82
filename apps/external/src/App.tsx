@@ -1,8 +1,9 @@
+
 import AppRouter from "./app/router";
 
-import {
-  useAuth,
-} from "./app/providers";
+import { useAuth } from "./app/providers";
+
+import SessionSkeleton from "./shared/components/SessionSkeleton";
 
 import {
   MOCK_DOCUMENTS,
@@ -17,21 +18,7 @@ export default function App() {
   } = useAuth();
 
   if (isCheckingSession) {
-    return (
-      <div
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "#f3f4f6",
-          color: "#6b7280",
-          fontSize: 14,
-        }}
-      >
-        Verificando sessão...
-      </div>
-    );
+    return <SessionSkeleton />;
   }
 
   return (

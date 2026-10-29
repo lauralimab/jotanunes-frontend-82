@@ -101,6 +101,20 @@ export default function Icon({
       </svg>
     ),
 
+    "sidebar-expand": (
+      <svg viewBox="0 0 24 24" style={s}>
+        <polyline points="7 6 13 12 7 18" />
+        <polyline points="12 6 18 12 12 18" />
+      </svg>
+    ),
+
+    "sidebar-collapse": (
+      <svg viewBox="0 0 24 24" style={s}>
+        <polyline points="17 6 11 12 17 18" />
+        <polyline points="12 6 6 12 12 18" />
+      </svg>
+    ),
+
     list: (
       <svg viewBox="0 0 24 24" style={s}>
         <line x1="8" y1="6" x2="21" y2="6" />
@@ -135,13 +149,13 @@ export default function Icon({
     ),
 
     eyeOff: (
-  <svg viewBox="0 0 24 24" style={s}>
-    <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a20.14 20.14 0 0 1 5.06-5.94" />
-    <path d="M9.9 4.24A10.56 10.56 0 0 1 12 4c7 0 11 8 11 8a20.29 20.29 0 0 1-2.16 3.19" />
-    <line x1="1" y1="1" x2="23" y2="23" />
-    <path d="M14.12 14.12a3 3 0 0 1-4.24-4.24" />
-  </svg>
-),
+      <svg viewBox="0 0 24 24" style={s}>
+        <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a20.14 20.14 0 0 1 5.06-5.94" />
+        <path d="M9.9 4.24A10.56 10.56 0 0 1 12 4c7 0 11 8 11 8a20.29 20.29 0 0 1-2.16 3.19" />
+        <line x1="1" y1="1" x2="23" y2="23" />
+        <path d="M14.12 14.12a3 3 0 0 1-4.24-4.24" />
+      </svg>
+    ),
 
     plus: (
       <svg viewBox="0 0 24 24" style={s}>

@@ -133,10 +133,10 @@ export default function Sidebar({
               : "Recolher menu"
           }
         >
-          <Icon
-            name="list"
-            size={20}
-          />
+        <Icon
+  name={collapsed ? "sidebar-expand" : "sidebar-collapse"}
+  size={20}
+/>
         </button>
 
         <div
