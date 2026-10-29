@@ -1,32 +1,20 @@
-import Skeleton from "../../../../shared/components/Skeleton";
 import Icon from "../../../../shared/components/Icon";
+import { dashboardMocks } from "../dashboardMocks";
+import styles from "../dashboard.module.css";
 
-
-
-type EstatisticasCardsProps = {
-  supplierTotal: number | null;
-  suppliersLoading: boolean;
-};
-
-export default function EstatisticasCards({ supplierTotal, suppliersLoading }: EstatisticasCardsProps) {
+export default function EstatisticasCards() {
   const stats = [
-    { label: "Total Fornecedores",     value: supplierTotal?.toLocaleString("pt-BR") ?? "—", icon: "building", color: "#c01a2b", bg: "#fde8ea" },
-    { label: "Aguardando Análise",     value: 9,  icon: "clock",    color: "#ca8a04", bg: "#fef9c3" },
-    { label: "Correção Solicitada",    value: 3,  icon: "edit",     color: "#d97706", bg: "#fff7ed" },
-    { label: "Boletins Pendentes",     value: 4,icon: "money",    color: "#7c3aed", bg: "#ede9fe" },
+    { label: "Docs. em análise", value: dashboardMocks.documentsAwaitingReview, icon: "clock", color: "#a16207", bg: "#fef9c3" },
+    { label: "Docs. reprovados", value: dashboardMocks.rejectedDocuments, icon: "file", color: "#c01a2b", bg: "#fde8ea" },
+    { label: "Solic. pendentes", value: dashboardMocks.requestsWithPending, icon: "alert", color: "#c2410c", bg: "#ffedd5" },
+    { label: "Solic. em andamento", value: dashboardMocks.requestsInProgress, icon: "list", color: "#2563eb", bg: "#dbeafe" },
   ];
-  return (
-<div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: 16, marginBottom: 24 }} aria-busy={suppliersLoading} aria-label="Indicadores do dashboard">
-          {stats.map(s => (
-            <div key={s.label} className="stat-card">
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                <div><div className="label"><Skeleton loading={suppliersLoading}>{s.label}</Skeleton></div><div className="value" aria-live={s.label === "Total Fornecedores" ? "polite" : undefined} style={{ color: s.color, marginTop: 8 }}><Skeleton loading={suppliersLoading} width={64} height={28}>{s.value}</Skeleton></div></div>
-                <div style={{ width: 40, height: 40, borderRadius: 10, background: suppliersLoading ? "transparent" : s.bg, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <Skeleton loading={suppliersLoading} width={40} height={40} borderRadius={10}><Icon name={s.icon} size={20} color={s.color} /></Skeleton>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-  );
+  return <div className={styles.metrics} aria-label="Indicadores do dashboard">
+    {stats.map(stat => <div key={stat.label} className="stat-card">
+      <div className={styles.metricContent}>
+        <div><div className="label">{stat.label}</div><div className="value" style={{ color: stat.color, marginTop: 8 }}>{stat.value.toLocaleString("pt-BR")}</div></div>
+        <span className={styles.metricIcon} style={{ background: stat.bg, color: stat.color }} aria-hidden="true"><Icon name={stat.icon} size={20} /></span>
+      </div>
+    </div>)}
+  </div>;
 }

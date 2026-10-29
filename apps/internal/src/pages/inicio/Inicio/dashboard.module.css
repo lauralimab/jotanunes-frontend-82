@@ -1,0 +1,83 @@
+.page:global(.page-wrapper) { padding: 2rem clamp(1.5rem, 4vw, 4rem) 2rem; }
+.page > :global(.page-wrapper-inner) { width: 100%; max-width: 1500px; margin: 0 auto; }
+.dashboard { --operational-height: clamp(19rem, 45dvh, 29rem); display: grid; gap: 1.5rem; min-width: 0; }
+.metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+.metrics > :global(.stat-card) { min-height: 0; padding: 1.25rem; justify-content: flex-start; }
+.metricContent { display: flex; justify-content: space-between; align-items: flex-start; gap: .75rem; }
+.metricIcon { width: 2.5rem; height: 2.5rem; border-radius: 10px; display: grid; place-items: center; flex-shrink: 0; }
+.operationalGrid { display: grid; grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr); gap: 1.25rem; align-items: stretch; }
+.tableCard:global(.card) { display: flex; flex-direction: column; padding: 0; min-width: 0; height: var(--operational-height); overflow: hidden; }
+.heading { flex-shrink: 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+.tableHeading { padding: 1.25rem; border-bottom: 1px solid var(--glass-border-color); }
+.heading h3 { margin: 0; font-size: .9375rem; font-weight: 700; color: #0f172a; }
+.description { margin: .375rem 0 0; font-size: .78125rem; line-height: 1.5; color: #475569; }
+.heading button { flex-shrink: 0; }
+.tableScroll { flex: 1; min-height: 0; overflow-x: auto; }
+.queue { min-width: 640px; height: 100%; display: flex; flex-direction: column; }
+/* Somente o corpo rola; o cabeçalho conserva o fundo translúcido original. */
+.queue thead { display: block; flex-shrink: 0; overflow-y: hidden; scrollbar-gutter: stable; }
+.queue tbody { display: block; flex: 1; min-height: 0; overflow-y: auto; scrollbar-gutter: stable; }
+.queue tr { display: table; width: 100%; table-layout: fixed; }
+.queue th:nth-child(1), .queue td:nth-child(1) { width: 31%; }
+.queue th:nth-child(2), .queue td:nth-child(2) { width: 26%; }
+.queue th:nth-child(3), .queue td:nth-child(3) { width: 16%; }
+.queue th:nth-child(4), .queue td:nth-child(4) { width: 19%; }
+.queue th:nth-child(5), .queue td:nth-child(5) { width: 8%; }
+.queue td { overflow-wrap: anywhere; }
+.truncatedName { display: block; min-width: 0; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.queue td:nth-child(3) { white-space: nowrap; }
+.pendingCard { min-width: 0; min-height: 0; height: var(--operational-height); display: flex; flex-direction: column; }
+.pendingList { display: grid; align-content: start; flex: 1; min-height: 0; overflow-y: auto; scrollbar-gutter: stable; gap: .75rem; margin-top: 1rem; padding-right: .25rem; }
+.queue tbody:focus-visible, .pendingList:focus-visible { outline: 2px solid #c01a2b; outline-offset: -2px; }
+.pendingItem { display: grid; grid-template-columns: 2.25rem minmax(0, 1fr) auto; align-items: start; gap: .625rem; padding: .875rem; border: 1px solid var(--glass-border-color); border-radius: 12px; }
+.pendingAvatar { width: 2.25rem; height: 2.25rem; display: grid; place-items: center; border-radius: 9px; background: #fde8ea; color: #a51727; font-size: .75rem; font-weight: 700; }
+.pendingContent { min-width: 0; }
+.pendingAction:global(.btn) { width: 1.5rem; height: 2rem; border: 0; }
+.pendingAction:focus-visible { outline: 2px solid #c01a2b; outline-offset: 2px; }
+.pendingName { margin: 0; font-size: .8125rem; line-height: 1.5; font-weight: 600; overflow-wrap: anywhere; color: #0f172a; }
+.pendingFacts { display: flex; flex-wrap: wrap; gap: .375rem .75rem; margin: .625rem 0 0; font-size: .6875rem; line-height: 1.5; color: #475569; }
+.pendingFacts div { display: flex; flex-wrap: wrap; gap: .25rem; }
+.pendingFacts dd { margin: 0; font-weight: 600; color: #0f172a; }
+.statusGrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
+.statusLabel { display: flex; justify-content: space-between; gap: .5rem; align-items: baseline; margin-bottom: .625rem; font-size: .8125rem; font-weight: 600; }
+.statusLabel small { font-size: .75rem; color: #64748b; font-weight: 400; }
+.statusTotal { text-align: right; flex-shrink: 0; font-size: .75rem; color: #475569; }
+.statusTotal strong { display: block; font-size: 1.5rem; color: #0f172a; }
+.statusError { margin: 1.25rem 0 0; font-size: .8125rem; color: #64748b; }
+.dialog { border: 1px solid var(--glass-border-color); padding: 1.25rem; width: min(34rem, calc(100vw - 2rem)); max-height: calc(100dvh - 2rem); overflow-y: auto; }
+.dialog::backdrop { background: rgba(15, 23, 42, .45); backdrop-filter: blur(3px); }
+@media (max-width: 1199px) { .metrics, .statusGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .operationalGrid { grid-template-columns: minmax(0, 1fr); } .pendingList { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .page:global(.page-wrapper) { padding: 1rem .875rem 1.5rem; } .pendingList, .statusGrid { grid-template-columns: minmax(0, 1fr); } .metrics { gap: .75rem; } .metrics > :global(.stat-card) { padding: 1rem; } .metricContent { flex-direction: column-reverse; gap: .625rem; } .heading { gap: .5rem; } .statusGrid { gap: 1rem; } }
+
+/* Resumos mais densos em telas de notebook, preservando as consultas completas. */
+@media (min-width: 900px) and (max-height: 900px) {
+  .page:global(.page-wrapper) { padding: 1.5rem clamp(1.5rem, 4vw, 4rem) 1rem; }
+  .dashboard { --operational-height: clamp(17rem, calc(100dvh - 26rem), 26rem); gap: 1.5rem; }
+  .metrics { gap: .75rem; }
+  .metrics > :global(.stat-card) { min-height: 0; padding: 1rem; }
+  .operationalGrid { gap: 1rem; }
+  .tableHeading { padding: .875rem 1rem; }
+  .description { margin-top: .25rem; line-height: 1.4; }
+  .queue th { padding: .5rem .75rem; }
+  .queue td { height: 2.75rem; padding: .375rem .75rem; }
+  .pendingCard:global(.card) { padding: 1rem; }
+  .pendingList { gap: .5rem; margin-top: .75rem; }
+  .pendingList .pendingItem { padding: .625rem; gap: .5rem; }
+  .pendingList .pendingName { line-height: 1.35; }
+  .pendingList .pendingFacts { margin-top: .375rem; gap: .25rem .625rem; }
+  .statusCard:global(.card) { padding: 1rem; }
+  .statusGrid { margin-top: 1rem; gap: 1rem; }
+  .statusLabel { margin-bottom: .375rem; }
+  .statusTotal strong { font-size: 1.375rem; }
+}
+@media (min-width: 900px) and (max-height: 800px) {
+  .page:global(.page-wrapper) { padding: 1.25rem clamp(1.5rem, 4vw, 4rem) .75rem; }
+  .dashboard { gap: 1.5rem; }
+  .metrics > :global(.stat-card) { min-height: 0; padding: .75rem 1rem; }
+  .tableHeading { padding: .75rem 1rem; }
+  .statusGrid { margin-top: .75rem; }
+}
+@media (min-width: 900px) and (max-height: 700px) {
+  .queue td { height: 2.5rem; }
+  .pendingList .pendingAvatar { width: 2rem; height: 2rem; }
+}
