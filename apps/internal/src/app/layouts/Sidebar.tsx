@@ -10,7 +10,6 @@ export default function Sidebar({ screen, onNav, onLogout, open, onClose, collap
     { id: "document-analysis",       label: "Análise de Documentos",    icon: "eye",       group: "Operações" },
     { id: "expirations",             label: "Vencimentos",              icon: "calendar",  group: "Operações" },
     { id: "boletim",                 label: "Boletim de Pagamento",     icon: "money",     group: "Operações" },
-    { id: "autorizacao-excepcional", label: "Autorizações Excepcionais",icon: "star",      group: "Controle" },
     { id: "recebimento-material",    label: "Recebimento de Material",  icon: "package",   group: "Controle" },
     { id: "notifications",           label: "Notificações",             icon: "bell",      group: "Sistema" },
     { id: "history",                 label: "Histórico",                icon: "list",      group: "Sistema" },
