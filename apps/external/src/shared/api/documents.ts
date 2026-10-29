@@ -262,3 +262,38 @@ export async function uploadDocument(
 
   return document;
 }
+
+
+export async function getDocumentFile(
+  accessToken: string,
+  documentId: number,
+): Promise<Blob> {
+  const response = await fetch(
+    `${API_URL}/api/Document/${documentId}/download`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    const message = await getErrorMessage(
+      response,
+      "Não foi possível carregar o arquivo.",
+    );
+
+    throw new Error(message);
+  }
+
+  const file = await response.blob();
+
+  if (file.size === 0) {
+    throw new Error(
+      "O arquivo retornado está vazio.",
+    );
+  }
+
+  return file;
+}
