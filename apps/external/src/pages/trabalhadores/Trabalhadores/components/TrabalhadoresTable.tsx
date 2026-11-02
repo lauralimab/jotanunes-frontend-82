@@ -1,14 +1,33 @@
-import {
-  useMemo,
-  useState,
-} from "react";
+import { useState } from "react";
 
 import Icon from "../../../../shared/components/Icon";
+import Select from "../../../../shared/components/Select";
+import TablePagination from "../../../../shared/components/TablePagination";
+import Skeleton from "../../../../shared/components/Skeleton";
 
 import type { Worker } from "../../../../shared/types/workers";
 
+export type StatusFilter =
+  | "todos"
+  | "ativos"
+  | "inativos";
+
 type TrabalhadoresTableProps = {
   trabalhadores: Worker[];
+
+  loading: boolean;
+
+  /** Texto e status ainda não aplicados (o que está digitado). */
+  search: string;
+  status: StatusFilter;
+  onSearchChange: (value: string) => void;
+  onStatusChange: (value: StatusFilter) => void;
+  onApplyFilters: () => void;
+
+  totalCount: number;
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
 
   onDocuments: () => void;
 
@@ -21,100 +40,28 @@ type TrabalhadoresTableProps = {
   ) => Promise<void>;
 };
 
-type StatusFilter =
-  | "todos"
-  | "ativos"
-  | "inativos";
-
-function normalizeText(
-  value: string,
-) {
-  return value
-    .normalize("NFD")
-    .replace(
-      /[\u0300-\u036f]/g,
-      "",
-    )
-    .toLowerCase()
-    .trim();
-}
-
 export default function TrabalhadoresTable({
   trabalhadores,
+  loading,
+  search,
+  status,
+  onSearchChange,
+  onStatusChange,
+  onApplyFilters,
+  totalCount,
+  currentPage,
+  totalPages,
+  onPageChange,
   onDocuments,
   onEdit,
   onToggleStatus,
 }: TrabalhadoresTableProps) {
-  const [
-    search,
-    setSearch,
-  ] = useState("");
-
-  const [
-    statusFilter,
-    setStatusFilter,
-  ] =
-    useState<StatusFilter>(
-      "todos",
-    );
-
   const [
     changingStatusId,
     setChangingStatusId,
   ] = useState<number | null>(
     null,
   );
-
-  const trabalhadoresFiltrados =
-    useMemo(() => {
-      const normalizedSearch =
-        normalizeText(search);
-
-      const searchDigits =
-        search.replace(
-          /\D/g,
-          "",
-        );
-
-      return trabalhadores.filter(
-        (trabalhador) => {
-          const matchesSearch =
-            normalizedSearch === "" ||
-            normalizeText(
-              trabalhador.name,
-            ).includes(
-              normalizedSearch,
-            ) ||
-            trabalhador.cpf
-              .replace(
-                /\D/g,
-                "",
-              )
-              .includes(
-                searchDigits,
-              );
-
-          const matchesStatus =
-            statusFilter ===
-              "todos" ||
-            (statusFilter ===
-              "ativos" &&
-              trabalhador.active) ||
-            (statusFilter ===
-              "inativos" &&
-              !trabalhador.active);
-
-          return (
-            matchesSearch &&
-            matchesStatus
-          );
-        },
-      );
-    }, [
-      trabalhadores,
-      search,
-      statusFilter,
-    ]);
 
   async function handleToggleStatus(
     trabalhador: Worker,
@@ -134,6 +81,9 @@ export default function TrabalhadoresTable({
     }
   }
 
+  const trabalhadoresFiltrados =
+    trabalhadores;
+
   return (
     <div
       className="card"
@@ -142,84 +92,139 @@ export default function TrabalhadoresTable({
         overflow: "hidden",
       }}
     >
-      <div
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          onApplyFilters();
+        }}
         style={{
           padding:
             "16px 20px",
           borderBottom:
             "1px solid rgba(15,23,42,0.06)",
           display: "flex",
-          gap: 10,
+          gap: 12,
           flexWrap: "wrap",
+          alignItems: "flex-end",
         }}
       >
         <div
           style={{
-            position:
-              "relative",
             flex: 1,
             minWidth: 220,
-            maxWidth: 320,
+            maxWidth: 340,
+          }}
+        >
+          <label
+            htmlFor="busca-funcionario"
+            style={{
+              display: "block",
+              marginBottom: 5,
+              fontSize: 12.5,
+              fontWeight: 600,
+              color: "#374151",
+            }}
+          >
+            Buscar funcionário
+          </label>
+
+          <div
+            style={{
+              position: "relative",
+            }}
+          >
+            <span
+              style={{
+                position:
+                  "absolute",
+                left: 10,
+                top: "50%",
+                transform:
+                  "translateY(-50%)",
+                color: "#64748b",
+                pointerEvents:
+                  "none",
+                display: "flex",
+              }}
+            >
+              <Icon
+                name="search"
+                size={15}
+              />
+            </span>
+
+            <input
+              id="busca-funcionario"
+              className="input-base"
+              placeholder="Buscar por nome ou CPF"
+              value={search}
+              onChange={(event) =>
+                onSearchChange(
+                  event.target.value,
+                )
+              }
+              style={{
+                paddingLeft: 32,
+              }}
+            />
+          </div>
+        </div>
+
+        <div
+          style={{
+            width: 170,
           }}
         >
           <span
             style={{
-              position:
-                "absolute",
-              left: 10,
-              top: "50%",
-              transform:
-                "translateY(-50%)",
-              color:
-                "#64748b",
-              pointerEvents:
-                "none",
+              display: "block",
+              marginBottom: 5,
+              fontSize: 12.5,
+              fontWeight: 600,
+              color: "#374151",
             }}
           >
-            <Icon
-              name="search"
-              size={15}
-            />
+            Status do funcionário
           </span>
 
-          <input
-            className="input-base"
-            placeholder="Buscar por nome ou CPF..."
-            value={search}
-            onChange={(event) =>
-              setSearch(
-                event.target.value,
+          <Select
+            label="Filtrar por status do funcionário"
+            value={status}
+            options={[
+              {
+                value: "todos",
+                label: "Todos",
+              },
+              {
+                value: "ativos",
+                label: "Ativos",
+              },
+              {
+                value: "inativos",
+                label: "Inativos",
+              },
+            ]}
+            onChange={(value) =>
+              onStatusChange(
+                value as StatusFilter,
               )
             }
-            style={{
-              paddingLeft: 32,
-            }}
           />
         </div>
 
-        <select
-          className="select-base"
-          value={statusFilter}
-          onChange={(event) =>
-            setStatusFilter(
-              event.target
-                .value as StatusFilter,
-            )
-          }
+        <button
+          type="submit"
+          className="btn btn-primary"
+          disabled={loading}
         >
-          <option value="todos">
-            Todos
-          </option>
+          <Icon
+            name="search"
+            size={15}
+          />
 
-          <option value="ativos">
-            Ativos
-          </option>
-
-          <option value="inativos">
-            Inativos
-          </option>
-        </select>
-      </div>
+          Buscar
+        </button>
+      </form>
 
       <table className="table-base">
         <thead>
@@ -243,7 +248,47 @@ export default function TrabalhadoresTable({
         </thead>
 
         <tbody>
-          {trabalhadoresFiltrados
+          {loading ? (
+            Array.from(
+              { length: 5 },
+              (_, index) => (
+                <tr
+                  key={index}
+                  aria-hidden="true"
+                >
+                  <td>
+                    <Skeleton
+                      width={160}
+                      height={14}
+                    />
+                  </td>
+
+                  <td>
+                    <Skeleton
+                      width={120}
+                      height={14}
+                    />
+                  </td>
+
+                  <td>
+                    <Skeleton
+                      width={68}
+                      height={23}
+                      borderRadius={999}
+                    />
+                  </td>
+
+                  <td>
+                    <Skeleton
+                      width={180}
+                      height={28}
+                      borderRadius={6}
+                    />
+                  </td>
+                </tr>
+              ),
+            )
+          ) : trabalhadoresFiltrados
             .length > 0 ? (
             trabalhadoresFiltrados.map(
               (trabalhador) => {
@@ -468,6 +513,17 @@ export default function TrabalhadoresTable({
           )}
         </tbody>
       </table>
+
+      <TablePagination
+        totalCount={totalCount}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        itemLabel="funcionário(s)"
+        ariaLabel="Páginas de funcionários"
+        loading={loading}
+        loadingText="Carregando funcionários..."
+        onPageChange={onPageChange}
+      />
     </div>
   );
 }

@@ -25,8 +25,18 @@ import AdicionarTrabalhadorModal, {
 
 import EditarTrabalhadorModal from "./components/EditarTrabalhadorModal";
 
-import TrabalhadoresTable from "./components/TrabalhadoresTable";
+import TrabalhadoresTable, {
+  type StatusFilter,
+} from "./components/TrabalhadoresTable";
 import TrabalhadoresTableSkeleton from "./components/TrabalhadoresTableSkeleton";
+
+const PAGE_SIZE = 10;
+
+type Filters = {
+  search: string;
+  status: StatusFilter;
+  pageNumber: number;
+};
 
 type TrabalhadoresPageProps = {
   onNav: (
@@ -56,10 +66,40 @@ export default function TrabalhadoresPage({
     null,
   );
 
+  // O que está digitado no formulário de busca.
+  const [draft, setDraft] =
+    useState<{
+      search: string;
+      status: StatusFilter;
+    }>({
+      search: "",
+      status: "todos",
+    });
+
+  // O que foi realmente aplicado (dispara a chamada à API).
+  const [filters, setFilters] =
+    useState<Filters>({
+      search: "",
+      status: "todos",
+      pageNumber: 1,
+    });
+
+  const [pageInfo, setPageInfo] =
+    useState({
+      totalCount: 0,
+      totalPages: 0,
+      currentPage: 1,
+    });
+
   const [
     isLoading,
     setIsLoading,
   ] = useState(true);
+
+  const [
+    hasLoaded,
+    setHasLoaded,
+  ] = useState(false);
 
   const [
     error,
@@ -83,20 +123,77 @@ export default function TrabalhadoresPage({
         setIsLoading(true);
         setError("");
 
+        const search =
+          filters.search.trim();
+
+        const isCpf =
+          /^[\d.\s-]+$/.test(search);
+
         const result =
           await getWorkers(
             token,
             {
-              pageNumber: 1,
-              pageSize: 50,
+              pageNumber:
+                filters.pageNumber,
+              pageSize: PAGE_SIZE,
+              name:
+                search && !isCpf
+                  ? search
+                  : undefined,
+              cpf:
+                search && isCpf
+                  ? search.replace(
+                    /\D/g,
+                    "",
+                  )
+                  : undefined,
+              active:
+                filters.status ===
+                  "todos"
+                  ? undefined
+                  : filters.status ===
+                  "ativos",
             },
           );
 
-        if (!cancelled) {
-          setTrabalhadores(
-            result.items,
-          );
+        if (cancelled) {
+          return;
         }
+
+        // Apagou o último item da última página: volta uma página.
+        if (
+          result.items.length === 0 &&
+          filters.pageNumber > 1
+        ) {
+          setFilters((current) => ({
+            ...current,
+            pageNumber:
+              Math.max(
+                1,
+                Math.min(
+                  current.pageNumber - 1,
+                  result.totalPages,
+                ),
+              ),
+          }));
+
+          return;
+        }
+
+        setTrabalhadores(
+          result.items,
+        );
+
+        setPageInfo({
+          totalCount:
+            result.totalCount,
+          totalPages:
+            result.totalPages,
+          currentPage:
+            result.currentPage,
+        });
+
+        setHasLoaded(true);
       } catch (loadError) {
         if (cancelled) {
           return;
@@ -113,6 +210,8 @@ export default function TrabalhadoresPage({
             "Não foi possível carregar os funcionários.",
           );
         }
+
+        setHasLoaded(true);
       } finally {
         if (!cancelled) {
           setIsLoading(false);
@@ -127,7 +226,22 @@ export default function TrabalhadoresPage({
     return () => {
       cancelled = true;
     };
-  }, [auth?.accessToken]);
+  }, [auth?.accessToken, filters]);
+
+  /** Recarrega a página atual com os mesmos filtros. */
+  function reloadWorkers() {
+    setFilters((current) => ({
+      ...current,
+    }));
+  }
+
+  function applyFilters() {
+    setFilters({
+      search: draft.search.trim(),
+      status: draft.status,
+      pageNumber: 1,
+    });
+  }
 
   async function handleAddTrabalhador(
     form: TrabalhadorForm,
@@ -138,8 +252,7 @@ export default function TrabalhadoresPage({
       );
     }
 
-    const novoTrabalhador =
-      await createWorker(
+    await createWorker(
         auth.accessToken,
         {
           name: form.name,
@@ -147,14 +260,13 @@ export default function TrabalhadoresPage({
         },
       );
 
-    setTrabalhadores(
-      (current) => [
-        ...current,
-        novoTrabalhador,
-      ],
-    );
-
     setShowAddModal(false);
+
+    // Volta para a página 1 para o novo funcionário aparecer.
+    setFilters((current) => ({
+      ...current,
+      pageNumber: 1,
+    }));
   }
 
   async function handleEditTrabalhador(
@@ -169,25 +281,15 @@ export default function TrabalhadoresPage({
       );
     }
 
-    const atualizado =
-      await updateWorker(
-        auth.accessToken,
-        trabalhadorEditando.id,
-        {
-          name,
-        },
-      );
-
-    setTrabalhadores(
-      (current) =>
-        current.map(
-          (trabalhador) =>
-            trabalhador.id ===
-              atualizado.id
-              ? atualizado
-              : trabalhador,
-        ),
+    await updateWorker(
+      auth.accessToken,
+      trabalhadorEditando.id,
+      {
+        name,
+      },
     );
+
+    reloadWorkers();
 
     setTrabalhadorEditando(
       null,
@@ -208,27 +310,19 @@ export default function TrabalhadoresPage({
     try {
       setError("");
 
-      const atualizado =
-        trabalhador.active
-          ? await deactivateWorker(
-            auth.accessToken,
-            trabalhador.id,
-          )
-          : await activateWorker(
-            auth.accessToken,
-            trabalhador.id,
-          );
+      if (trabalhador.active) {
+        await deactivateWorker(
+          auth.accessToken,
+          trabalhador.id,
+        );
+      } else {
+        await activateWorker(
+          auth.accessToken,
+          trabalhador.id,
+        );
+      }
 
-      setTrabalhadores(
-        (current) =>
-          current.map(
-            (item) =>
-              item.id ===
-                atualizado.id
-                ? atualizado
-                : item,
-          ),
-      );
+      reloadWorkers();
     } catch (statusError) {
       if (
         statusError instanceof Error
@@ -289,12 +383,57 @@ export default function TrabalhadoresPage({
           </div>
         )}
 
-        {isLoading ? (
+        {!hasLoaded ? (
           <TrabalhadoresTableSkeleton />
         ) : (
           <TrabalhadoresTable
             trabalhadores={
               trabalhadores
+            }
+            loading={isLoading}
+            search={draft.search}
+            status={draft.status}
+            onSearchChange={(
+              search,
+            ) =>
+              setDraft(
+                (current) => ({
+                  ...current,
+                  search,
+                }),
+              )
+            }
+            onStatusChange={(
+              status,
+            ) =>
+              setDraft(
+                (current) => ({
+                  ...current,
+                  status,
+                }),
+              )
+            }
+            onApplyFilters={
+              applyFilters
+            }
+            totalCount={
+              pageInfo.totalCount
+            }
+            currentPage={
+              pageInfo.currentPage
+            }
+            totalPages={
+              pageInfo.totalPages
+            }
+            onPageChange={(
+              pageNumber,
+            ) =>
+              setFilters(
+                (current) => ({
+                  ...current,
+                  pageNumber,
+                }),
+              )
             }
             onDocuments={() =>
               onNav(
