@@ -158,6 +158,7 @@ export default function EditarTrabalhadorModal({
 
             <input
               className="input-base"
+              placeholder="Ex.: Maria da Silva Santos"
               value={name}
               disabled={isSaving}
               onChange={(event) =>
@@ -191,13 +192,21 @@ export default function EditarTrabalhadorModal({
                 trabalhador.cpf
               }
               disabled
+              readOnly
+              aria-describedby="cpf-nao-editavel"
+              style={{
+                background: "#f1f5f9",
+                borderColor: "#e2e8f0",
+                color: "#64748b",
+                cursor: "not-allowed",
+              }}
             />
 
             <div
+              id="cpf-nao-editavel"
               style={{
                 marginTop: 5,
-                color:
-                  "#94a3b8",
+                color: "#64748b",
                 fontSize: 11.5,
               }}
             >
