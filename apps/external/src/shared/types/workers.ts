@@ -27,6 +27,17 @@ export type WorkersPage = {
   totalCount: number;
 };
 
+export type WorkerOrderBy =
+  | 1
+  | 2
+  | 3
+  | 4
+  | 5;
+
+export type OrderDirection =
+  | 1
+  | 2;
+
 export type WorkersQuery = {
   pageNumber?: number;
   pageSize?: number;
@@ -34,4 +45,6 @@ export type WorkersQuery = {
   cpf?: string;
   active?: boolean;
   supplyRequestId?: number;
+  orderBy?: WorkerOrderBy;
+  orderDirection?: OrderDirection;
 };

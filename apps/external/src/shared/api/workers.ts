@@ -76,6 +76,20 @@ export async function getWorkers(
     );
   }
 
+  if (query.orderBy !== undefined) {
+  params.set(
+    "orderBy",
+    String(query.orderBy),
+  );
+}
+
+if (query.orderDirection !== undefined) {
+  params.set(
+    "orderDirection",
+    String(query.orderDirection),
+  );
+}
+
   if (
     query.supplyRequestId !== undefined
   ) {
