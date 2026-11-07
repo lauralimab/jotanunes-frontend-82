@@ -27,26 +27,31 @@ import {
   type ComplianceChecklist,
 } from "../../../shared/types/compliance";
 
+import PendencyHistoryModal
+  from "./components/PendencyHistoryModal";
+
 type PendenciasPageProps = {
   onNav: (
     screen: "send-document",
+    searchParams?: URLSearchParams,
   ) => void;
 };
 
 type PendencyViewItem = {
   key: string;
-
   item: ChecklistItem;
 
   supplyRequestId: number;
+  workSiteName: string | null;
 
-  workSiteName:
-  | string
-  | null;
+  workerId: number | null;
+  workerName: string | null;
 
-  workerName:
-  | string
-  | null;
+  category: 1 | 2;
+  subject: 1 | 2;
+
+  periodStart: string | null;
+  periodEnd: string | null;
 
   context: string;
 };
@@ -76,9 +81,7 @@ function getBadgeStatus(
 }
 
 function formatDate(
-  value:
-    | string
-    | null,
+  value: string | null,
 ) {
   if (!value) {
     return null;
@@ -87,9 +90,7 @@ function formatDate(
   const parts =
     value.split("-");
 
-  if (
-    parts.length === 3
-  ) {
+  if (parts.length === 3) {
     return `${parts[2]}/${parts[1]}/${parts[0]}`;
   }
 
@@ -147,7 +148,14 @@ function buildPendencies(
 
         workSiteName: null,
 
+        workerId: null,
         workerName: null,
+
+        category: 1,
+        subject: 1,
+
+        periodStart: null,
+        periodEnd: null,
 
         context:
           "Cadastro / Habilitação da empresa",
@@ -177,7 +185,17 @@ function buildPendencies(
         workSiteName:
           checklist.workSiteName,
 
+        workerId: null,
         workerName: null,
+
+        category: 2,
+        subject: 1,
+
+        periodStart:
+          checklist.periodStart,
+
+        periodEnd:
+          checklist.periodEnd,
 
         context:
           "Documento recorrente da empresa",
@@ -199,24 +217,24 @@ function buildPendencies(
           continue;
         }
 
-        const key =
+        const seenKey =
           `${worker.workerId}-${item.documentTypeId}`;
 
         if (
           workerOnboardingSeen.has(
-            key,
+            seenKey,
           )
         ) {
           continue;
         }
 
         workerOnboardingSeen.add(
-          key,
+          seenKey,
         );
 
         result.push({
           key:
-            `worker-onboarding-${key}`,
+            `worker-onboarding-${seenKey}`,
 
           item,
 
@@ -225,8 +243,17 @@ function buildPendencies(
 
           workSiteName: null,
 
+          workerId:
+            worker.workerId,
+
           workerName:
             worker.workerName,
+
+          category: 1,
+          subject: 2,
+
+          periodStart: null,
+          periodEnd: null,
 
           context:
             "Habilitação do trabalhador",
@@ -256,8 +283,20 @@ function buildPendencies(
           workSiteName:
             checklist.workSiteName,
 
+          workerId:
+            worker.workerId,
+
           workerName:
             worker.workerName,
+
+          category: 2,
+          subject: 2,
+
+          periodStart:
+            checklist.periodStart,
+
+          periodEnd:
+            checklist.periodEnd,
 
           context:
             "Documento recorrente do trabalhador",
@@ -295,6 +334,14 @@ export default function PendenciasPage({
     setError,
   ] =
     useState("");
+
+  const [
+    historyItem,
+    setHistoryItem,
+  ] =
+    useState<PendencyViewItem | null>(
+      null,
+    );
 
   useEffect(() => {
     const accessToken =
@@ -399,6 +446,91 @@ export default function PendenciasPage({
         CHECKLIST_ITEM_STATUS.expired,
     ).length;
 
+  function openUpload(
+    pending:
+      PendencyViewItem,
+  ) {
+    const params =
+      new URLSearchParams();
+
+    params.set(
+      "source",
+      "pendencies",
+    );
+
+    params.set(
+      "documentTypeId",
+      String(
+        pending.item
+          .documentTypeId,
+      ),
+    );
+
+    if (
+      pending.category === 2
+    ) {
+      params.set(
+        "supplyRequestId",
+        String(
+          pending.supplyRequestId,
+        ),
+      );
+
+      if (
+        pending.periodStart
+      ) {
+        params.set(
+          "periodStart",
+          pending.periodStart,
+        );
+      }
+
+      if (
+        pending.periodEnd
+      ) {
+        params.set(
+          "periodEnd",
+          pending.periodEnd,
+        );
+      }
+
+      if (
+        pending.workSiteName
+      ) {
+        params.set(
+          "workSiteName",
+          pending.workSiteName,
+        );
+      }
+    }
+
+    if (
+      pending.subject === 2 &&
+      pending.workerId
+    ) {
+      params.set(
+        "workerId",
+        String(
+          pending.workerId,
+        ),
+      );
+
+      if (
+        pending.workerName
+      ) {
+        params.set(
+          "workerName",
+          pending.workerName,
+        );
+      }
+    }
+
+    onNav(
+      "send-document",
+      params,
+    );
+  }
+
   return (
     <>
       <Header
@@ -412,15 +544,11 @@ export default function PendenciasPage({
             role="alert"
             style={{
               marginBottom: 16,
-              padding:
-                "12px 16px",
-              border:
-                "1px solid #fecaca",
+              padding: "12px 16px",
+              border: "1px solid #fecaca",
               borderRadius: 8,
-              background:
-                "#fef2f2",
-              color:
-                "#b91c1c",
+              background: "#fef2f2",
+              color: "#b91c1c",
               fontSize: 13,
             }}
           >
@@ -433,10 +561,8 @@ export default function PendenciasPage({
             className="card"
             style={{
               padding: 36,
-              textAlign:
-                "center",
-              color:
-                "#64748b",
+              textAlign: "center",
+              color: "#64748b",
             }}
           >
             Carregando pendências...
@@ -446,294 +572,235 @@ export default function PendenciasPage({
             <div
               style={{
                 marginBottom: 16,
-                padding:
-                  "12px 16px",
-                background:
-                  "#fff7ed",
-                border:
-                  "1px solid #fed7aa",
+                padding: "12px 16px",
+                background: "#fff7ed",
+                border: "1px solid #fed7aa",
                 borderRadius: 8,
                 display: "flex",
                 gap: 10,
-                alignItems:
-                  "center",
+                alignItems: "center",
               }}
             >
-              <Icon
-                name="alert"
-                size={18}
-                color="#d97706"
-              />
+              <Icon name="alert" size={18} color="#d97706" />
 
               <span
                 style={{
                   fontSize: 13,
-                  color:
-                    "#92400e",
+                  color: "#92400e",
                 }}
               >
                 <strong>
                   {items.length}{" "}
-                  {items.length === 1
-                    ? "documento"
-                    : "documentos"}
+                  {items.length === 1 ? "documento" : "documentos"}
                 </strong>{" "}
-                precisam de
-                acompanhamento.
-                {" "}
-                {pendingCount} aguardando
-                envio,{" "}
-                {analysisCount} em
-                análise e{" "}
-                {problemCount} rejeitado(s)
-                ou vencido(s).
+                precisam de acompanhamento. {pendingCount} aguardando envio, {analysisCount}{" "}
+                em análise e {problemCount} rejeitado(s) ou vencido(s).
               </span>
             </div>
 
-            {items.length ===
-              0 ? (
+            {items.length === 0 ? (
               <div
                 className="card"
                 style={{
                   padding: 32,
-                  textAlign:
-                    "center",
+                  textAlign: "center",
                 }}
               >
                 <div
                   style={{
                     fontSize: 14,
                     fontWeight: 700,
-                    color:
-                      "#15803d",
+                    color: "#15803d",
                   }}
                 >
-                  Nenhuma pendência
-                  encontrada
+                  Nenhuma pendência encontrada
                 </div>
 
                 <div
                   style={{
                     marginTop: 5,
                     fontSize: 12.5,
-                    color:
-                      "#6b7280",
+                    color: "#6b7280",
                   }}
                 >
-                  Os documentos exigidos
-                  nas solicitações ativas
-                  estão regularizados.
+                  Os documentos exigidos nas solicitações ativas estão regularizados.
                 </div>
               </div>
             ) : (
               <div
                 style={{
                   display: "flex",
-                  flexDirection:
-                    "column",
+                  flexDirection: "column",
                   gap: 12,
                 }}
               >
-                {items.map(
-                  ({
+                {items.map((pending) => {
+                  const {
                     key,
                     item,
                     workSiteName,
                     workerName,
                     context,
-                  }) => {
-                    const canUpload =
-                      item.status !==
-                      CHECKLIST_ITEM_STATUS.pending;
+                  } = pending;
 
-                    const expirationDate =
-                      formatDate(
-                        item.expirationDate,
-                      );
+                  const canUpload =
+                    item.status !== CHECKLIST_ITEM_STATUS.pending;
 
-                    return (
+                  const expirationDate = formatDate(item.expirationDate);
+
+                  return (
+                    <div
+                      key={key}
+                      className="card"
+                      style={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        gap: 16,
+                        borderLeft:
+                          item.status === CHECKLIST_ITEM_STATUS.rejected ||
+                            item.status === CHECKLIST_ITEM_STATUS.expired
+                            ? "3px solid #dc2626"
+                            : "3px solid #d97706",
+                      }}
+                    >
                       <div
-                        key={key}
-                        className="card"
                         style={{
-                          display:
-                            "flex",
-                          alignItems:
-                            "flex-start",
-                          gap: 16,
-                          borderLeft:
-                            item.status ===
-                              CHECKLIST_ITEM_STATUS.rejected ||
-                              item.status ===
-                              CHECKLIST_ITEM_STATUS.expired
-                              ? "3px solid #dc2626"
-                              : "3px solid #d97706",
+                          width: 40,
+                          height: 40,
+                          borderRadius: 10,
+                          background: "#fff7ed",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
                         }}
                       >
+                        <Icon name="doc" size={20} color="#d97706" />
+                      </div>
+
+                      <div style={{ flex: 1 }}>
                         <div
                           style={{
-                            width: 40,
-                            height: 40,
-                            borderRadius:
-                              10,
-                            background:
-                              "#fff7ed",
-                            display:
-                              "flex",
-                            alignItems:
-                              "center",
-                            justifyContent:
-                              "center",
-                            flexShrink: 0,
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 10,
+                            flexWrap: "wrap",
+                            marginBottom: 4,
                           }}
                         >
-                          <Icon
-                            name="doc"
-                            size={20}
-                            color="#d97706"
+                          <span
+                            style={{
+                              fontWeight: 700,
+                              fontSize: 14,
+                            }}
+                          >
+                            {item.documentTypeName}
+                          </span>
+
+                          <StatusBadge
+                            status={getBadgeStatus(item.status)}
                           />
                         </div>
 
                         <div
                           style={{
-                            flex: 1,
+                            fontSize: 12.5,
+                            color: "#6b7280",
                           }}
                         >
-                          <div
-                            style={{
-                              display:
-                                "flex",
-                              alignItems:
-                                "center",
-                              gap: 10,
-                              flexWrap:
-                                "wrap",
-                              marginBottom:
-                                4,
-                            }}
-                          >
-                            <span
-                              style={{
-                                fontWeight:
-                                  700,
-                                fontSize:
-                                  14,
-                              }}
-                            >
-                              {
-                                item.documentTypeName
-                              }
-                            </span>
-
-                            <StatusBadge
-                              status={getBadgeStatus(
-                                item.status,
-                              )}
-                            />
-                          </div>
-
-                          <div
-                            style={{
-                              fontSize:
-                                12.5,
-                              color:
-                                "#6b7280",
-                            }}
-                          >
-                            {context}
-
-                            {workerName &&
-                              ` • ${workerName}`}
-
-                            {workSiteName &&
-                              ` • Obra: ${workSiteName}`}
-
-                            {expirationDate &&
-                              ` • Validade: ${expirationDate}`}
-                          </div>
-
-                          <div
-                            style={{
-                              marginTop:
-                                3,
-                              fontSize:
-                                11,
-                              color:
-                                "#9ca3af",
-                            }}
-                          >
-                            Código:{" "}
-                            {
-                              item.documentTypeCode
-                            }
-                          </div>
-
-                          {item.rejectionReason && (
-                            <div
-                              style={{
-                                marginTop:
-                                  8,
-                                padding:
-                                  "8px 12px",
-                                borderRadius:
-                                  6,
-                                background:
-                                  "#fef2f2",
-                                border:
-                                  "1px solid #fecaca",
-                                fontSize:
-                                  12,
-                                color:
-                                  "#374151",
-                              }}
-                            >
-                              <strong
-                                style={{
-                                  color:
-                                    "#b91c1c",
-                                }}
-                              >
-                                Motivo da
-                                rejeição:{" "}
-                              </strong>
-
-                              {
-                                item.rejectionReason
-                              }
-                            </div>
-                          )}
+                          {context}
+                          {workerName && ` • ${workerName}`}
+                          {workSiteName && ` • Obra: ${workSiteName}`}
+                          {expirationDate && ` • Validade: ${expirationDate}`}
                         </div>
+
+                        <div
+                          style={{
+                            marginTop: 3,
+                            fontSize: 11,
+                            color: "#9ca3af",
+                          }}
+                        >
+                          Código: {item.documentTypeCode}
+                        </div>
+
+                        {item.rejectionReason && (
+                          <div
+                            style={{
+                              marginTop: 8,
+                              padding: "8px 12px",
+                              borderRadius: 6,
+                              background: "#fef2f2",
+                              border: "1px solid #fecaca",
+                              fontSize: 12,
+                              color: "#374151",
+                            }}
+                          >
+                            <strong style={{ color: "#b91c1c" }}>
+                              Motivo da rejeição: {" "}
+                            </strong>
+                            {item.rejectionReason}
+                          </div>
+                        )}
+                      </div>
+
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: 8,
+                          alignItems: "center",
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        <button
+                          type="button"
+                          className="btn btn-secondary btn-sm"
+                          onClick={() => setHistoryItem(pending)}
+                        >
+                          <Icon name="history" size={13} />
+                          Histórico
+                        </button>
 
                         {canUpload && (
                           <button
                             type="button"
                             className="btn btn-primary btn-sm"
-                            onClick={() =>
-                              onNav(
-                                "send-document",
-                              )
-                            }
+                            onClick={() => openUpload(pending)}
                           >
-                            <Icon
-                              name="upload"
-                              size={13}
-                            />
-
-                            {item.status ===
-                              CHECKLIST_ITEM_STATUS.notSent
+                            <Icon name="upload" size={13} />
+                            {item.status === CHECKLIST_ITEM_STATUS.notSent
                               ? "Enviar"
                               : "Reenviar"}
                           </button>
                         )}
                       </div>
-                    );
-                  },
-                )}
+                    </div>
+                  );
+                })}
               </div>
             )}
           </>
         )}
       </PageWrapper>
+
+      {historyItem && auth?.accessToken && (
+        <PendencyHistoryModal
+          accessToken={auth.accessToken}
+          documentTypeId={historyItem.item.documentTypeId}
+          documentName={historyItem.item.documentTypeName}
+          category={historyItem.category}
+          supplyRequestId={historyItem.supplyRequestId}
+          workerId={historyItem.workerId}
+          context={
+            historyItem.workerName
+              ? `${historyItem.context} • ${historyItem.workerName}`
+              : historyItem.workSiteName
+                ? `${historyItem.context} • ${historyItem.workSiteName}`
+                : historyItem.context
+          }
+          onClose={() => setHistoryItem(null)}
+        />
+      )}
     </>
   );
 }
