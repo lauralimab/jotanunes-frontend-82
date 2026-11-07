@@ -1,6 +1,5 @@
 import {
   useState,
-  type ComponentProps,
 } from "react";
 
 import {
@@ -30,17 +29,21 @@ import MinhaContaPage from "../pages/conta/MinhaConta";
 
 import NaoEncontradoPage from "../pages/erros/NaoEncontrado";
 
-import { ROUTES } from "../shared/constants/routes";
+import {
+  ROUTES,
+} from "../shared/constants/routes";
 
-import type { AuthToken } from "../shared/types/auth";
+import type {
+  AuthToken,
+} from "../shared/types/auth";
 
-type Documents =
-  ComponentProps<
-    typeof PendenciasPage
-  >["documents"];
+import type {
+  DashboardDocument,
+} from "../pages/inicio/Inicio/components/DocumentosRecentesCard";
 
 const PAGE_ROUTES = {
-  documents: ROUTES.documents,
+  documents:
+    ROUTES.documents,
 
   "send-document":
     ROUTES.sendDocument,
@@ -53,7 +56,9 @@ type PageDestination =
   keyof typeof PAGE_ROUTES;
 
 type AppRouterProps = {
-  auth: AuthToken | null;
+  auth:
+    | AuthToken
+    | null;
 
   onLogin: (
     authToken: AuthToken,
@@ -63,11 +68,14 @@ type AppRouterProps = {
     | void
     | Promise<void>;
 
-  documents: Documents;
+  documents:
+    DashboardDocument[];
 };
 
 type PortalRouteLayoutProps = {
-  auth: AuthToken | null;
+  auth:
+    | AuthToken
+    | null;
 
   onLogout: () =>
     | void
@@ -81,7 +89,8 @@ function PortalRouteLayout({
   const [
     navOpen,
     setNavOpen,
-  ] = useState(false);
+  ] =
+    useState(false);
 
   if (!auth) {
     return (
@@ -139,7 +148,7 @@ export default function AppRouter({
   ) {
     navigate(
       PAGE_ROUTES[
-      destination
+        destination
       ],
     );
   }
@@ -243,7 +252,9 @@ export default function AppRouter({
       >
         {/* DASHBOARD */}
         <Route
-          path={ROUTES.home}
+          path={
+            ROUTES.home
+          }
           element={
             <InicioPage
               documents={
@@ -303,9 +314,6 @@ export default function AppRouter({
           }
           element={
             <PendenciasPage
-              documents={
-                documents
-              }
               onNav={
                 navigateByDestination
               }
