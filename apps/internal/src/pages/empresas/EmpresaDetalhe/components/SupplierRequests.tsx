@@ -12,6 +12,8 @@ import type {
 } from "../../../../shared/types/supplyRequest";
 
 import Skeleton from "../../../../shared/components/Skeleton";
+import SupplyRequestDocumentsModal
+  from "./SupplyRequestDocumentsModal";
 
 type Props = {
   companyId: number;
@@ -80,6 +82,14 @@ export default function SupplierRequests({
 }: Props) {
   const [requests, setRequests] =
     useState<SupplyRequest[]>([]);
+
+  const [
+    selectedRequest,
+    setSelectedRequest,
+  ] =
+    useState<SupplyRequest | null>(
+      null,
+    );
 
   const [loading, setLoading] =
     useState(true);
@@ -185,10 +195,10 @@ export default function SupplierRequests({
                 color: "#6b7280",
               }}
             >
-             {requests.length}{" "}
-            {requests.length === 1
-              ? "solicitação"
-              : "solicitações"}
+              {requests.length}{" "}
+              {requests.length === 1
+                ? "solicitação"
+                : "solicitações"}
             </span>
           )}
       </div>
@@ -335,6 +345,7 @@ export default function SupplierRequests({
                       "#ffffff",
                   }}
                 >
+
                   <div
                     style={{
                       display:
@@ -491,6 +502,31 @@ export default function SupplierRequests({
                         no momento
                       </div>
                     )}
+
+                    <div
+                      style={{
+                        marginTop: 16,
+                        paddingTop: 14,
+                        borderTop:
+                          "1px solid #f3f4f6",
+                        display: "flex",
+                        justifyContent:
+                          "flex-end",
+                      }}
+                    >
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        onClick={() =>
+                          setSelectedRequest(
+                            request,
+                          )
+                        }
+                      >
+                        Gerenciar documentos
+                      </button>
+                    </div>
+
                   </div>
                 </article>
               );
@@ -498,6 +534,26 @@ export default function SupplierRequests({
           )}
         </div>
       )}
+
+      {selectedRequest && (
+        <SupplyRequestDocumentsModal
+          request={
+            selectedRequest
+          }
+          onClose={() =>
+            setSelectedRequest(
+              null,
+            )
+          }
+          onSaved={() =>
+            setVersion(
+              (current) =>
+                current + 1,
+            )
+          }
+        />
+      )}
+
     </section>
   );
 }
