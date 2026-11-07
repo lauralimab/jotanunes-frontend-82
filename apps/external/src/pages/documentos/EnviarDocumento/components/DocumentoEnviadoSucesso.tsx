@@ -2,10 +2,13 @@ import Icon from "../../../../shared/components/Icon";
 
 type DocumentoEnviadoSucessoProps = {
   onSendAnother: () => void;
+
+  actionLabel?: string;
 };
 
 export default function DocumentoEnviadoSucesso({
   onSendAnother,
+  actionLabel = "Enviar outro",
 }: DocumentoEnviadoSucessoProps) {
   return (
     <div
@@ -61,14 +64,16 @@ export default function DocumentoEnviadoSucesso({
 
       <button
         className="btn btn-primary"
-        onClick={onSendAnother}
+        onClick={
+          onSendAnother
+        }
       >
         <Icon
-          name="plus"
+          name="check"
           size={15}
         />
 
-        Enviar outro
+        {actionLabel}
       </button>
     </div>
   );

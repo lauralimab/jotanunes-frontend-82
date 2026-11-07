@@ -142,16 +142,23 @@ export default function AppRouter({
   const navigate =
     useNavigate();
 
-  function navigateByDestination(
-    destination:
-      PageDestination,
-  ) {
-    navigate(
-      PAGE_ROUTES[
-        destination
-      ],
-    );
-  }
+function navigateByDestination(
+  destination:
+    PageDestination,
+  searchParams?:
+    URLSearchParams,
+) {
+  const path =
+    PAGE_ROUTES[
+      destination
+    ];
+
+  navigate(
+    searchParams
+      ? `${path}?${searchParams.toString()}`
+      : path,
+  );
+}
 
   return (
     <Routes>
