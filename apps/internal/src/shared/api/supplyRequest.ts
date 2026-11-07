@@ -3,6 +3,8 @@ import type {
   SupplierType,
   SupplyRequestCreateRequest,
   SupplyRequestDocumentsUpdateRequest,
+  SupplyRequestFilters,
+  SupplyRequestPage,
 } from "../types/supplyRequest";
 
 import {
@@ -12,6 +14,41 @@ import {
 
 const base =
   "/api/supplyrequest";
+
+  export function getSupplyRequests(
+  filters: SupplyRequestFilters = {},
+): Promise<SupplyRequestPage> {
+  const query =
+    new URLSearchParams();
+
+  for (
+    const [key, value]
+    of Object.entries(filters)
+  ) {
+    if (
+      value !== undefined &&
+      value !== null
+    ) {
+      query.set(
+        key,
+        String(value),
+      );
+    }
+  }
+
+  const search =
+    query.toString();
+
+  return requestApi<SupplyRequestPage>(
+    search
+      ? `${base}?${search}`
+      : base,
+    "Não foi possível carregar as solicitações.",
+    {
+      method: "GET",
+    },
+  );
+}
 
 export function getSupplyRequestDocumentOptions(
   companyId: number,

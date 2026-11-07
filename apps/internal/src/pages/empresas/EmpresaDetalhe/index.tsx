@@ -10,6 +10,7 @@ import NovoFornecedorModal from "../Empresas/components/NovoFornecedorModal";
 import ExcluirFornecedorModal from "../Empresas/components/ExcluirFornecedorModal";
 import SupplierPeople, { SupplierPeopleSkeleton } from "./components/SupplierPeople";
 import ErrorState from "../../../shared/components/ErrorState";
+import SupplierRequests from "./components/SupplierRequests";
 import type { Screen } from "../../../shared/types/portal";
 
 type Props = { onNav: (screen: Screen) => void; companyId: number | null; editOnOpen: boolean; onEditClose: () => void };
@@ -176,6 +177,9 @@ export default function EmpresaDetalhePage({ onNav, companyId, editOnOpen, onEdi
                   </div>
                 </section>
               </div>
+              <SupplierRequests
+                companyId={company.id}
+              />
               <SupplierPeople key={company.id} companyId={company.id} />
             </>}
       </PageWrapper>
