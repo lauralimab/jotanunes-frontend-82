@@ -17,7 +17,11 @@ import {
   updateWorker,
 } from "../../../shared/api/workers";
 
-import type { Worker } from "../../../shared/types/workers";
+import type {
+  OrderDirection,
+  Worker,
+  WorkerOrderBy,
+} from "../../../shared/types/workers";
 
 import AdicionarTrabalhadorModal, {
   type TrabalhadorForm,
@@ -27,14 +31,75 @@ import EditarTrabalhadorModal from "./components/EditarTrabalhadorModal";
 
 import TrabalhadoresTable, {
   type StatusFilter,
+  type WorkerSort,
 } from "./components/TrabalhadoresTable";
+
 import TrabalhadoresTableSkeleton from "./components/TrabalhadoresTableSkeleton";
 
 const PAGE_SIZE = 10;
 
+function getWorkerOrdering(
+  sort: WorkerSort,
+): {
+  orderBy: WorkerOrderBy;
+  orderDirection: OrderDirection;
+} {
+  switch (sort) {
+    case "name-desc":
+      return {
+        orderBy: 5,
+        orderDirection: 2,
+      };
+
+    case "cpf-asc":
+      return {
+        orderBy: 3,
+        orderDirection: 1,
+      };
+
+    case "cpf-desc":
+      return {
+        orderBy: 3,
+        orderDirection: 2,
+      };
+
+    case "newest":
+      return {
+        orderBy: 1,
+        orderDirection: 2,
+      };
+
+    case "oldest":
+      return {
+        orderBy: 1,
+        orderDirection: 1,
+      };
+
+    case "active-first":
+      return {
+        orderBy: 4,
+        orderDirection: 2,
+      };
+
+    case "inactive-first":
+      return {
+        orderBy: 4,
+        orderDirection: 1,
+      };
+
+    case "name-asc":
+    default:
+      return {
+        orderBy: 5,
+        orderDirection: 1,
+      };
+  }
+}
+
 type Filters = {
   search: string;
   status: StatusFilter;
+  sort: WorkerSort;
   pageNumber: number;
 };
 
@@ -71,9 +136,11 @@ export default function TrabalhadoresPage({
     useState<{
       search: string;
       status: StatusFilter;
+      sort: WorkerSort;
     }>({
       search: "",
       status: "todos",
+      sort: "name-asc",
     });
 
   // O que foi realmente aplicado (dispara a chamada à API).
@@ -81,6 +148,7 @@ export default function TrabalhadoresPage({
     useState<Filters>({
       search: "",
       status: "todos",
+      sort: "name-asc",
       pageNumber: 1,
     });
 
@@ -129,17 +197,25 @@ export default function TrabalhadoresPage({
         const isCpf =
           /^[\d.\s-]+$/.test(search);
 
+        const ordering =
+          getWorkerOrdering(
+            filters.sort,
+          );
+
         const result =
           await getWorkers(
             token,
             {
               pageNumber:
                 filters.pageNumber,
+
               pageSize: PAGE_SIZE,
+
               name:
                 search && !isCpf
                   ? search
                   : undefined,
+
               cpf:
                 search && isCpf
                   ? search.replace(
@@ -147,12 +223,19 @@ export default function TrabalhadoresPage({
                     "",
                   )
                   : undefined,
+
               active:
                 filters.status ===
                   "todos"
                   ? undefined
                   : filters.status ===
                   "ativos",
+
+              orderBy:
+                ordering.orderBy,
+
+              orderDirection:
+                ordering.orderDirection,
             },
           );
 
@@ -239,6 +322,7 @@ export default function TrabalhadoresPage({
     setFilters({
       search: draft.search.trim(),
       status: draft.status,
+      sort: draft.sort,
       pageNumber: 1,
     });
   }
@@ -253,12 +337,12 @@ export default function TrabalhadoresPage({
     }
 
     await createWorker(
-        auth.accessToken,
-        {
-          name: form.name,
-          cpf: form.cpf,
-        },
-      );
+      auth.accessToken,
+      {
+        name: form.name,
+        cpf: form.cpf,
+      },
+    );
 
     setShowAddModal(false);
 
@@ -393,6 +477,8 @@ export default function TrabalhadoresPage({
             loading={isLoading}
             search={draft.search}
             status={draft.status}
+            sort={draft.sort}
+
             onSearchChange={(
               search,
             ) =>
@@ -403,6 +489,7 @@ export default function TrabalhadoresPage({
                 }),
               )
             }
+
             onStatusChange={(
               status,
             ) =>
@@ -413,6 +500,18 @@ export default function TrabalhadoresPage({
                 }),
               )
             }
+
+            onSortChange={(
+              sort,
+            ) =>
+              setDraft(
+                (current) => ({
+                  ...current,
+                  sort,
+                }),
+              )
+            }
+
             onApplyFilters={
               applyFilters
             }
