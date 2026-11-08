@@ -7,6 +7,7 @@ import {
   Outlet,
   Route,
   Routes,
+  useLocation,
   useNavigate,
 } from "react-router-dom";
 
@@ -37,10 +38,6 @@ import type {
   AuthToken,
 } from "../shared/types/auth";
 
-import type {
-  DashboardDocument,
-} from "../pages/inicio/Inicio/components/DocumentosRecentesCard";
-
 const PAGE_ROUTES = {
   documents:
     ROUTES.documents,
@@ -57,8 +54,8 @@ type PageDestination =
 
 type AppRouterProps = {
   auth:
-    | AuthToken
-    | null;
+  | AuthToken
+  | null;
 
   onLogin: (
     authToken: AuthToken,
@@ -67,15 +64,12 @@ type AppRouterProps = {
   onLogout: () =>
     | void
     | Promise<void>;
-
-  documents:
-    DashboardDocument[];
 };
 
 type PortalRouteLayoutProps = {
   auth:
-    | AuthToken
-    | null;
+  | AuthToken
+  | null;
 
   onLogout: () =>
     | void
@@ -137,28 +131,75 @@ export default function AppRouter({
   auth,
   onLogin,
   onLogout,
-  documents,
 }: AppRouterProps) {
   const navigate =
     useNavigate();
 
-function navigateByDestination(
-  destination:
-    PageDestination,
-  searchParams?:
-    URLSearchParams,
-) {
-  const path =
-    PAGE_ROUTES[
-      destination
-    ];
+  function ContextualDocumentUploadRoute() {
+    const navigate =
+      useNavigate();
 
-  navigate(
-    searchParams
-      ? `${path}?${searchParams.toString()}`
-      : path,
-  );
-}
+    const location =
+      useLocation();
+
+    const params =
+      new URLSearchParams(
+        location.search,
+      );
+
+    const source =
+      params.get(
+        "source",
+      );
+
+    const documentTypeId =
+      params.get(
+        "documentTypeId",
+      );
+
+    if (
+      source !==
+      "pendencies" ||
+      !documentTypeId
+    ) {
+      return (
+        <Navigate
+          to={
+            ROUTES.pendencies
+          }
+          replace
+        />
+      );
+    }
+
+    return (
+      <EnviarDocumentoPage
+        onCancel={() =>
+          navigate(
+            ROUTES.pendencies,
+          )
+        }
+      />
+    );
+  }
+
+  function navigateByDestination(
+    destination:
+      PageDestination,
+    searchParams?:
+      URLSearchParams,
+  ) {
+    const path =
+      PAGE_ROUTES[
+      destination
+      ];
+
+    navigate(
+      searchParams
+        ? `${path}?${searchParams.toString()}`
+        : path,
+    );
+  }
 
   return (
     <Routes>
@@ -264,9 +305,6 @@ function navigateByDestination(
           }
           element={
             <InicioPage
-              documents={
-                documents
-              }
               onNav={
                 navigateByDestination
               }
@@ -290,27 +328,17 @@ function navigateByDestination(
             ROUTES.documents
           }
           element={
-            <DocumentosPage
-              onNav={
-                navigateByDestination
-              }
-            />
+            <DocumentosPage />
           }
         />
 
-        {/* ENVIAR DOCUMENTO */}
+        {/* ENVIO CONTEXTUAL DE DOCUMENTO */}
         <Route
           path={
             ROUTES.sendDocument
           }
           element={
-            <EnviarDocumentoPage
-              onCancel={() =>
-                navigate(
-                  ROUTES.documents,
-                )
-              }
-            />
+            <ContextualDocumentUploadRoute />
           }
         />
 

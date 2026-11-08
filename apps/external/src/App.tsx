@@ -1,13 +1,10 @@
-
 import AppRouter from "./app/router";
 
-import { useAuth } from "./app/providers";
+import {
+  useAuth,
+} from "./app/providers";
 
 import SessionSkeleton from "./shared/components/SessionSkeleton";
-
-import {
-  MOCK_DOCUMENTS,
-} from "./shared/mocks/portal";
 
 export default function App() {
   const {
@@ -17,16 +14,23 @@ export default function App() {
     handleLogout,
   } = useAuth();
 
-  if (isCheckingSession) {
-    return <SessionSkeleton />;
+  if (
+    isCheckingSession
+  ) {
+    return (
+      <SessionSkeleton />
+    );
   }
 
   return (
     <AppRouter
       auth={auth}
-      onLogin={handleLogin}
-      onLogout={handleLogout}
-      documents={MOCK_DOCUMENTS}
+      onLogin={
+        handleLogin
+      }
+      onLogout={
+        handleLogout
+      }
     />
   );
 }
