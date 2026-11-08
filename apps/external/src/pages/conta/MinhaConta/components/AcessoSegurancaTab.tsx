@@ -84,7 +84,7 @@ export default function AcessoSegurancaTab({
               style={{
                 fontSize: 11.5,
                 fontWeight: 600,
-                color: "#6b7280",
+                color: "#475569",
                 display: "block",
                 marginBottom: 5,
                 textTransform: "uppercase",
@@ -131,7 +131,7 @@ export default function AcessoSegurancaTab({
               style={{
                 fontSize: 11.5,
                 fontWeight: 600,
-                color: "#6b7280",
+                color: "#475569",
                 display: "block",
                 marginBottom: 5,
                 textTransform: "uppercase",
@@ -203,7 +203,7 @@ export default function AcessoSegurancaTab({
               <div
                 style={{
                   fontSize: 12,
-                  color: "#6b7280",
+                  color: "#475569",
                   marginTop: 2,
                 }}
               >

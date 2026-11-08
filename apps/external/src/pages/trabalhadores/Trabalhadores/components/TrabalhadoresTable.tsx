@@ -323,7 +323,7 @@ export default function TrabalhadoresTable({
 
                   <td
                     style={{
-                      color: "#6b7280",
+                      color: "#475569",
                       fontFamily: "monospace",
                       fontSize: 13,
                     }}

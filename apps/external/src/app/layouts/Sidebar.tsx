@@ -47,42 +47,37 @@ export default function Sidebar({
   const userName = auth?.user.name ?? "";
 
   const links = [
-    {
-      path: ROUTES.home,
-      label: "Dashboard",
-      icon: "home",
-    },
-    {
-      path: ROUTES.companyData,
-      label: "Dados da Empresa",
-      icon: "building",
-    },
-    {
-      path: ROUTES.workers,
-      label: "Funcionários",
-      icon: "users",
-    },
-    {
-      path: ROUTES.documents,
-      label: "Documentos",
-      icon: "doc",
-    },
-    {
-      path: ROUTES.sendDocument,
-      label: "Enviar Documento",
-      icon: "upload",
-    },
-    {
-      path: ROUTES.pendencies,
-      label: "Pendências",
-      icon: "alert",
-    },
-    {
-      path: ROUTES.account,
-      label: "Meu Perfil",
-      icon: "shield",
-    },
-  ];
+  {
+    path: ROUTES.home,
+    label: "Dashboard",
+    icon: "home",
+  },
+  {
+    path: ROUTES.pendencies,
+    label: "Pendências",
+    icon: "alert",
+  },
+  {
+    path: ROUTES.documents,
+    label: "Documentos",
+    icon: "doc",
+  },
+  {
+    path: ROUTES.workers,
+    label: "Funcionários",
+    icon: "users",
+  },
+  {
+    path: ROUTES.companyData,
+    label: "Dados da Empresa",
+    icon: "building",
+  },
+  {
+    path: ROUTES.account,
+    label: "Meu Perfil",
+    icon: "shield",
+  },
+];
 
   function handleNavigate(path: string) {
     navigate(path);

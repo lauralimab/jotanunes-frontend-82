@@ -3,10 +3,11 @@ import {
   useState,
 } from "react";
 
-import { useAuth } from "../../../app/providers";
+import {
+  useAuth,
+} from "../../../app/providers";
 
 import Header from "../../../shared/components/Header";
-import Icon from "../../../shared/components/Icon";
 import PageWrapper from "../../../shared/components/PageWrapper";
 
 import {
@@ -17,41 +18,42 @@ import type {
   Document as SupplierDocument,
 } from "../../../shared/types/documents";
 
-import DocumentosTable from "./components/DocumentosTable";
-import FluxoStatus from "./components/FluxoStatus";
+import DocumentosTable
+  from "./components/DocumentosTable";
 
-type DocumentosPageProps = {
-  onNav: (
-    screen: "send-document",
-  ) => void;
-};
+import FluxoStatus
+  from "./components/FluxoStatus";
 
-export default function DocumentosPage({
-  onNav,
-}: DocumentosPageProps) {
-  const { auth } = useAuth();
+export default function DocumentosPage() {
+  const {
+    auth,
+  } = useAuth();
 
   const [
     documents,
     setDocuments,
-  ] = useState<
-    SupplierDocument[]
-  >([]);
+  ] =
+    useState<
+      SupplierDocument[]
+    >([]);
 
   const [
     totalCount,
     setTotalCount,
-  ] = useState(0);
+  ] =
+    useState(0);
 
   const [
     isLoading,
     setIsLoading,
-  ] = useState(true);
+  ] =
+    useState(true);
 
   const [
     error,
     setError,
-  ] = useState("");
+  ] =
+    useState("");
 
   useEffect(() => {
     const accessToken =
@@ -61,7 +63,8 @@ export default function DocumentosPage({
       return;
     }
 
-    let cancelled = false;
+    let cancelled =
+      false;
 
     async function loadDocuments(
       token: string,
@@ -90,22 +93,18 @@ export default function DocumentosPage({
         setTotalCount(
           result.totalCount,
         );
-      } catch (loadError) {
+      } catch (
+        loadError
+      ) {
         if (cancelled) {
           return;
         }
 
-        if (
+        setError(
           loadError instanceof Error
-        ) {
-          setError(
-            loadError.message,
-          );
-        } else {
-          setError(
-            "Não foi possível carregar os documentos.",
-          );
-        }
+            ? loadError.message
+            : "Não foi possível carregar os documentos.",
+        );
       } finally {
         if (!cancelled) {
           setIsLoading(false);
@@ -120,30 +119,15 @@ export default function DocumentosPage({
     return () => {
       cancelled = true;
     };
-  }, [auth?.accessToken]);
+  }, [
+    auth?.accessToken,
+  ]);
 
   return (
     <>
       <Header
         title="Documentos"
-        subtitle="Consulta de documentos enviados pelo fornecedor"
-        actions={
-          <button
-            className="btn btn-primary"
-            onClick={() =>
-              onNav(
-                "send-document",
-              )
-            }
-          >
-            <Icon
-              name="upload"
-              size={15}
-            />
-
-            Enviar Documento
-          </button>
-        }
+        subtitle="Acompanhe os documentos enviados e o andamento das análises"
       />
 
       <PageWrapper>
@@ -151,17 +135,24 @@ export default function DocumentosPage({
 
         {error && (
           <div
+            role="alert"
             style={{
               padding:
                 "12px 14px",
+
               marginBottom: 16,
+
               borderRadius: 8,
+
               background:
                 "#fef2f2",
+
               border:
                 "1px solid #fecaca",
+
               color:
                 "#b91c1c",
+
               fontSize: 13,
             }}
           >
@@ -172,12 +163,15 @@ export default function DocumentosPage({
         {isLoading ? (
           <div
             className="card"
+
             style={{
               padding: 32,
+
               textAlign:
                 "center",
+
               color:
-                "#64748b",
+                "#475569",
             }}
           >
             Carregando documentos...
@@ -187,6 +181,7 @@ export default function DocumentosPage({
             documents={
               documents
             }
+
             totalCount={
               totalCount
             }

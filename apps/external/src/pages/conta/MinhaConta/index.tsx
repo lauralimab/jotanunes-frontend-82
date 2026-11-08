@@ -408,7 +408,7 @@ export default function MinhaContaPage() {
 
                     fontSize: 12.5,
 
-                    color: "#6b7280",
+                    color: "#475569",
 
                   }}
 
@@ -420,7 +420,7 @@ export default function MinhaContaPage() {
 
                     size={13}
 
-                    color="#9ca3af"
+                    color="#64748b"
 
                   />
 
@@ -508,7 +508,7 @@ export default function MinhaContaPage() {
 
                     fontSize: 11,
 
-                    color: "#9ca3af",
+                    color: "#64748b",
 
                     marginTop: 2,
 

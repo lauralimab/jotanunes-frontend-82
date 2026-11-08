@@ -72,7 +72,7 @@ export default function HistoricoTab() {
                   textAlign: "left",
                   fontSize: 11.5,
                   fontWeight: 700,
-                  color: "#6b7280",
+                  color: "#475569",
                   padding: "0 12px 12px",
                   textTransform: "uppercase",
                   letterSpacing: "0.05em",
@@ -98,7 +98,7 @@ export default function HistoricoTab() {
                   style={{
                     padding: "12px",
                     fontSize: 13,
-                    color: "#6b7280",
+                    color: "#475569",
                     fontFamily: "monospace",
                     whiteSpace: "nowrap",
                   }}
@@ -148,7 +148,7 @@ export default function HistoricoTab() {
                         color:
                           record.user ===
                           "Sistema"
-                            ? "#6b7280"
+                            ? "#475569"
                             : "#c01a2b",
                       }}
                     >

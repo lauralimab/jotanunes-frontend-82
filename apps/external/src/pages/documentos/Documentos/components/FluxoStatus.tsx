@@ -47,7 +47,7 @@ export default function FluxoStatus() {
         style={{
           fontSize: 11.5,
           color:
-            "#6b7280",
+            "#475569",
           fontWeight: 600,
         }}
       >

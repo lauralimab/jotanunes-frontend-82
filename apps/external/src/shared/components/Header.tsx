@@ -48,7 +48,7 @@ export default function Header({
             style={{
               margin: "2px 0 0",
               fontSize: 12.5,
-              color: "#6b7280",
+              color: "#475569",
             }}
           >
             {subtitle}

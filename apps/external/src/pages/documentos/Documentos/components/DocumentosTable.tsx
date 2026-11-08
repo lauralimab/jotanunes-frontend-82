@@ -278,7 +278,7 @@ export default function DocumentosTable({
                       <Icon
                         name="doc"
                         size={16}
-                        color="#6b7280"
+                        color="#475569"
                       />
 
                       <div
@@ -298,7 +298,7 @@ export default function DocumentosTable({
                         <div
                           style={{
                             marginTop: 2,
-                            color: "#94a3b8",
+                            color: "#64748b",
                             fontSize: 11.5,
                             overflowWrap: "anywhere",
                           }}
@@ -368,7 +368,7 @@ export default function DocumentosTable({
                   {/* DATA DE ENVIO */}
                   <td
                     style={{
-                      color: "#6b7280",
+                      color: "#475569",
                     }}
                   >
                     {formatDate(
@@ -416,7 +416,7 @@ export default function DocumentosTable({
         <span
           style={{
             fontSize: 12.5,
-            color: "#6b7280",
+            color: "#475569",
           }}
         >
           {filtered.length}
