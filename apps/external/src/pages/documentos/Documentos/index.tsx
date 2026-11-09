@@ -18,11 +18,43 @@ import type {
   Document as SupplierDocument,
 } from "../../../shared/types/documents";
 
-import DocumentosTable
-  from "./components/DocumentosTable";
+import DocumentosCards
+  from "./components/DocumentosCards";
 
-import FluxoStatus
-  from "./components/FluxoStatus";
+async function getAllDocuments(
+  accessToken: string,
+) {
+  const documents:
+    SupplierDocument[] = [];
+
+  let pageNumber = 1;
+  let totalPages = 1;
+
+  do {
+    const result =
+      await getDocuments(
+        accessToken,
+        {
+          pageNumber,
+          pageSize: 100,
+        },
+      );
+
+    documents.push(
+      ...result.items,
+    );
+
+    totalPages =
+      result.totalPages;
+
+    pageNumber++;
+  } while (
+    pageNumber <=
+    totalPages
+  );
+
+  return documents;
+}
 
 export default function DocumentosPage() {
   const {
@@ -36,12 +68,6 @@ export default function DocumentosPage() {
     useState<
       SupplierDocument[]
     >([]);
-
-  const [
-    totalCount,
-    setTotalCount,
-  ] =
-    useState(0);
 
   const [
     isLoading,
@@ -60,6 +86,7 @@ export default function DocumentosPage() {
       auth?.accessToken;
 
     if (!accessToken) {
+      setIsLoading(false);
       return;
     }
 
@@ -74,12 +101,8 @@ export default function DocumentosPage() {
         setError("");
 
         const result =
-          await getDocuments(
+          await getAllDocuments(
             token,
-            {
-              pageNumber: 1,
-              pageSize: 50,
-            },
           );
 
         if (cancelled) {
@@ -87,11 +110,7 @@ export default function DocumentosPage() {
         }
 
         setDocuments(
-          result.items,
-        );
-
-        setTotalCount(
-          result.totalCount,
+          result,
         );
       } catch (
         loadError
@@ -127,32 +146,24 @@ export default function DocumentosPage() {
     <>
       <Header
         title="Documentos"
-        subtitle="Acompanhe os documentos enviados e o andamento das análises"
+        subtitle="Acompanhe os documentos enviados, análises e históricos"
       />
 
       <PageWrapper>
-        <FluxoStatus />
-
         {error && (
           <div
             role="alert"
             style={{
+              marginBottom: 16,
               padding:
                 "12px 14px",
-
-              marginBottom: 16,
-
               borderRadius: 8,
-
               background:
                 "#fef2f2",
-
               border:
                 "1px solid #fecaca",
-
               color:
                 "#b91c1c",
-
               fontSize: 13,
             }}
           >
@@ -163,13 +174,10 @@ export default function DocumentosPage() {
         {isLoading ? (
           <div
             className="card"
-
             style={{
-              padding: 32,
-
+              padding: 40,
               textAlign:
                 "center",
-
               color:
                 "#475569",
             }}
@@ -177,13 +185,9 @@ export default function DocumentosPage() {
             Carregando documentos...
           </div>
         ) : (
-          <DocumentosTable
+          <DocumentosCards
             documents={
               documents
-            }
-
-            totalCount={
-              totalCount
             }
           />
         )}
