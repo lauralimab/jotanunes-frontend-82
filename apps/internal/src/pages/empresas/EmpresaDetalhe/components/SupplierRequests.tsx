@@ -12,11 +12,16 @@ import type {
 } from "../../../../shared/types/supplyRequest";
 
 import Skeleton from "../../../../shared/components/Skeleton";
+
 import SupplyRequestDocumentsModal
   from "./SupplyRequestDocumentsModal";
 
+import CreateSupplyRequestModal
+  from "./CreateSupplyRequestModal";
+
 type Props = {
   companyId: number;
+  supplierType: 1 | 2;
 };
 
 const statusStyles = {
@@ -79,8 +84,12 @@ function getMissingWorkers(
 
 export default function SupplierRequests({
   companyId,
+  supplierType,
 }: Props) {
-  const [requests, setRequests] =
+  const [
+    requests,
+    setRequests,
+  ] =
     useState<SupplyRequest[]>([]);
 
   const [
@@ -91,13 +100,28 @@ export default function SupplierRequests({
       null,
     );
 
-  const [loading, setLoading] =
+  const [
+    showCreateModal,
+    setShowCreateModal,
+  ] =
+    useState(false);
+
+  const [
+    loading,
+    setLoading,
+  ] =
     useState(true);
 
-  const [error, setError] =
+  const [
+    error,
+    setError,
+  ] =
     useState("");
 
-  const [version, setVersion] =
+  const [
+    version,
+    setVersion,
+  ] =
     useState(0);
 
   useEffect(() => {
@@ -160,6 +184,7 @@ export default function SupplierRequests({
           alignItems: "center",
           gap: 16,
           marginBottom: 18,
+          flexWrap: "wrap",
         }}
       >
         <div>
@@ -175,8 +200,7 @@ export default function SupplierRequests({
 
           <p
             style={{
-              margin:
-                "4px 0 0",
+              margin: "4px 0 0",
               fontSize: 12.5,
               color: "#6b7280",
             }}
@@ -187,20 +211,40 @@ export default function SupplierRequests({
           </p>
         </div>
 
-        {!loading &&
-          !error && (
-            <span
-              style={{
-                fontSize: 12,
-                color: "#6b7280",
-              }}
-            >
-              {requests.length}{" "}
-              {requests.length === 1
-                ? "solicitação"
-                : "solicitações"}
-            </span>
-          )}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+          }}
+        >
+          {!loading &&
+            !error && (
+              <span
+                style={{
+                  fontSize: 12,
+                  color: "#6b7280",
+                }}
+              >
+                {requests.length}{" "}
+                {requests.length === 1
+                  ? "solicitação"
+                  : "solicitações"}
+              </span>
+            )}
+
+          <button
+            type="button"
+            className="btn btn-primary btn-sm"
+            onClick={() =>
+              setShowCreateModal(
+                true,
+              )
+            }
+          >
+            + Nova solicitação
+          </button>
+        </div>
       </div>
 
       {loading ? (
@@ -288,8 +332,7 @@ export default function SupplierRequests({
             Tentar novamente
           </button>
         </div>
-      ) : requests.length ===
-        0 ? (
+      ) : requests.length === 0 ? (
         <div
           style={{
             padding: "28px 16px",
@@ -333,9 +376,7 @@ export default function SupplierRequests({
 
               return (
                 <article
-                  key={
-                    request.id
-                  }
+                  key={request.id}
                   style={{
                     border:
                       "1px solid #e5e7eb",
@@ -345,11 +386,9 @@ export default function SupplierRequests({
                       "#ffffff",
                   }}
                 >
-
                   <div
                     style={{
-                      display:
-                        "flex",
+                      display: "flex",
                       justifyContent:
                         "space-between",
                       alignItems:
@@ -363,8 +402,7 @@ export default function SupplierRequests({
                           fontSize: 11,
                           color:
                             "#9ca3af",
-                          fontWeight:
-                            600,
+                          fontWeight: 600,
                           textTransform:
                             "uppercase",
                           letterSpacing:
@@ -379,10 +417,8 @@ export default function SupplierRequests({
                         style={{
                           margin:
                             "5px 0 0",
-                          fontSize:
-                            15,
-                          fontWeight:
-                            700,
+                          fontSize: 15,
+                          fontWeight: 700,
                           color:
                             "#111827",
                         }}
@@ -397,30 +433,25 @@ export default function SupplierRequests({
                       style={{
                         padding:
                           "5px 9px",
-                        borderRadius:
-                          999,
+                        borderRadius: 999,
                         background:
                           status.background,
                         color:
                           status.color,
                         fontSize: 11,
-                        fontWeight:
-                          700,
+                        fontWeight: 700,
                         whiteSpace:
                           "nowrap",
                       }}
                     >
-                      {
-                        status.label
-                      }
+                      {status.label}
                     </span>
                   </div>
 
                   <div
                     style={{
                       marginTop: 16,
-                      display:
-                        "grid",
+                      display: "grid",
                       gap: 9,
                       fontSize: 12.5,
                     }}
@@ -438,8 +469,7 @@ export default function SupplierRequests({
 
                       <div
                         style={{
-                          fontWeight:
-                            600,
+                          fontWeight: 600,
                           color:
                             "#374151",
                         }}
@@ -458,8 +488,7 @@ export default function SupplierRequests({
                           style={{
                             color:
                               "#b45309",
-                            fontWeight:
-                              600,
+                            fontWeight: 600,
                           }}
                         >
                           {
@@ -476,16 +505,14 @@ export default function SupplierRequests({
                           style={{
                             color:
                               "#b45309",
-                            fontWeight:
-                              600,
+                            fontWeight: 600,
                           }}
                         >
                           {
                             missingWorkers
                           }{" "}
                           trabalhador(es)
-                          ainda
-                          irregular(es)
+                          ainda irregular(es)
                         </div>
                       )}
 
@@ -494,12 +521,11 @@ export default function SupplierRequests({
                         style={{
                           color:
                             "#15803d",
-                          fontWeight:
-                            600,
+                          fontWeight: 600,
                         }}
                       >
-                        Sem pendências
-                        no momento
+                        Sem pendências no
+                        momento
                       </div>
                     )}
 
@@ -523,10 +549,10 @@ export default function SupplierRequests({
                           )
                         }
                       >
-                        Gerenciar documentos
+                        Gerenciar
+                        documentos
                       </button>
                     </div>
-
                   </div>
                 </article>
               );
@@ -554,6 +580,27 @@ export default function SupplierRequests({
         />
       )}
 
+      {showCreateModal && (
+        <CreateSupplyRequestModal
+          companyId={
+            companyId
+          }
+          supplierType={
+            supplierType
+          }
+          onClose={() =>
+            setShowCreateModal(
+              false,
+            )
+          }
+          onCreated={() =>
+            setVersion(
+              (current) =>
+                current + 1,
+            )
+          }
+        />
+      )}
     </section>
   );
 }
