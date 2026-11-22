@@ -22,6 +22,7 @@ export type CompanyAddress = {
 export type CompanyUpdateRequest = {
   corporateName: string
   tradeName: string
+  supplierType: SupplierType
   stateRegistration?: string | null
   email: string
   phone: string

@@ -11,6 +11,8 @@ import PageWrapper from "../../../shared/components/PageWrapper";
 import StatusBadge from "../../../shared/components/StatusBadge";
 
 import type { Screen } from "../../../shared/types/portal";
+import type { WorkSite } from "../../../shared/types/worksite";
+import type { Company } from "../../../shared/types/company";
 import type {
   Document,
   DocumentAnalysisResult,
@@ -18,11 +20,15 @@ import type {
 
 import {
   getDocuments,
+  getDocumentsForCompany,
+  getDocumentsForWorkSite,
   downloadDocument,
   getDocumentAnalysis,
   approveDocument,
   rejectDocument,
 } from "../../../shared/api/document";
+import { getWorkSite } from "../../../shared/api/worksite";
+import { getCompany } from "../../../shared/api/company";
 
 // FORMATAÇÃO DE DATAS
 function formatDate(value: string | null | undefined): string {
@@ -75,14 +81,35 @@ function getVerdict(value: string | null | undefined): string {
   }
 }
 
+type Props = {
+  onNav: (s: Screen) => void;
+  workSiteId?: number;
+  invalidWorkSiteId?: boolean;
+  companyId?: number;
+  invalidCompanyId?: boolean;
+  requestedDocumentId?: number;
+  invalidDocumentId?: boolean;
+  onBackToContext?: () => void;
+};
+
 export default function AvaliarDocumentoPage({
   onNav,
-}: {
-  onNav: (s: Screen) => void;
-}) {
+  workSiteId,
+  invalidWorkSiteId = false,
+  companyId,
+  invalidCompanyId = false,
+  requestedDocumentId,
+  invalidDocumentId = false,
+  onBackToContext,
+}: Props) {
+  const contextualMode = workSiteId !== undefined || companyId !== undefined || invalidWorkSiteId || invalidCompanyId;
+  const scopeKey = invalidWorkSiteId ? "invalid-worksite" : invalidCompanyId ? "invalid-supplier" : workSiteId !== undefined ? `worksite:${workSiteId}` : companyId !== undefined ? `supplier:${companyId}` : "global";
   // DOCUMENTOS
   const [documents, setDocuments] = useState<Document[]>([]);
+  const [documentsScope, setDocumentsScope] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [documentSelectionError, setDocumentSelectionError] = useState<string | null>(null);
+  const [contextNameState, setContextNameState] = useState<{ scope: string; name: string | null } | null>(null);
 
   // PESQUISA
   const [searchText, setSearchText] = useState("");
@@ -141,9 +168,14 @@ export default function AvaliarDocumentoPage({
   } | null>(null);
 
   // DOCUMENTO SELECIONADO
-  const doc = documents.find((item) => item.id === selectedId) ?? null;
+  const scopedDocuments = documentsScope === scopeKey ? documents : [];
+  const scopedSelectedId = documentsScope === scopeKey ? selectedId : null;
+  const scopedLoading = documentsScope !== scopeKey || loadingDocuments;
+  const scopedError = documentsScope === scopeKey ? documentsError : null;
+  const scopedContextName = contextNameState?.scope === scopeKey ? contextNameState.name : null;
+  const doc = scopedDocuments.find((item) => item.id === scopedSelectedId) ?? null;
 
-  const filteredDocuments = documents.filter((item) => {
+  const filteredDocuments = scopedDocuments.filter((item) => {
     const search = appliedSearch.trim().toLocaleLowerCase("pt-BR");
 
     if (!search) return true;
@@ -162,16 +194,16 @@ export default function AvaliarDocumentoPage({
   });
 
   const sortedDocuments = [...filteredDocuments].sort((a, b) => {
-    const nameComparison = a.documentTypeName.localeCompare(
-      b.documentTypeName,
+    const nameComparison = (a.documentTypeName ?? "").localeCompare(
+      b.documentTypeName ?? "",
       "pt-BR",
       { sensitivity: "base" }
     );
 
     if (nameComparison !== 0) return nameComparison;
 
-    const companyComparison = a.companyCorporateName.localeCompare(
-      b.companyCorporateName,
+    const companyComparison = (a.companyCorporateName ?? "").localeCompare(
+      b.companyCorporateName ?? "",
       "pt-BR",
       { sensitivity: "base" }
     );
@@ -189,47 +221,93 @@ export default function AvaliarDocumentoPage({
     currentPage * itemsPerPage
   );
 
-  // BUSCAR DOCUMENTOS NA API
+  // Load globally without filters, or use the explicit worksite context.
   useEffect(() => {
     let active = true;
+    const controller = new AbortController();
+    const requestScope = scopeKey;
 
     async function loadDocuments() {
-      try {
-        setLoadingDocuments(true);
-        setDocumentsError(null);
+      setLoadingDocuments(true);
+      setDocumentsError(null);
+      setDocumentSelectionError(null);
+      setDocuments([]);
+      setSelectedId(null);
+      setCurrentPage(1);
+      setContextNameState({ scope: requestScope, name: null });
 
-        const result = await getDocuments();
+      if (invalidWorkSiteId || invalidCompanyId) {
+        setDocumentsError("O contexto de obra ou fornecedor na URL est\u00e1 ausente ou n\u00e3o \u00e9 v\u00e1lido.");
+        setDocumentsScope(requestScope);
+        setLoadingDocuments(false);
+        return;
+      }
+
+      let contextName: string | null = null;
+      try {
+        if (workSiteId !== undefined) {
+          const workSite: WorkSite = await getWorkSite(workSiteId, controller.signal);
+          if (!active) return;
+          contextName = workSite.name;
+        } else if (companyId !== undefined) {
+          const company: Company = await getCompany(companyId);
+          if (!active) return;
+          contextName = company.corporateName || company.tradeName || "Fornecedor";
+        }
+        setContextNameState({ scope: requestScope, name: contextName });
+
+        const result = workSiteId === undefined
+          ? companyId === undefined
+            ? await getDocuments()
+            : await getDocumentsForCompany(companyId, controller.signal)
+          : await getDocumentsForWorkSite(workSiteId, controller.signal);
 
         if (!active) return;
-
         setDocuments(result);
-
-        // NÃO SELECIONA DOCUMENTO AUTOMATICAMENTE
-        setSelectedId(null);
+        if (invalidDocumentId) {
+          setSelectedId(null);
+          setDocumentSelectionError("O identificador do documento na URL n\u00e3o \u00e9 v\u00e1lido.");
+        } else if (requestedDocumentId !== undefined) {
+          const sortedResult = [...result].sort((a, b) => {
+            const nameComparison = (a.documentTypeName ?? "").localeCompare(b.documentTypeName ?? "", "pt-BR", { sensitivity: "base" });
+            if (nameComparison !== 0) return nameComparison;
+            const companyComparison = (a.companyCorporateName ?? "").localeCompare(b.companyCorporateName ?? "", "pt-BR", { sensitivity: "base" });
+            return companyComparison !== 0 ? companyComparison : a.id - b.id;
+          });
+          const selectedIndex = sortedResult.findIndex(document => document.id === requestedDocumentId);
+          if (selectedIndex < 0) {
+            setSelectedId(null);
+            setDocumentSelectionError("Este documento n\u00e3o foi encontrado entre os documentos desta obra.");
+          } else {
+            setSelectedId(requestedDocumentId);
+            setCurrentPage(Math.floor(selectedIndex / itemsPerPage) + 1);
+          }
+        }
+        setDocumentsScope(requestScope);
       } catch (error) {
         if (!active) return;
-
+        setContextNameState({ scope: requestScope, name: contextName });
+        setDocuments([]);
         setDocumentsError(
           error instanceof Error
             ? error.message
-            : "Não foi possível carregar os documentos."
+            : "N\u00e3o foi poss\u00edvel carregar os documentos."
         );
+        setDocumentsScope(requestScope);
       } finally {
-        if (active) {
-          setLoadingDocuments(false);
-        }
+        if (active) setLoadingDocuments(false);
       }
     }
 
     void loadDocuments();
-
     return () => {
       active = false;
+      controller.abort();
     };
-  }, []);
+  }, [scopeKey, workSiteId, invalidWorkSiteId, companyId, invalidCompanyId, requestedDocumentId, invalidDocumentId]);
 
   useEffect(() => {
-    if (selectedId === null) {
+    if (scopedSelectedId === null) {
       setFileUrl(null);
       setLoadingFile(false);
       return;
@@ -244,7 +322,7 @@ export default function AvaliarDocumentoPage({
 
     async function loadFile() {
       try {
-        const blob = await downloadDocument(selectedId as number);
+        const blob = await downloadDocument(scopedSelectedId as number);
 
         if (!active) return;
 
@@ -274,11 +352,11 @@ export default function AvaliarDocumentoPage({
         URL.revokeObjectURL(objectUrl);
       }
     };
-  }, [selectedId, fileVersion]);
+  }, [scopedSelectedId, fileVersion]);
 
   // CARREGAR A ANÁLISE AUTOMÁTICA
   useEffect(() => {
-    if (selectedId === null) {
+    if (scopedSelectedId === null) {
       setAnalysis(null);
       setLoadingAnalysis(false);
       return;
@@ -292,7 +370,7 @@ export default function AvaliarDocumentoPage({
 
     async function loadAnalysis() {
       try {
-        const result = await getDocumentAnalysis(selectedId as number);
+        const result = await getDocumentAnalysis(scopedSelectedId as number);
 
         if (active) {
           setAnalysis(result);
@@ -317,7 +395,7 @@ export default function AvaliarDocumentoPage({
     return () => {
       active = false;
     };
-  }, [selectedId]);
+  }, [scopedSelectedId]);
 
   // MONITORAR TELA CHEIA
   useEffect(() => {
@@ -347,6 +425,7 @@ export default function AvaliarDocumentoPage({
 
   function selectDocument(id: number) {
     setSelectedId(id);
+    setDocumentSelectionError(null);
 
     setDecisionError(null);
     setDecisionSuccess(null);
@@ -359,6 +438,20 @@ export default function AvaliarDocumentoPage({
 
     setRejectError(null);
     setCorrectionError(null);
+  }
+
+  async function reloadCurrentDocumentList() {
+    try {
+      const updatedDocuments = workSiteId !== undefined
+        ? await getDocumentsForWorkSite(workSiteId)
+        : companyId !== undefined
+          ? await getDocumentsForCompany(companyId)
+          : await getDocuments();
+      setDocuments(updatedDocuments);
+      setDocumentsScope(scopeKey);
+    } catch {
+      setDecisionError("A decis\u00e3o foi registrada, mas n\u00e3o foi poss\u00edvel atualizar a lista. Recarregue a p\u00e1gina.");
+    }
   }
 
   async function handleRejectDocument(reason: string) {
@@ -385,14 +478,7 @@ export default function AvaliarDocumentoPage({
 
       setShowRejectModal(false);
 
-      try {
-        const updatedDocuments = await getDocuments();
-        setDocuments(updatedDocuments);
-      } catch {
-        setDecisionError(
-          "A reprovação foi registrada, mas não foi possível atualizar a lista. Recarregue a página."
-        );
-      }
+      await reloadCurrentDocumentList();
     } catch (error) {
       setRejectError(
         error instanceof Error
@@ -427,7 +513,7 @@ export default function AvaliarDocumentoPage({
 
     setPendingCorrection({
       documentId: doc.id,
-      documentName: doc.documentTypeName,
+      documentName: doc.documentTypeName ?? "Documento",
       type: type.trim(),
       reason: reason.trim(),
     });
@@ -455,14 +541,7 @@ export default function AvaliarDocumentoPage({
       setPendingCorrection(null);
       setShowCorrectionModal(false);
 
-      try {
-        const updatedDocuments = await getDocuments();
-        setDocuments(updatedDocuments);
-      } catch {
-        setDecisionError(
-          "A solicitação foi registrada, mas não foi possível atualizar a lista. Recarregue a página."
-        );
-      }
+      await reloadCurrentDocumentList();
     } catch (error) {
       setPendingCorrection(null);
       setShowCorrectionModal(true);
@@ -494,7 +573,7 @@ export default function AvaliarDocumentoPage({
 
     setPendingApproval({
       id: doc.id,
-      name: doc.documentTypeName,
+      name: doc.documentTypeName ?? "Documento",
     });
   }
 
@@ -512,14 +591,7 @@ export default function AvaliarDocumentoPage({
 
       setPendingApproval(null);
 
-      try {
-        const updatedDocuments = await getDocuments();
-        setDocuments(updatedDocuments);
-      } catch {
-        setDecisionError(
-          "A aprovação foi registrada, mas não foi possível atualizar a lista. Recarregue a página."
-        );
-      }
+      await reloadCurrentDocumentList();
     } catch (error) {
       setDecisionError(
         error instanceof Error
@@ -553,18 +625,27 @@ export default function AvaliarDocumentoPage({
   return (
     <>
       <Header
-        title="Análise de Documento"
+        title={contextualMode ? (scopedContextName ? `Análise de Documentos — ${scopedContextName}` : "Análise de Documentos") : "Análise de Documento"}
         subtitle={
-          doc
-            ? doc.documentTypeName
-            : "Consultar e analisar documentos enviados"
+          contextualMode
+            ? "Documentos relacionados a esta obra"
+            : doc
+              ? (doc.documentTypeName ?? "Documento")
+              : "Consultar e analisar documentos enviados"
         }
         actions={
           <button
             className="btn btn-secondary btn-sm"
-            onClick={() => onNav("admin-suppliers")}
+            onClick={() => {
+              if (contextualMode) {
+                if (onBackToContext) onBackToContext();
+                else onNav("worksites");
+              } else {
+                onNav("admin-suppliers");
+              }
+            }}
           >
-            ← Voltar
+            {contextualMode ? (workSiteId !== undefined ? "← Voltar para a obra" : companyId !== undefined ? "← Voltar para o fornecedor" : "← Voltar") : "← Voltar"}
           </button>
         }
       />
@@ -584,7 +665,7 @@ export default function AvaliarDocumentoPage({
           </div>
         )}
 
-        {documentsError && (
+        {scopedError && (
           <div
             className="card"
             role="alert"
@@ -593,19 +674,25 @@ export default function AvaliarDocumentoPage({
               color: "#b91c1c",
             }}
           >
-            {documentsError}
+            {scopedError}
           </div>
         )}
 
-        {loadingDocuments && (
+        {documentSelectionError && (
+          <div className="card" role="alert" style={{ marginBottom: 16, color: "#b91c1c" }}>
+            {documentSelectionError}
+          </div>
+        )}
+
+        {scopedLoading && (
           <div className="card">Carregando documentos...</div>
         )}
 
-        {!loadingDocuments && !documentsError && documents.length === 0 && (
+        {!scopedLoading && !scopedError && scopedDocuments.length === 0 && (
           <div className="card">Nenhum documento encontrado.</div>
         )}
 
-        {documents.length > 0 && (
+        {scopedDocuments.length > 0 && (
           <>
             <div
               className="card"
@@ -709,7 +796,7 @@ export default function AvaliarDocumentoPage({
                         style={{
                           borderBottom: "1px solid #f1f5f9",
                           background:
-                            selectedId === item.id ? "#f8fafc" : "transparent",
+                            scopedSelectedId === item.id ? "#f8fafc" : "transparent",
                         }}
                       >
                         <td
@@ -987,7 +1074,7 @@ export default function AvaliarDocumentoPage({
                       doc.contentType?.startsWith("image/") ? (
                         <img
                           src={fileUrl}
-                          alt={doc.originalFileName}
+                          alt={doc.originalFileName ?? "Documento"}
                           style={{
                             width: "100%",
                             height: isFullscreen ? "100%" : "auto",
@@ -998,7 +1085,7 @@ export default function AvaliarDocumentoPage({
                       ) : (
                         <iframe
                           src={fileUrl}
-                          title={doc.originalFileName}
+                          title={doc.originalFileName ?? "Documento"}
                           style={{
                             width: "100%",
                             height: "100%",
@@ -1314,8 +1401,8 @@ export default function AvaliarDocumentoPage({
       {showRejectModal && doc && (
         <ReprovarDocumentoModal
           doc={{
-            name: doc.documentTypeName,
-            person: doc.companyCorporateName,
+            name: doc.documentTypeName ?? "Documento",
+            person: doc.companyCorporateName ?? "",
           }}
           onClose={() => setShowRejectModal(false)}
           onConfirm={handleRejectDocument}
@@ -1329,8 +1416,8 @@ export default function AvaliarDocumentoPage({
       {showCorrectionModal && doc && (
         <SolicitarCorrecaoModal
           doc={{
-            name: doc.documentTypeName,
-            person: doc.companyCorporateName,
+            name: doc.documentTypeName ?? "Documento",
+            person: doc.companyCorporateName ?? "",
           }}
           onClose={() => setShowCorrectionModal(false)}
           onConfirm={handleRequestCorrection}

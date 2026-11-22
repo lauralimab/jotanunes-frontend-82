@@ -24,12 +24,10 @@ import NovoFornecedorModal
 import ExcluirFornecedorModal
   from "../Empresas/components/ExcluirFornecedorModal";
 
-import SupplierPeople, {
-  SupplierPeopleSkeleton,
-} from "./components/SupplierPeople";
-
-import SupplierRequests
-  from "./components/SupplierRequests";
+import SupplierDetailsSections, {
+  SupplierDetailsSectionsSkeleton,
+  type SupplierDetailSection,
+} from "./components/SupplierDetailsSections";
 
 import type {
   Screen,
@@ -47,6 +45,12 @@ type Props = {
   editOnOpen: boolean;
 
   onEditClose: () => void;
+  onAnalyzeDocument: (documentId: number, search: string, page: number, sort: "document" | "supplier" | "status", order: "asc" | "desc") => void;
+  initialDocumentSearch?: string;
+  initialDocumentPage?: number;
+  initialDocumentOrder?: "asc" | "desc";
+  initialDocumentSort?: "document" | "supplier" | "status";
+  initialSection?: SupplierDetailSection;
 };
 
 const statuses = {
@@ -430,7 +434,7 @@ function CompanyDetailsSkeleton() {
         </section>
       </div>
 
-      <SupplierPeopleSkeleton />
+      <SupplierDetailsSectionsSkeleton />
     </div>
   );
 }
@@ -440,6 +444,12 @@ export default function EmpresaDetalhePage({
   companyId,
   editOnOpen,
   onEditClose,
+  onAnalyzeDocument,
+  initialDocumentSearch,
+  initialDocumentPage,
+  initialDocumentOrder,
+  initialDocumentSort,
+  initialSection,
 }: Props) {
   const [
     result,
@@ -759,10 +769,8 @@ export default function EmpresaDetalhePage({
                   <span
                     className="badge"
                     style={{
-                      background:
-                        "#ede9fe",
-                      color:
-                        "#7c3aed",
+                      background: company.supplierType === 2 ? "#f3e8dc" : "#d9dfe5",
+                      color: company.supplierType === 2 ? "#80552f" : "#3e4b59",
                     }}
                   >
                     <Icon
@@ -952,20 +960,16 @@ export default function EmpresaDetalhePage({
               </section>
             </div>
 
-            <SupplierRequests
-              companyId={
-                company.id
-              }
-              supplierType={
-                company.supplierType
-              }
-            />
-
-            <SupplierPeople
-              key={company.id}
-              companyId={
-                company.id
-              }
+            <SupplierDetailsSections
+              key={`supplier-${company.id}`}
+              companyId={company.id}
+              supplierType={company.supplierType}
+              initialSearch={initialDocumentSearch}
+              initialPage={initialDocumentPage}
+              initialOrder={initialDocumentOrder}
+              initialSort={initialDocumentSort}
+              initialSection={initialSection}
+              onAnalyzeDocument={onAnalyzeDocument}
             />
           </>
         ) : null}

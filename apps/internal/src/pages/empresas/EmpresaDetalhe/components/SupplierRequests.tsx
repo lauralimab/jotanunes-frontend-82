@@ -86,88 +86,24 @@ export default function SupplierRequests({
   companyId,
   supplierType,
 }: Props) {
-  const [
-    requests,
-    setRequests,
-  ] =
-    useState<SupplyRequest[]>([]);
-
-  const [
-    selectedRequest,
-    setSelectedRequest,
-  ] =
-    useState<SupplyRequest | null>(
-      null,
-    );
-
-  const [
-    showCreateModal,
-    setShowCreateModal,
-  ] =
-    useState(false);
-
-  const [
-    loading,
-    setLoading,
-  ] =
-    useState(true);
-
-  const [
-    error,
-    setError,
-  ] =
-    useState("");
-
-  const [
-    version,
-    setVersion,
-  ] =
-    useState(0);
+  const [requestResult, setRequestResult] = useState<{ key: string; requests: SupplyRequest[]; error?: string } | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<SupplyRequest | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [version, setVersion] = useState(0);
+  const requestKey = `${companyId}:${version}`;
 
   useEffect(() => {
     let active = true;
+    getSupplyRequests({ companyId, pageNumber: 1, pageSize: 50 })
+      .then(result => { if (active) setRequestResult({ key: requestKey, requests: result.items }); })
+      .catch(cause => { if (active) setRequestResult({ key: requestKey, requests: [], error: cause instanceof Error ? cause.message : "N?o foi poss?vel carregar as solicita??es." }); });
+    return () => { active = false; };
+  }, [companyId, requestKey]);
 
-    setLoading(true);
-    setError("");
-
-    getSupplyRequests({
-      companyId,
-      pageNumber: 1,
-      pageSize: 50,
-    })
-      .then((result) => {
-        if (!active) {
-          return;
-        }
-
-        setRequests(
-          result.items,
-        );
-      })
-      .catch((cause) => {
-        if (!active) {
-          return;
-        }
-
-        setError(
-          cause instanceof Error
-            ? cause.message
-            : "Não foi possível carregar as solicitações.",
-        );
-      })
-      .finally(() => {
-        if (active) {
-          setLoading(false);
-        }
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [
-    companyId,
-    version,
-  ]);
+  const currentRequestResult = requestResult?.key === requestKey ? requestResult : null;
+  const requests = currentRequestResult?.requests ?? [];
+  const error = currentRequestResult?.error ?? "";
+  const loading = currentRequestResult === null;
 
   return (
     <section
@@ -549,8 +485,7 @@ export default function SupplierRequests({
                           )
                         }
                       >
-                        Gerenciar
-                        documentos
+                        Gerenciar solicitação
                       </button>
                     </div>
                   </div>
@@ -582,6 +517,7 @@ export default function SupplierRequests({
 
       {showCreateModal && (
         <CreateSupplyRequestModal
+          mode="supplier"
           companyId={
             companyId
           }
