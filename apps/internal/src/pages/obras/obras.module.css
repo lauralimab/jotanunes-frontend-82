@@ -1,4 +1,21 @@
-.card:global(.card) { padding: 0; overflow: hidden; }
+.catalog:global(.card) { padding: 0; overflow: hidden; }
+.catalog { min-width: 0; }
+.catalogPanel { padding: 1rem 1.25rem 1rem; min-width: 0; container-type: inline-size; }
+.catalogGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.workSiteCard:global(.card) { position: relative; display: flex; flex-direction: column; min-width: 0; min-height: 10.5rem; padding: 0; overflow: hidden; border: 1px solid var(--glass-border-color); border-radius: var(--glass-border-radius); background: var(--glass-background); box-shadow: 0 4px 18px rgba(15, 23, 42, .05); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease, transform .2s ease; }
+.workSiteCard:global(.card:hover) { background: var(--glass-background-hover); border-color: rgba(255, 255, 255, .72); box-shadow: 0 10px 26px rgba(15, 23, 42, .09); transform: translateY(-2px); }
+.workSiteCover, .coverSkeleton { width: 100%; height: 160px; flex: 0 0 160px; overflow: hidden; border-radius: var(--glass-border-radius) var(--glass-border-radius) 0 0; }
+.workSiteCover img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .35s ease; }
+.workSiteCard:global(.card:hover) .workSiteCover img { transform: scale(1.025); }
+.coverSkeleton { background: linear-gradient(110deg, rgba(148, 163, 184, .12) 8%, rgba(148, 163, 184, .24) 18%, rgba(148, 163, 184, .12) 33%); background-size: 200% 100%; }
+.cardContent { display: flex; flex: 1; flex-direction: column; gap: 1rem; min-width: 0; padding: 1rem 1.25rem 1.25rem; }
+.cardLink { position: absolute; inset: 0; z-index: 1; padding: 0; border: 0; border-radius: inherit; background: transparent; cursor: pointer; }
+.cardLink:focus-visible { outline: 2px solid var(--red-primary); outline-offset: 3px; }
+.cardHeading { display: flex; gap: .625rem; align-items: center; }
+.cardIcon { display: grid; place-items: center; width: 2.25rem; height: 2.25rem; flex-shrink: 0; border-radius: 9px; background: #fde8ea; color: var(--red-primary); }
+.cardName { flex: 1; min-width: 0; }
+.cardName h3 { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; margin: 0; color: #0f172a; font-size: .875rem; line-height: 1.45; font-weight: 700; overflow-wrap: anywhere; }
+.cardArrow { display: flex; flex-shrink: 0; color: #94a3b8; }
 .filters { padding: 1rem 1.25rem; border-bottom: 1px solid #f1f5f9; display: flex; align-items: flex-end; gap: 0.75rem; flex-wrap: wrap; }
 .search { display: grid; gap: 0.375rem; flex: 1 1 14rem; max-width: 24rem; font-size: 0.75rem; color: #64748b; font-weight: 600; }
 .search > span { margin-left: 5px; }
@@ -16,6 +33,9 @@
 .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #0f172a; font-weight: 600; line-height: 1.25rem; }
 .actions { display: flex; align-items: center; gap: 0.375rem; }
 .empty { padding: 2rem; text-align: center; color: #64748b; }
+@container (min-width: 1050px) { .catalogGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@container (max-width: 700px) { .catalogGrid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 480px) { .catalogPanel { padding: .875rem .75rem 1rem; } .cardContent { padding: .875rem 1rem 1rem; } }
 .form { display: flex; flex-direction: column; min-height: 0; }
 .body { padding: 1.5rem; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
 .fields { display: grid; gap: 1rem; }
@@ -39,4 +59,14 @@
 .detailFields { display: grid; gap: 1rem; }
 .detailLabel { margin-bottom: 0.375rem; color: #9ca3af; font-size: 0.6875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
 .detailValue { color: #374151; font-size: 0.84375rem; font-weight: 600; overflow-wrap: anywhere; }
+.workSiteIdentity:global(.card) { display: flex; align-items: center; gap: 1.25rem; margin-bottom: 1.25rem; min-width: 0; }
+.workSiteIdentity .detailName h2 { margin: 0; color: #0f172a; font-size: 1.25rem; line-height: 1.4; overflow-wrap: anywhere; }
+.workSiteInfoGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; }
+.workSiteInfoCard:global(.card) { min-width: 0; }
+.workSiteInfoCard .sectionTitle { margin-bottom: 1rem; }
+.workSiteInfoCard .detailFields { display: flex; flex-direction: column; align-items: stretch; gap: 1rem; width: 100%; margin: 0; padding: 0; text-align: left; }
+.workSiteInfoCard .detailFields > div { display: flex; flex-direction: column; align-items: flex-start; width: 100%; text-align: left; }
+.workSiteInfoCard .detailLabel { display: block; width: 100%; margin: 0 0 .375rem; padding: 0; text-align: left; }
+.workSiteInfoCard .detailValue { display: block; width: 100%; margin: 0; padding: 0; text-align: left; }
+@media (max-width: 700px) { .workSiteIdentity:global(.card) { align-items: flex-start; gap: .875rem; padding: 1rem; } .workSiteIdentity .detailIcon { width: 2.75rem; height: 2.75rem; } .workSiteInfoGrid { grid-template-columns: minmax(0, 1fr); gap: .875rem; } }
 @media (max-width: 480px) { .details { grid-template-columns: minmax(0, 1fr); } }

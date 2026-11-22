@@ -243,7 +243,7 @@ export default function NovoFornecedorModal({ onClose, onSaved, initialCompany }
     const text = (name: string) => String(data.get(name) ?? "").trim();
 
     const fields = (step === steps.length - 1 ? stepFields.flat() : stepFields[step])
-      .filter(name => !isEditing || (name !== "cnpj" && name !== "supplierType"));
+      .filter(name => !isEditing || name !== "cnpj");
     const nextErrors = validateFields(data, fields, withoutNumber);
     setFieldErrors(nextErrors);
     setError("");
@@ -268,6 +268,7 @@ export default function NovoFornecedorModal({ onClose, onSaved, initialCompany }
     const updatePayload: CompanyUpdateRequest = {
       corporateName: text("corporateName"),
       tradeName: text("tradeName"),
+      supplierType: Number(text("supplierType")) as SupplierType,
       stateRegistration: text("stateRegistration") || null,
       email: text("email"),
       phone,
@@ -339,7 +340,7 @@ export default function NovoFornecedorModal({ onClose, onSaved, initialCompany }
             <div className={styles.grid}>
               <Field label="CNPJ" name="cnpj" error={fieldErrors.cnpj} placeholder="00.000.000/0000-00" inputMode="numeric" onChange={handleCnpjChange} defaultValue={initialCompany ? maskCnpj(initialCompany.cnpj) : undefined} disabled={isSubmitting || isEditing} autoFocus />
               <div className={styles.field}><span>Tipo de fornecedor *</span>
-                <Select name="supplierType" label="Tipo de fornecedor" placeholder="Selecione o tipo" required disabled={isSubmitting || isEditing} defaultValue={initialCompany ? String(initialCompany.supplierType) : undefined}
+                <Select name="supplierType" label="Tipo de fornecedor" placeholder="Selecione o tipo" required disabled={isSubmitting} defaultValue={initialCompany ? String(initialCompany.supplierType) : undefined}
                   options={[{ value: "1", label: "Material" }, { value: "2", label: "Mão de obra" }]}
                   invalid={Boolean(fieldErrors.supplierType)} describedBy={fieldErrors.supplierType ? "supplierType-error" : undefined}
                   onChange={() => setFieldErrors(current => ({ ...current, supplierType: "" }))} />

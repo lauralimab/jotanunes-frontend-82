@@ -5,8 +5,8 @@ import type { Screen } from "../../shared/types/portal";
 export default function Sidebar({ screen, onNav, onLogout, open, onClose, collapsed, onToggleCollapsed }: { screen: Screen | null; onNav: (s: Screen) => void; onLogout: () => void; open: boolean; onClose: () => void; collapsed: boolean; onToggleCollapsed: () => void }) {
   const links: { id: Screen; label: string; icon: string; group?: string }[] = [
     { id: "admin-dashboard",         label: "Dashboard",                icon: "dashboard" },
-    { id: "admin-suppliers",         label: "Fornecedores",             icon: "companies", group: "Operações" },
     { id: "worksites",               label: "Obras",                    icon: "crane",     group: "Operações" },
+    { id: "admin-suppliers",         label: "Fornecedores",             icon: "companies", group: "Operações" },
     { id: "document-types",          label: "Tipos de documentos",      icon: "doc",       group: "Operações" },
     { id: "document-analysis",       label: "Análise de Documentos",    icon: "eye",       group: "Operações" },
     { id: "expirations",             label: "Vencimentos",              icon: "calendar",  group: "Operações" },
