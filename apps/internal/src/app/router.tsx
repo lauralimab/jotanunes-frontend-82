@@ -143,14 +143,14 @@ export default function AppRouter() {
         }} />
         : <ObrasPage onSelectWorkSite={id => navigate(`/obras/${id}`)} />
         : route.screen === "document-types" ? <TiposDocumentosPage />
-        : route.screen === "admin-dashboard" ? <InicioPage onNav={handleNav} />
+        : route.screen === "admin-dashboard" ? <InicioPage onNav={handleNav} onSelectCompany={companyId => navigate(`/fornecedores/${companyId}`)} onAnalyzeDocument={documentId => navigate(`/documentos/analise?documentId=${documentId}`)} />
         : route.screen === "admin-suppliers" ? <EmpresasPage onSelectCompany={id => navigate(`/fornecedores/${id}`)} onEditCompany={id => navigate(`/fornecedores/${id}?editar=true`)} />
           : route.screen === "supplier-details" ? <EmpresaDetalhePage onNav={screen => { if (screen === "admin-suppliers" && workSiteOriginId) navigate(`/obras/${workSiteOriginId}`); else handleNav(screen); }} companyId={route.companyId!} editOnOpen={editSupplierOnOpen} initialDocumentSearch={queryParams.get("documentSearch") ?? ""} initialDocumentPage={initialDocumentPage} initialDocumentOrder={initialDocumentOrder} initialDocumentSort={initialDocumentSort} initialSection={initialSupplierSection} onAnalyzeDocument={(documentId, documentSearch, documentPage, documentSort, documentOrder) => {
             const params = new URLSearchParams({ companyId: String(route.companyId), documentId: String(documentId), returnSearch: documentSearch, returnPage: String(documentPage), returnSort: documentSort, returnOrder: documentOrder, returnSection: "documents" });
             if (workSiteOriginId) params.set("returnWorkSiteId", String(workSiteOriginId));
             navigate(`/documentos/analise?${params.toString()}`);
           }} onEditClose={() => navigate(`/fornecedores/${route.companyId}${workSiteOriginId ? `?obraId=${workSiteOriginId}` : ""}`, { replace: true })} />
-            : route.screen === "document-analysis" ? <AvaliarDocumentoPage onNav={handleNav} workSiteId={hasWorkSiteContext && workSiteOriginId ? workSiteOriginId : undefined} companyId={hasCompanyContext && documentCompanyId ? documentCompanyId : undefined} invalidWorkSiteId={(hasWorkSiteContext && workSiteOriginId === null) || (hasDocumentContext && workSiteOriginId === null && !hasCompanyContext)} invalidCompanyId={invalidCompanyContext || (hasDocumentContext && !hasWorkSiteContext && !hasCompanyContext)} invalidDocumentId={invalidDocumentId} requestedDocumentId={requestedDocumentId} onBackToContext={() => {
+            : route.screen === "document-analysis" ? <AvaliarDocumentoPage onNav={handleNav} workSiteId={hasWorkSiteContext && workSiteOriginId ? workSiteOriginId : undefined} companyId={hasCompanyContext && documentCompanyId ? documentCompanyId : undefined} invalidWorkSiteId={hasWorkSiteContext && workSiteOriginId === null} invalidCompanyId={invalidCompanyContext || (hasDocumentContext && !hasWorkSiteContext && !hasCompanyContext && requestedDocumentId === undefined)} invalidDocumentId={invalidDocumentId} requestedDocumentId={requestedDocumentId} onBackToContext={() => {
               const previousSearch = queryParams.get("returnSearch") ?? "";
               const params = new URLSearchParams();
               if (previousSearch) params.set("documentSearch", previousSearch);
