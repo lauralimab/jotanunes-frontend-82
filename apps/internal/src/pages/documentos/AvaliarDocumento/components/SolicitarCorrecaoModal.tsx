@@ -20,13 +20,9 @@ export default function SolicitarCorrecaoModal({
   loading,
   error,
 }: Props) {
-  const [type, setType] = useState("");
   const [reason, setReason] = useState("");
 
-  const canSubmit =
-    type.trim().length > 0 &&
-    reason.trim().length > 0 &&
-    !loading;
+  const canSubmit = reason.trim().length > 0 && !loading;
 
   return (
     <div
@@ -107,51 +103,6 @@ export default function SolicitarCorrecaoModal({
             {doc.person}
           </span>
         </div>
-
-        <label
-          htmlFor="correction-type"
-          style={{
-            display: "block",
-            fontSize: 13,
-            fontWeight: 600,
-            marginBottom: 8,
-          }}
-        >
-          Motivo principal *
-        </label>
-
-        <select
-          id="correction-type"
-          value={type}
-          onChange={(event) => setType(event.target.value)}
-          disabled={loading}
-          style={{
-            width: "100%",
-            padding: 12,
-            border: "1px solid #cbd5e1",
-            borderRadius: 8,
-            marginBottom: 18,
-            background: "#fff",
-          }}
-        >
-          <option value="">Selecione o motivo...</option>
-          <option value="Documento ilegível">
-            Documento ilegível
-          </option>
-          <option value="Dados divergentes">
-            Dados divergentes
-          </option>
-          <option value="Documento vencido">
-            Documento vencido
-          </option>
-          <option value="Assinatura ausente ou inválida">
-            Assinatura ausente ou inválida
-          </option>
-          <option value="Documento incompleto">
-            Documento incompleto
-          </option>
-          <option value="Outro">Outro</option>
-        </select>
 
         <label
           htmlFor="correction-reason"
@@ -254,7 +205,7 @@ export default function SolicitarCorrecaoModal({
             type="button"
             className="btn btn-secondary"
             disabled={!canSubmit}
-            onClick={() => void onConfirm(type, reason.trim())}
+            onClick={() => void onConfirm("", reason.trim())}
           >
             <Icon name="edit" size={15} />
             {loading ? "Enviando..." : "Enviar solicitação"}
