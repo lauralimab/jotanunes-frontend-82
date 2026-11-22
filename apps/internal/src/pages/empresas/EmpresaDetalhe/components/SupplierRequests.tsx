@@ -24,6 +24,9 @@ type Props = {
   supplierType: 1 | 2;
 };
 
+const PAGE_SIZE = 4;
+const API_PAGE_SIZE = 100;
+
 const statusStyles = {
   1: {
     label: "Aberta",
@@ -90,18 +93,33 @@ export default function SupplierRequests({
   const [selectedRequest, setSelectedRequest] = useState<SupplyRequest | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [version, setVersion] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
   const requestKey = `${companyId}:${version}`;
 
   useEffect(() => {
     let active = true;
-    getSupplyRequests({ companyId, pageNumber: 1, pageSize: 50 })
-      .then(result => { if (active) setRequestResult({ key: requestKey, requests: result.items }); })
+    async function loadRequests() {
+      const firstPage = await getSupplyRequests({ companyId, pageNumber: 1, pageSize: API_PAGE_SIZE });
+      const requests = [...firstPage.items];
+      for (let pageNumber = 2; pageNumber <= firstPage.totalPages; pageNumber += 1) {
+        const page = await getSupplyRequests({ companyId, pageNumber, pageSize: API_PAGE_SIZE });
+        requests.push(...page.items);
+      }
+      return requests;
+    }
+
+    loadRequests()
+      .then(requests => { if (active) setRequestResult({ key: requestKey, requests }); })
       .catch(cause => { if (active) setRequestResult({ key: requestKey, requests: [], error: cause instanceof Error ? cause.message : "N?o foi poss?vel carregar as solicita??es." }); });
     return () => { active = false; };
   }, [companyId, requestKey]);
 
   const currentRequestResult = requestResult?.key === requestKey ? requestResult : null;
   const requests = currentRequestResult?.requests ?? [];
+  const sortedRequests = [...requests].sort((a, b) => b.id - a.id);
+  const totalPages = Math.max(1, Math.ceil(sortedRequests.length / PAGE_SIZE));
+  const safePage = Math.min(currentPage, totalPages);
+  const pageRequests = sortedRequests.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
   const error = currentRequestResult?.error ?? "";
   const loading = currentRequestResult === null;
 
@@ -293,7 +311,7 @@ export default function SupplierRequests({
             gap: 14,
           }}
         >
-          {requests.map(
+          {pageRequests.map(
             (request) => {
               const status =
                 statusStyles[
@@ -493,6 +511,34 @@ export default function SupplierRequests({
               );
             },
           )}
+        </div>
+      )}
+
+      {!loading && !error && totalPages > 1 && (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginTop: 18 }}>
+          <span style={{ fontSize: 12, color: "#6b7280" }}>
+            Página {safePage} de {totalPages}
+          </span>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <button type="button" className="btn btn-secondary btn-sm" disabled={safePage === 1} onClick={() => setCurrentPage(safePage - 1)}>
+              Anterior
+            </button>
+            {Array.from({ length: totalPages }, (_, index) => index + 1).map(page => (
+              <button
+                key={page}
+                type="button"
+                className={page === safePage ? "btn btn-primary btn-sm" : "btn btn-secondary btn-sm"}
+                aria-current={page === safePage ? "page" : undefined}
+                aria-label={`Ir para página ${page}`}
+                onClick={() => setCurrentPage(page)}
+              >
+                {page}
+              </button>
+            ))}
+            <button type="button" className="btn btn-secondary btn-sm" disabled={safePage === totalPages} onClick={() => setCurrentPage(safePage + 1)}>
+              Próxima
+            </button>
+          </div>
         </div>
       )}
 

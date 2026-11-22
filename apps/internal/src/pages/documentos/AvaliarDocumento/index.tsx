@@ -767,10 +767,19 @@ export default function AvaliarDocumentoPage({
                 <table
                   style={{
                     width: "100%",
+                    minWidth: 760,
+                    tableLayout: "fixed",
                     borderCollapse: "collapse",
                     fontSize: 13,
                   }}
                 >
+                  <colgroup>
+                    <col style={{ width: "24%" }} />
+                    <col style={{ width: "24%" }} />
+                    <col style={{ width: "24%" }} />
+                    <col style={{ width: "16%" }} />
+                    <col style={{ width: "12%" }} />
+                  </colgroup>
                   <thead>
                     <tr
                       style={{
@@ -779,9 +788,11 @@ export default function AvaliarDocumentoPage({
                         color: "#64748b",
                       }}
                     >
-                      <th style={{ padding: "12px 10px" }}>DOCUMENTO</th>
+                      <th style={{ padding: "12px 10px", whiteSpace: "nowrap" }}>DOCUMENTO</th>
 
-                      <th style={{ padding: "12px 10px" }}>FORNECEDOR</th>
+                      <th style={{ padding: "12px 10px", whiteSpace: "nowrap" }}>FORNECEDOR</th>
+
+                      <th style={{ padding: "12px 10px", whiteSpace: "nowrap" }}>OBRA</th>
 
                       <th style={{ padding: "12px 10px" }}>SITUAÇÃO</th>
 
@@ -799,17 +810,22 @@ export default function AvaliarDocumentoPage({
                             scopedSelectedId === item.id ? "#f8fafc" : "transparent",
                         }}
                       >
-                        <td
-                          style={{
-                            padding: "13px 10px",
-                            fontWeight: 500,
-                          }}
-                        >
-                          {item.documentTypeName}
+                        <td style={{ padding: "13px 10px", fontWeight: 500, overflow: "hidden" }}>
+                          <div title={item.documentTypeName || "Documento"} style={{ overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}>
+                            {item.documentTypeName || "Documento"}
+                          </div>
                         </td>
 
-                        <td style={{ padding: "13px 10px" }}>
-                          {item.companyCorporateName}
+                        <td style={{ padding: "13px 10px", overflow: "hidden" }}>
+                          <div title={item.companyCorporateName || "-"} style={{ overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}>
+                            {item.companyCorporateName || "-"}
+                          </div>
+                        </td>
+
+                        <td style={{ padding: "13px 10px", overflow: "hidden" }}>
+                          <div title={item.workSiteName || "-"} style={{ overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}>
+                            {item.workSiteName || "-"}
+                          </div>
                         </td>
 
                         <td style={{ padding: "13px 10px" }}>
@@ -834,7 +850,7 @@ export default function AvaliarDocumentoPage({
                     {filteredDocuments.length === 0 && (
                       <tr>
                         <td
-                          colSpan={4}
+                          colSpan={5}
                           style={{
                             padding: 24,
                             textAlign: "center",
@@ -1126,6 +1142,7 @@ export default function AvaliarDocumentoPage({
                     {[
                       ["Tipo", doc.documentTypeName],
                       ["Fornecedor", doc.companyCorporateName],
+                      ["Obra", doc.workSiteName || "-"],
                       ["Enviado em", formatDate(doc.createdAt)],
                       ["Validade", formatDate(doc.expirationDate)],
                       ["Status atual", ""],

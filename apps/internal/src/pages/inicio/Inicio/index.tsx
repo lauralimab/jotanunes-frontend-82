@@ -6,18 +6,20 @@ import EstatisticasCards from "./components/EstatisticasCards";
 import DocumentosRecentesCard from "./components/DocumentosRecentesCard";
 import SolicitacoesPendentesCard from "./components/SolicitacoesPendentesCard";
 import StatusFornecedoresCard from "./components/StatusFornecedoresCard";
+import useDashboardData from "./useDashboardData";
 
 import styles from "./dashboard.module.css";
 
-export default function InicioPage({ onNav }: { onNav: (s: Screen) => void }) {
+export default function InicioPage({ onNav, onSelectCompany, onAnalyzeDocument }: { onNav: (s: Screen) => void; onSelectCompany: (companyId: number) => void; onAnalyzeDocument: (documentId: number) => void }) {
+  const data = useDashboardData();
   return <>
     <Header title="Dashboard Administrativo" subtitle="Pendências e prioridades da operação" />
     <PageWrapper className={styles.page}>
       <div className={styles.dashboard}>
-        <EstatisticasCards />
+        <EstatisticasCards data={data} />
         <div className={styles.operationalGrid}>
-          <DocumentosRecentesCard onNav={onNav} />
-          <SolicitacoesPendentesCard />
+          <DocumentosRecentesCard onNav={onNav} onAnalyzeDocument={onAnalyzeDocument} documents={data.documents} loading={data.loadingDocuments} error={data.documentsError} />
+          <SolicitacoesPendentesCard requests={data.pendingRequests} loading={data.loadingRequests} error={data.requestsError} onSelectSupplier={onSelectCompany} />
         </div>
         <StatusFornecedoresCard />
       </div>
